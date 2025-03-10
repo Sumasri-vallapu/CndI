@@ -1,0 +1,89 @@
+## 🏗 Project Context
+This is a **mobile-first web application** designed to provide an intuitive and responsive user experience.  
+The application will serve as a platform where users can **discover, track, and engage with events** happening around them.  
+It aims to be **lightweight, performant, and scalable**, ensuring accessibility across different devices.  
+This is a **mobile-first web application** using:
+- **Frontend:** React 19 + Vite 6.2 + TypeScript 5.7 + Tailwind CSS 4.0.
+- **UI Components:** ShadCN UI, Radix UI.
+- **Build Tools:** ESLint, @vitejs/plugin-react.
+- **Node.js Version:** 22.14.0.
+
+It follows modern **UI/UX patterns**, **performance best practices**, and **scalable architecture principles**.  
+Development should **prioritize modularity, responsiveness, maintainability, and performance**.
+
+---
+
+## 📌 General Guidelines
+- Be casual unless otherwise specified.
+- Be **terse but precise**—avoid unnecessary repetition.
+- Suggest **solutions beyond what I ask** (anticipate needs).
+- Treat me as an **expert**, but optimize when necessary.
+- Be **accurate and thorough**, ensuring compatibility with:
+  - **React 19 + Vite + TypeScript**
+  - **Tailwind CSS 4 + ShadCN UI + Radix UI**
+  - **ESLint & Prettier**
+  - **Node.js 22.14.0**
+
+---
+
+## 📜 Specification & Planning (But No Overhead)
+- If I provide **an idea**, help refine it into a **specification (`spec.md`)** only if needed.
+- **No unnecessary back-and-forth brainstorming**—just give **concise**, actionable suggestions.
+- If a task requires multiple steps, **generate a structured execution plan (`prompt_plan.md`)**.
+- If needed, generate a **simple `todo.md` checklist**, but don't overcomplicate it.
+
+---
+
+## 🏗 **Code Structure & Best Practices**
+### **📁 File Organization**
+src/ ├── components/ # Reusable UI components ├── pages/ # Top-level page components ├── utils/ # Helper functions ├── hooks/ # Custom React hooks ├── api/ # API service functions (if needed later)
+
+
+
+### **📌 Coding Standards**
+- **Use functional components with hooks** (no class components).
+- **Prefer `const` over `let`** for variable declarations.
+- **Use camelCase** for variables/functions, **PascalCase** for components.
+- **Follow Tailwind CSS v4 conventions** (`w-full`, `grid-cols-1 md:grid-cols-3`, etc.).
+- **Respect my Prettier formatting preferences** when suggesting code.
+
+---
+
+## 🚀 **Execution Workflow**
+### **Codegen Strategy**
+1. **Break down prompts into small, executable steps.**
+2. **Ensure each code snippet is fully integrated before moving on.**
+3. **Suggest incremental changes that align with the `prompt_plan.md`**.
+4. **Prevent orphaned or unused code.**
+5. **Provide options for different approaches (where relevant).**
+6. **Avoid unnecessary boilerplate repetition.**
+
+### **Code Review & Testing**
+Cursor should **automate testing and review processes**:
+- **Suggest missing tests before completing code generation.**
+- **Use Jest & React Testing Library for unit tests.**
+- **Ensure key functions have test coverage, but don’t force 100% coverage.**
+- **Suggest refactoring opportunities & performance optimizations.**
+
+---
+
+## 🔥 **Error Handling & Debugging**
+- Use **try/catch blocks** for async functions.
+- Implement a **global error boundary component**.
+- Provide **debugging strategies for common React, Vite, and TypeScript issues**.
+
+---
+
+## **📦 Deployment & Security**
+- **Use environment variables (`.env`) for API keys and sensitive data.**
+- **Ensure all dependencies are pinned (`package.json`).**
+- **Follow best practices for Vite's build optimizations.**
+- **Minimize JavaScript bundle size for performance.**
+
+---
+
+## ✨ **How Cursor Should Respond**
+- **Provide the answer immediately**, then explain if necessary.
+- If a **code change is required**, **only show relevant modifications** instead of repeating everything.
+- **Split responses if needed** for clarity.
+- Suggest **modern best practices and optimizations** for React, TypeScript, Vite, and Tailwind CSS.
