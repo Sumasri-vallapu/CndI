@@ -150,12 +150,12 @@
 // export default App;
 
 
-import UploadPhoto from "./components/ui/UploadPhoto";
+import Helloworld from "./components/ui/Helloworld";
 
 function App() {
   return (
-    <div>
-      <UploadPhoto />
+    <div className="flex items-center justify-center min-h-screen">
+      <Helloworld />
     </div>
   );
 }
