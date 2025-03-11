@@ -12,9 +12,9 @@ secret_files/
 # Ignore frontend dependencies
 frontend/node_modules/
 
-# Ignore build files
-frontend/dist/
+
 
 # Ignore VS Code settings
 .vscode/
+
 

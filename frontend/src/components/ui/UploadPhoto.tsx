@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_BASE_URL = "https://yuvachetana.com/api/upload/";
+
 const UploadPhoto = () => {
   const [username, setUsername] = useState("");
   const [photo, setPhoto] = useState<File | null>(null);
@@ -24,7 +26,7 @@ const UploadPhoto = () => {
     formData.append("photo", photo);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/upload/", {
+      const response = await fetch(API_BASE_URL, {
         method: "POST",
         body: formData,
       });

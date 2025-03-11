@@ -12,4 +12,4 @@ export const API_BASE_URL = "http://localhost:8000"; // FastAPI backend
 // export async function fetchEvents() {
 //     const response = await fetch(API_ENDPOINTS.EVENTS);
 //     return response.json();
-// }
+// }       
