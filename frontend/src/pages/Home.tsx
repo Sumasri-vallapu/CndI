@@ -1,75 +1,93 @@
-import { Button } from "../components/ui/button";
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import ImageCarousel from "@/components/ui/ImageCarousel";
+import Testimonials from "@/components/ui/Testimonials"; // ✅ Import Testimonials Component
 
 const Home = () => {
+  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState<"aboutOrg" | "aboutFellowship" | null>(null);
+
+  const toggleSection = (section: "aboutOrg" | "aboutFellowship") => {
+    setActiveSection(activeSection === section ? null : section);
+  };
+
   return (
-    <div className="min-h-screen bg-white text-onyx">
-      {/* Hero Section */}
-      <section className="relative text-center py-16 px-6">
-        <h1 className="text-2xl font-bold text-walnut md:text-5xl">
-
-          Empower Change. Lead the Future.
-        </h1>
-        <h1 className="text-10xl font-bold text-red-500">Aravali Hotel in Mount Abut</h1>
-
-        <p className="mt-3 text-lg text-gray-700 md:text-xl">
-          Join Yuva Chetana and make an impact in your village today.
-        </p>
-        <div className="mt-6">
-          <Button className="bg-walnut text-white px-6 py-3 rounded-xl hover:bg-earth transition">
-            Join Now
-          </Button>
-        </div>
-      </section>
-
-      {/* Info Section */}
-      <section className="px-6 py-12">
-        <div className="bg-white shadow-lg rounded-xl p-6 border-l-4 border-walnut">
-          <h2 className="text-xl font-bold text-walnut">About Yuva Chetana</h2>
-          <p className="text-gray-700 mt-2">
-            Yuva Chetana empowers young individuals like you to lead change in rural India.
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 px-4 py-6 space-y-6">
+     
+      {/* ✅ Main Introduction Card */}
+      <Card className="w-full max-w-3xl text-center shadow-lg">
+        <CardContent className="flex justify-center">
+        <img 
+        src="/Images/organization_logo.png" 
+        alt="Yuva Chetana Logo" 
+        className="h-16 w-auto object-contain" 
+        loading="eager"
+        />
+        </CardContent>
+        <CardContent className="px-6 py-6">
+          <h1 className="text-2xl font-bold text-walnut">Dear Young Citizen! Youth of India</h1>
+          <h2 className="text-xl font-semibold text-earth mt-2">Welcome to Yuva Chetana!</h2>
+          <p className="mt-4 text-gray-700 leading-relaxed">
+            Yuva Chetana is a platform for young individuals like you who want to bring change.
+            Together, we will work for the growth of our villages!
           </p>
-        </div>
-      </section>
+        </CardContent>
+      </Card>
 
-      {/* Live Counter */}
-      <section className="px-6 py-12 text-center">
-        <div className="grid grid-cols-3 gap-4">
-          <div>
-            <h3 className="text-3xl font-bold text-walnut">500+</h3>
-            <p className="text-sm text-gray-600">Active Volunteers</p>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold text-walnut">100+</h3>
-            <p className="text-sm text-gray-600">Villages Reached</p>
-          </div>
-          <div>
-            <h3 className="text-3xl font-bold text-walnut">10,000+</h3>
-            <p className="text-sm text-gray-600">Children Benefited</p>
-          </div>
-        </div>
-      </section>
+      {/* ✅ Moving Image Gallery */}
+      <div className="w-full max-w-3xl overflow-hidden rounded-lg shadow-md">
+      <h3 className="text-2xl font-bold text-walnut text-center mb-4">Our Gallery</h3>
 
-      {/* Scrolling Testimonials */}
-      <section className="px-6 py-12">
-        <h2 className="text-xl font-bold text-walnut text-center">What People Say</h2>
-        <motion.div
-          className="mt-6 overflow-hidden"
-          animate={{ x: ["100%", "-100%"] }}
-          transition={{ repeat: Infinity, duration: 10, ease: "linear" }}
-        >
-          <div className="flex space-x-6">
-            <div className="bg-white p-4 rounded-xl shadow-md">
-              <p className="text-gray-700">"An amazing platform to drive change!"</p>
-              <span className="text-sm text-walnut font-semibold">- Volunteer</span>
-            </div>
-            <div className="bg-white p-4 rounded-xl shadow-md">
-              <p className="text-gray-700">"Helped my village kids grow!"</p>
-              <span className="text-sm text-walnut font-semibold">- Parent</span>
-            </div>
-          </div>
-        </motion.div>
-      </section>
+        <ImageCarousel className="max-w-full" />
+      </div>
+
+      {/* ✅ About Organization */}
+      <Card className="w-full max-w-3xl shadow-lg">
+        <CardContent className="px-6 py-5">
+          <h3 className="text-lg font-bold text-walnut cursor-pointer flex justify-between items-center" 
+              onClick={() => toggleSection("aboutOrg")}>
+            About Organization
+            <span>{activeSection === "aboutOrg" ? "▼" : "►"}</span>
+          </h3>
+          {activeSection === "aboutOrg" && (
+            <p className="text-gray-700 leading-relaxed mt-3">
+              Bharat Dekho is a non-profit organization working towards youth empowerment in rural areas of Telangana.
+              We aim to enable leadership and 21st-century skills in youth by providing them platforms to create change.
+              We welcome you to join this community of youth leaders!
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ✅ About Fellowship */}
+      <Card className="w-full max-w-3xl shadow-lg">
+        <CardContent className="px-6 py-5">
+          <h3 className="text-lg font-bold text-walnut cursor-pointer flex justify-between items-center" 
+              onClick={() => toggleSection("aboutFellowship")}>
+            About Fellowship
+            <span>{activeSection === "aboutFellowship" ? "▼" : "►"}</span>
+          </h3>
+          {activeSection === "aboutFellowship" && (
+            <ul className="text-gray-700 list-disc list-inside mt-3">
+              <li>Bharat: A 1-year long volunteering program for local youth to work on learning and wellbeing of children.</li>
+              <li>Bose Fellowship: An opportunity for rural youth, and through them, a chance for children and the village.</li>
+              <li>Volunteers from ______ villages, supporting ______ children.</li>
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* ✅ Testimonials Section */}
+      <Testimonials />
+
+      {/* ✅ Login Button */}
+      <div className="fixed bottom-8 text-white flex justify-center w-full hover:opacity-90 hover:scale-105 transition-all">
+        <Button onClick={() => navigate("/login")} className="max-w-lg w-full">
+          Login/Sign Up
+        </Button>
+      </div>
     </div>
   );
 };

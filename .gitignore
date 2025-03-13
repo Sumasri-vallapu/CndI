@@ -9,6 +9,8 @@ __pycache__/
 .env
 secret_files/
 
+resources/
+
 # Ignore frontend dependencies
 frontend/node_modules/
 
