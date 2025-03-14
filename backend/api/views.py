@@ -187,3 +187,116 @@ def login(request):
             {"status": "error", "message": "An error occurred during login"},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+@api_view(['POST'])
+def update_tasks(request):
+    mobile_number = request.data.get('mobile_number')
+    try:
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user.has_submitted_tasks = True
+        user.save()
+        return Response({
+            "status": "success",
+            "message": "Tasks submitted successfully"
+        }, status=status.HTTP_200_OK)
+    except UserSignUp.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+def update_data_consent(request):
+    mobile_number = request.data.get('mobile_number')
+    try:
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user.has_agreed_to_data_consent = True
+        user.save()
+        return Response({
+            "status": "success",
+            "message": "Data consent updated successfully"
+        }, status=status.HTTP_200_OK)
+    except UserSignUp.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['POST'])
+def update_child_protection_consent(request):
+    mobile_number = request.data.get('mobile_number')
+    try:
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user.has_agreed_to_child_protection = True
+        user.save()
+        return Response({
+            "status": "success",
+            "message": "Child protection consent updated successfully"
+        }, status=status.HTTP_200_OK)
+    except UserSignUp.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_user_status(request, mobile_number):
+    try:
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        return Response({
+            "status": "success",
+            "user_status": {
+                "is_registered": user.is_registered,
+                "has_submitted_tasks": user.has_submitted_tasks,
+                "is_selected": user.is_selected,
+                "has_agreed_to_data_consent": user.has_agreed_to_data_consent,
+                "has_agreed_to_child_protection": user.has_agreed_to_child_protection,
+                "final_access_granted": user.final_access_granted
+            }
+        }, status=status.HTTP_200_OK)
+    except UserSignUp.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found"
+        }, status=status.HTTP_404_NOT_FOUND)
+
+@api_view(['GET'])
+def get_castes(request):
+    # Add your logic to fetch castes
+    castes = [
+        {"id": 1, "name": "OC"},
+        {"id": 2, "name": "BC"},
+        {"id": 3, "name": "SC"},
+        {"id": 4, "name": "ST"}
+    ]  # Replace with database query
+    return Response(castes)
+
+@api_view(['GET'])
+def get_states(request):
+    # Add your logic to fetch states
+    states = [
+        {"id": 1, "name": "Andhra Pradesh"},
+        {"id": 2, "name": "Telangana"}
+    ]  # Replace with database query
+    return Response(states)
+
+@api_view(['GET'])
+def get_districts(request):
+    state_id = request.GET.get('state_id')
+    # Add your logic to fetch districts based on state_id
+    districts = []  # Replace with database query
+    return Response(districts)
+
+@api_view(['GET'])
+def get_mandals(request):
+    district_id = request.GET.get('district_id')
+    # Add your logic to fetch mandals based on district_id
+    mandals = []  # Replace with database query
+    return Response(mandals)
+
+@api_view(['GET'])
+def get_villages(request):
+    mandal_id = request.GET.get('mandal_id')
+    # Add your logic to fetch villages based on mandal_id
+    villages = []  # Replace with database query
+    return Response(villages)

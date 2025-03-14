@@ -3,6 +3,11 @@ import Home from '@/pages/Home';
 import Login from '@/pages/Login';
 import SignUp from '@/pages/SignUp';
 import ForgotPassword from '@/pages/ForgotPassword';
+import Register from '@/pages/Register';
+import Tasks from '@/pages/Tasks';
+import DataConsent from '@/pages/DataConsent';
+import ChildProtectionConsent from '@/pages/ChildProtectionConsent';
+import FinalUI from '@/pages/FinalUI';
 
 export default function App() {
   return (
@@ -12,19 +17,14 @@ export default function App() {
           <main className="flex-1">
             <Routes>
               <Route path="/" element={<Home />} />
-              {/* Add other routes as needed */}
-              <Route 
-                path="/login" 
-                element={<Login />}
-              /> 
-              <Route 
-                path="/signup" 
-                element={<SignUp />}
-              /> 
-              <Route 
-                path="/forgot-password" 
-                element={<ForgotPassword />}
-              />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/forgot-password" element={<ForgotPassword />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/data-consent" element={<DataConsent />} />
+              <Route path="/child-protection-consent" element={<ChildProtectionConsent />} />
+              <Route path="/final-ui" element={<FinalUI />} />
             </Routes>
           </main>
         </div>

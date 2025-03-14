@@ -13,7 +13,7 @@ const Login = () => {
   const [mobileError, setMobileError] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  
+
   // Get mobile number from navigation state if available
   useEffect(() => {
     if (location.state?.mobileNumber) {
@@ -29,13 +29,13 @@ const Login = () => {
 
   const handleLogin = async () => {
     setError(""); // Reset error
-    
+
     // Validate mobile number
     if (!mobileNumber || !password) {
       setError("Mobile Number and Password are required!");
       return;
     }
-    
+
     if (!validateMobileNumber(mobileNumber)) {
       setMobileError("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9");
       return;
@@ -52,8 +52,26 @@ const Login = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Login failed");
 
-      localStorage.setItem("token", data.token); // Store JWT token
-      navigate("/home"); // Redirect to home page
+      localStorage.setItem("token", data.token); // Store JWT token (for future use)
+
+      // ✅ Redirect based on user_status from backend
+      const userStatus = data.user_status;
+
+      if (userStatus === "PENDING_REGISTRATION") {
+        navigate("/register", { state: { mobileNumber } });
+      } else if (userStatus === "PENDING_TASK_SUBMISSION") {
+        navigate("/tasks", { state: { mobileNumber } });
+      } else if (userStatus === "AWAITING_SELECTION") {
+        alert("Your tasks are under review. Please wait for approval.");
+      } else if (userStatus === "PENDING_DATA_CONSENT") {
+        navigate("/data-consent", { state: { mobileNumber } });
+      } else if (userStatus === "PENDING_CHILD_PROTECTION_CONSENT") {
+        navigate("/child-protection-consent", { state: { mobileNumber } });
+      } else if (userStatus === "ACCESS_GRANTED") {
+        navigate("/final-ui", { state: { mobileNumber } });
+      } else {
+        setError("Unexpected status. Please try again.");
+      }
     } catch (err: any) {
       setError(err.message);
     }

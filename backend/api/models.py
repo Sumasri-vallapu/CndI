@@ -38,3 +38,26 @@ class UserSignUp(models.Model):
 
     def __str__(self):
         return f"{self.full_name} - {'Selected' if self.is_selected else 'Not Selected'}"
+
+
+class State(models.Model):
+    name = models.CharField(max_length=100)
+
+
+class District(models.Model):
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+
+class Mandal(models.Model):
+    district = models.ForeignKey(District, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+
+class Village(models.Model):
+    mandal = models.ForeignKey(Mandal, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+
+
+class CasteCategory(models.Model):
+    name = models.CharField(max_length=50)

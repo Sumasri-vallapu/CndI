@@ -74,3 +74,20 @@ INFO 2025-03-14 18:06:36,234 autoreload Watching for file changes with StatReloa
 INFO 2025-03-14 18:07:47,226 views User signed up successfully with ID: 25
 ERROR 2025-03-14 18:08:10,983 views Signup validation failed: {'mobile_number': [ErrorDetail(string='user sign up with this mobile number already exists.', code='unique')], 'given_name': [ErrorDetail(string='This field is required.', code='required')], 'password': [ErrorDetail(string='This field is required.', code='required')]}
 WARNING 2025-03-14 18:08:10,983 log Bad Request: /api/signup/
+INFO 2025-03-14 18:22:03,936 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:44:59,876 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 18:45:00,223 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:45:09,609 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/urls.py changed, reloading.
+INFO 2025-03-14 18:45:09,896 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:51:57,579 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/urls.py changed, reloading.
+INFO 2025-03-14 18:51:57,879 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:52:05,153 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 18:52:05,469 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:52:11,739 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/models.py changed, reloading.
+INFO 2025-03-14 18:52:12,061 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 20:42:30,741 views User signed up successfully with ID: 26
+WARNING 2025-03-14 20:42:46,000 log Unauthorized: /api/login/
+WARNING 2025-03-14 21:00:20,626 log Unauthorized: /api/login/
+INFO 2025-03-14 23:38:42,147 views User signed up successfully with ID: 27
+WARNING 2025-03-14 23:42:17,911 log Unauthorized: /api/login/
+WARNING 2025-03-14 23:42:40,247 log Unauthorized: /api/login/

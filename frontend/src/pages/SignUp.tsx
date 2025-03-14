@@ -66,8 +66,7 @@ const Register = () => {
     setLoading(true);
 
     try {
-      // Use the ENDPOINTS constant for the API URL
-      const response = await fetch(ENDPOINTS.REGISTER, {
+      const response = await fetch(ENDPOINTS.SIGNUP, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -81,10 +80,8 @@ const Register = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Registration failed");
 
-      // Show success message
       setRegistrationSuccess(true);
       
-      // Navigate to login page after a short delay
       setTimeout(() => {
         navigate("/login", { state: { mobileNumber } });
       }, 2000);
