@@ -1,0 +1,76 @@
+INFO 2025-03-14 15:39:15,283 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 15:41:22,102 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 15:41:22,521 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 15:41:56,994 views === Registration Request Started ===
+INFO 2025-03-14 15:41:56,994 views Raw request data: {'mobile_number': '8474743393', 'surname': 'u3u383883', 'given_name': 'u4u44u4', 'password': '339344U4'}
+INFO 2025-03-14 15:41:56,995 views Processed data after case conversion: {'mobile_number': '8474743393', 'surname': 'U3U383883', 'given_name': 'U4U44U4', 'password': '339344U4'}
+INFO 2025-03-14 15:41:57,881 views User registered successfully with ID: 20
+INFO 2025-03-14 15:42:50,546 views === Registration Request Started ===
+INFO 2025-03-14 15:42:50,547 views Raw request data: {'mobile_number': '6774474881', 'surname': 'jfjfhhf', 'given_name': 'hfhfhf', 'password': '4881HFHF'}
+INFO 2025-03-14 15:42:50,547 views Processed data after case conversion: {'mobile_number': '6774474881', 'surname': 'JFJFHHF', 'given_name': 'HFHFHF', 'password': '4881HFHF'}
+INFO 2025-03-14 15:42:51,437 views User registered successfully with ID: 21
+INFO 2025-03-14 15:43:59,884 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 15:44:00,253 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 15:45:23,554 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 15:45:23,899 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 15:46:01,938 views Processed data after case conversion: {'mobile_number': '7737393939', 'surname': 'HDNDNND', 'given_name': 'EYEYYE', 'password': '3939EYYE'}
+INFO 2025-03-14 15:46:02,826 views User registered successfully with ID: 22
+INFO 2025-03-14 15:50:08,032 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/models.py changed, reloading.
+INFO 2025-03-14 15:50:08,367 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 15:54:18,270 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 15:54:21,284 views Processed data after case conversion: {'mobile_number': '7373838921', 'surname': 'IMTHER', 'given_name': 'EVERYEHR', 'password': '8921YEHR'}
+INFO 2025-03-14 15:54:22,235 views User registered successfully with ID: 23
+INFO 2025-03-14 15:56:31,240 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 15:56:31,588 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:13:15,131 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:17:03,151 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/models.py changed, reloading.
+INFO 2025-03-14 17:17:03,486 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:20:47,374 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:20:47,692 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:21:07,123 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:21:07,427 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:21:15,704 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:21:16,062 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:22:27,063 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:22:27,352 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:22:29,560 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:22:29,856 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:23:05,447 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/urls.py changed, reloading.
+INFO 2025-03-14 17:23:05,827 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:23:24,224 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/urls.py changed, reloading.
+INFO 2025-03-14 17:23:24,510 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:25:04,985 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:25:24,375 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:25:24,685 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:25:25,090 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:25:25,452 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:27:22,354 views User signed up successfully with ID: 24
+INFO 2025-03-14 17:50:57,035 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:50:57,337 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:51:14,767 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:51:15,101 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:51:24,482 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:51:24,779 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:51:42,200 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:51:42,490 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:52:07,036 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:52:07,342 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:52:41,966 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 17:52:42,284 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:53:03,809 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/urls.py changed, reloading.
+INFO 2025-03-14 17:53:04,127 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:54:41,359 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/urls.py changed, reloading.
+INFO 2025-03-14 17:54:41,709 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:57:46,231 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/models.py changed, reloading.
+INFO 2025-03-14 17:57:46,544 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 17:58:33,342 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/models.py changed, reloading.
+INFO 2025-03-14 17:58:33,655 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:01:35,018 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 18:01:35,352 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:06:24,199 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 18:06:24,524 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:06:35,896 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-14 18:06:36,234 autoreload Watching for file changes with StatReloader
+INFO 2025-03-14 18:07:47,226 views User signed up successfully with ID: 25
+ERROR 2025-03-14 18:08:10,983 views Signup validation failed: {'mobile_number': [ErrorDetail(string='user sign up with this mobile number already exists.', code='unique')], 'given_name': [ErrorDetail(string='This field is required.', code='required')], 'password': [ErrorDetail(string='This field is required.', code='required')]}
+WARNING 2025-03-14 18:08:10,983 log Bad Request: /api/signup/

@@ -1,5 +1,54 @@
 @import 'tailwindcss';
+
+/* Define theme colors using Tailwind v4 syntax */
+@theme {
+  --color-walnut: #7A3D1A;
+  --color-earth: #A86543;
+  --color-onyx: #111111;
+  --color-white: #FFFFFF;
+  
+  /* Add mappings for button colors */
+  --color-brown: var(--color-walnut);
+  --color-light-brown: var(--color-earth);
+  --color-primary: var(--color-walnut);
+  --color-primary-foreground: var(--color-white);
+}
+
+/* Apply theme colors to utility classes */
+@layer utilities {
+  .text-walnut {
+    color: var(--color-walnut);
+  }
+  .bg-walnut {
+    background-color: var(--color-walnut);
+  }
+  .text-earth {
+    color: var(--color-earth);
+  }
+  .bg-earth {
+    background-color: var(--color-earth);
+  }
+  .bg-brown {
+    background-color: var(--color-brown);
+  }
+  .bg-light-brown {
+    background-color: var(--color-light-brown);
+  }
+  .text-brown-500 {
+    color: var(--color-brown);
+  }
+}
+
+/* Add additional styles for ShadCN components */
+@layer components {
+  .btn-primary {
+    background-color: var(--color-walnut);
+    color: var(--color-white);
+  }
+}
+
 /*@import 'tailwindcss';
+
 
 @plugin 'tailwindcss-animate';
 

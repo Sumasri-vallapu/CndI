@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '@/pages/Home';
+import Login from '@/pages/Login';
+import SignUp from '@/pages/SignUp';
+import ForgotPassword from '@/pages/ForgotPassword';
 
 export default function App() {
   return (
@@ -12,11 +15,15 @@ export default function App() {
               {/* Add other routes as needed */}
               <Route 
                 path="/login" 
-                element={
-                  <div className="container flex items-center justify-center min-h-screen">
-                    Login Page
-                  </div>
-                } 
+                element={<Login />}
+              /> 
+              <Route 
+                path="/signup" 
+                element={<SignUp />}
+              /> 
+              <Route 
+                path="/forgot-password" 
+                element={<ForgotPassword />}
               />
             </Routes>
           </main>

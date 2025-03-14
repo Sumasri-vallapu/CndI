@@ -23,8 +23,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-yox%xp)acdch15i*2ks8tq)x4n9ac!xmikb-po93vdx!a+jps^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False 
-ALLOWED_HOSTS = ["yuvachetana.com", "www.yuvachetana.com"]
+DEBUG = True 
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "yuvachetana.com", "www.yuvachetana.com"]
 
 # DEBUG = False 
 # ALLOWED_HOSTS = []
@@ -118,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -146,3 +146,31 @@ AWS_S3_REGION_NAME = 'ap-south-1'  # Change if your bucket is in another region
 AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'verbose',
+        },
+        'file': {
+            'class': 'logging.FileHandler',
+            'filename': 'debug.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        '': {  # Root logger
+            'handlers': ['console', 'file'],
+            'level': 'INFO',
+        },
+    },
+}
