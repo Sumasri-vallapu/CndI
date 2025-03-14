@@ -1,5 +1,8 @@
 // API configuration
-const BASE_URL = 'http://localhost:8000/api';
+//const BASE_URL = 'http://localhost:8000/api';
+
+const BASE_URL = 'https://yuvachetana.com/api/';
+
 
 // API endpoints
 export const ENDPOINTS = {
