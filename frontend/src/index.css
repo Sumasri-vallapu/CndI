@@ -1,36 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-:root {
-  --color-walnut: #7A3D1A;
-  --color-earth: #A86543;
-  --color-onyx: #111111;
-  --color-white: #FFFFFF;
-  --background: #FFFFFF;
-  --foreground: #111111;
-}
-
-@layer base {
-  body {
-    @apply bg-background text-foreground min-h-screen font-sans;
-  }
-}
-
-@layer utilities {
-  .text-walnut {
-    color: var(--color-walnut);
-  }
-  .bg-walnut {
-    background-color: var(--color-walnut);
-  }
-  .text-earth {
-    color: var(--color-earth);
-  }
-  .bg-earth {
-    background-color: var(--color-earth);
-  }
-}
+@import 'tailwindcss';
 
 /* Define theme colors using Tailwind v4 syntax */
 @theme {

@@ -12,7 +12,7 @@ import FinalUI from '@/pages/FinalUI';
 export default function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-background font-sans antialiased">
+      <div className="min-h-screen font-sans antialiased">
         <div className="relative flex min-h-screen flex-col">
           <main className="flex-1">
             <Routes>
