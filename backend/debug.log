@@ -411,3 +411,6 @@ WARNING 2025-03-15 18:59:28,368 log Not Found: /favicon.ico
 INFO 2025-03-15 19:00:35,830 views User signed up successfully with ID: 38
 WARNING 2025-03-15 19:00:46,633 log Unauthorized: /api/login/
 INFO 2025-03-15 19:17:23,637 views User signed up successfully with ID: 39
+INFO 2025-03-15 19:38:30,114 autoreload Watching for file changes with StatReloader
+INFO 2025-03-15 19:40:15,286 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/views.py changed, reloading.
+INFO 2025-03-15 19:40:15,692 autoreload Watching for file changes with StatReloader

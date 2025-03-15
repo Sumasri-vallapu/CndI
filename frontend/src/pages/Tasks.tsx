@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { ENDPOINTS } from "@/utils/api";
-import { CheckCircle, Video } from "lucide-react";
 import Dropzone from "react-dropzone";
 
 interface LocationItem {
