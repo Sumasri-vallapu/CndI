@@ -373,3 +373,5 @@ INFO 2025-03-15 17:46:06,172 views User signed up successfully with ID: 33
 INFO 2025-03-15 17:53:23,042 autoreload /home/ajay/Documents/yuvachetana-app/backend/api/models.py changed, reloading.
 INFO 2025-03-15 17:53:23,405 autoreload Watching for file changes with StatReloader
 INFO 2025-03-15 17:54:35,505 views User signed up successfully with ID: 34
+INFO 2025-03-15 18:08:05,484 autoreload /home/ajay/Documents/yuvachetana-app/backend/backend/settings.py changed, reloading.
+INFO 2025-03-15 18:08:05,816 autoreload Watching for file changes with StatReloader
