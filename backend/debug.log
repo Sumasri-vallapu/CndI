@@ -375,3 +375,39 @@ INFO 2025-03-15 17:53:23,405 autoreload Watching for file changes with StatReloa
 INFO 2025-03-15 17:54:35,505 views User signed up successfully with ID: 34
 INFO 2025-03-15 18:08:05,484 autoreload /home/ajay/Documents/yuvachetana-app/backend/backend/settings.py changed, reloading.
 INFO 2025-03-15 18:08:05,816 autoreload Watching for file changes with StatReloader
+INFO 2025-03-15 18:19:02,114 autoreload Watching for file changes with StatReloader
+ERROR 2025-03-15 18:19:05,064 exception Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+Traceback (most recent call last):
+  File "/home/ajay/Documents/yuvachetana-app/backend/venv/lib/python3.12/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+               ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ajay/Documents/yuvachetana-app/backend/venv/lib/python3.12/site-packages/django/utils/deprecation.py", line 128, in __call__
+    response = self.process_request(request)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/ajay/Documents/yuvachetana-app/backend/venv/lib/python3.12/site-packages/django/middleware/common.py", line 48, in process_request
+    host = request.get_host()
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/ajay/Documents/yuvachetana-app/backend/venv/lib/python3.12/site-packages/django/http/request.py", line 151, in get_host
+    raise DisallowedHost(msg)
+django.core.exceptions.DisallowedHost: Invalid HTTP_HOST header: '127.0.0.1:8000'. You may need to add '127.0.0.1' to ALLOWED_HOSTS.
+WARNING 2025-03-15 18:19:05,100 log Bad Request: /
+INFO 2025-03-15 18:29:12,873 autoreload Watching for file changes with StatReloader
+INFO 2025-03-15 18:31:37,534 autoreload /home/ajay/Documents/yuvachetana-app/backend/backend/settings.py changed, reloading.
+INFO 2025-03-15 18:31:37,908 autoreload Watching for file changes with StatReloader
+INFO 2025-03-15 18:31:47,287 autoreload /home/ajay/Documents/yuvachetana-app/backend/backend/settings.py changed, reloading.
+INFO 2025-03-15 18:31:47,707 autoreload Watching for file changes with StatReloader
+INFO 2025-03-15 18:32:16,263 autoreload /home/ajay/Documents/yuvachetana-app/backend/backend/settings.py changed, reloading.
+INFO 2025-03-15 18:32:16,628 autoreload Watching for file changes with StatReloader
+INFO 2025-03-15 18:59:23,799 autoreload Watching for file changes with StatReloader
+WARNING 2025-03-15 18:59:27,992 log Not Found: /static/rest_framework/css/bootstrap.min.css
+WARNING 2025-03-15 18:59:27,994 log Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+WARNING 2025-03-15 18:59:27,995 log Not Found: /static/rest_framework/css/prettify.css
+WARNING 2025-03-15 18:59:27,997 log Not Found: /static/rest_framework/css/default.css
+WARNING 2025-03-15 18:59:27,998 log Not Found: /static/rest_framework/js/load-ajax-form.js
+WARNING 2025-03-15 18:59:28,003 log Not Found: /static/rest_framework/css/bootstrap-tweaks.css
+WARNING 2025-03-15 18:59:28,004 log Not Found: /static/rest_framework/css/prettify.css
+WARNING 2025-03-15 18:59:28,349 log Not Found: /static/rest_framework/js/load-ajax-form.js
+WARNING 2025-03-15 18:59:28,368 log Not Found: /favicon.ico
+INFO 2025-03-15 19:00:35,830 views User signed up successfully with ID: 38
+WARNING 2025-03-15 19:00:46,633 log Unauthorized: /api/login/
+INFO 2025-03-15 19:17:23,637 views User signed up successfully with ID: 39
