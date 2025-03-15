@@ -24,14 +24,14 @@ SECRET_KEY = 'django-insecure-yox%xp)acdch15i*2ks8tq)x4n9ac!xmikb-po93vdx!a+jps^
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False   
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "yuvachetana.com", "www.yuvachetana.com"]
+ALLOWED_HOSTS = [ "yuvachetana.com", "www.yuvachetana.com"]
 
 # "yuvachetana.com", "www.yuvachetana.com"
 
 # "localhost", "127.0.0.1", 
 # DEBUG = False 
 # ALLOWED_HOSTS = []
-
+"localhost", "127.0.0.1",
 
 # Application definition
 
