@@ -32,6 +32,25 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "yuvachetana.com", "www.yuvachetana.c
 # DEBUG = False 
 # ALLOWED_HOSTS = []
 
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "https://yuvachetana.com",
+    "https://www.yuvachetana.com",
+    "http://localhost:5173",  # If testing locally (Vite default)
+]
+
+CORS_ALLOW_CREDENTIALS = True  # If using authentication
+
+CORS_ALLOW_HEADERS = [
+    "authorization",
+    "content-type",
+    "x-csrftoken",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://yuvachetana.com",
+    "https://www.yuvachetana.com",
+]
 
 # Application definition
 
@@ -61,7 +80,7 @@ MIDDLEWARE = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 
-ROOT_URLCONF = 'backend.urls'
+ROOT_URLCONF = 'backend.urls'  
 
 TEMPLATES = [
     {
