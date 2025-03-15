@@ -23,8 +23,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-yox%xp)acdch15i*2ks8tq)x4n9ac!xmikb-po93vdx!a+jps^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  
-ALLOWED_HOSTS = ["yuvachetana.com", "www.yuvachetana.com"]
+DEBUG = True  
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "yuvachetana.com", "www.yuvachetana.com"]
+
+# "yuvachetana.com", "www.yuvachetana.com"
 
 # "localhost", "127.0.0.1", 
 # DEBUG = False 
@@ -39,8 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',  # Django REST framework
+    'django.contrib.staticfiles', 
+    'rest_framework',  # Django REST framework 
     'api',  # Your API app
     "corsheaders",  # Enables CORS handling in Django
 ]

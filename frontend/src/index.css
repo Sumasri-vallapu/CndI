@@ -47,6 +47,42 @@
   }
 }
 
+
+
+
+/* 🌍 Custom Styling for ShadCN Select */
+.select-trigger {
+  border: 1px solid #A86543; /* Earth Border */
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.select-content {
+  background-color: #A86543; /* Earth Background */
+  color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.select-item {
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  transition: background 0.2s;
+}
+
+.select-item:hover {
+  background-color: #111111; /* Onyx Hover */
+}
+
+.select-item[data-state="checked"] {
+  background-color: #7A3D1A; /* Walnut for Selected Item */
+  font-weight: 600;
+}
+
+
 /*@import 'tailwindcss';
 
 

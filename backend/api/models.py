@@ -43,21 +43,55 @@ class UserSignUp(models.Model):
 class State(models.Model):
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
+
 
 class District(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class Mandal(models.Model):
     district = models.ForeignKey(District, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return self.name
 
-class Village(models.Model):
+
+class GramPanchayat(models.Model):
     mandal = models.ForeignKey(Mandal, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
 
 
 class CasteCategory(models.Model):
     name = models.CharField(max_length=50)
+
+
+class Registration(models.Model):
+    user = models.ForeignKey(UserSignUp, on_delete=models.CASCADE, related_name='registrations')
+    mobile_number = models.CharField(max_length=15)
+    full_name = models.CharField(max_length=100)
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10)
+    caste_category = models.CharField(max_length=20)
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    district = models.ForeignKey(District, on_delete=models.CASCADE)
+    mandal = models.ForeignKey(Mandal, on_delete=models.CASCADE)
+    village = models.ForeignKey(GramPanchayat, on_delete=models.CASCADE)
+    insert_timestamp = models.DateTimeField(auto_now_add=True)
+    is_approved = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.full_name} - {self.mobile_number}"
+
+    class Meta:
+        db_table = 'api_registration'
+        ordering = ['-insert_timestamp']

@@ -4,12 +4,11 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import UserPhoto
+from .models import UserPhoto, State, District, Mandal, GramPanchayat, UserSignUp, Registration
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .models import UserSignUp
-from .serializers import UserSerializer
+from .serializers import UserSerializer, RegistrationSerializer
 import json     
 from django.utils import timezone
 import datetime
@@ -106,25 +105,51 @@ def forgot_password(request):
 
 @api_view(['POST'])
 def register(request):
-    # Log the raw request data
-    logger.info(f"Raw request data: {request.data}")
-    
     try:
-        # Log after potential case conversion
-        processed_data = {
-            'mobile_number': request.data.get('mobile_number'),
-            'surname': request.data.get('surname'),
-            'given_name': request.data.get('given_name'),
-            'password': request.data.get('password')
-        }
-        logger.info(f"Processed data: {processed_data}")
+        # Get the user first since mobile_number is required
+        mobile_number = request.data.get('mobile_number')
+        if not mobile_number:
+            return Response({
+                "status": "error",
+                "message": "Mobile number is required"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
         
-        # Your existing registration logic here
-        # ...
+        # Create registration data with user
+        data = request.data.copy()
+        data['user'] = user.id  # Add user ID to the data
         
+        serializer = RegistrationSerializer(data=data)
+        if serializer.is_valid():
+            # Save registration
+            registration = serializer.save()
+            
+            # Update UserSignUp status
+            user.is_registered = True
+            user.save()
+            
+            return Response({
+                "status": "success",
+                "message": "Registration successful"
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response({
+            "status": "error",
+            "errors": serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+        
+    except UserSignUp.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found. Please sign up first."
+        }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
         logger.error(f"Registration error: {str(e)}")
-        return Response({'detail': str(e)}, status=400)
+        return Response({
+            "status": "error",
+            "message": str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 # User Login
 @api_view(['POST'])
@@ -273,30 +298,60 @@ def get_castes(request):
 
 @api_view(['GET'])
 def get_states(request):
-    # Add your logic to fetch states
-    states = [
-        {"id": 1, "name": "Andhra Pradesh"},
-        {"id": 2, "name": "Telangana"}
-    ]  # Replace with database query
-    return Response(states)
+    states = State.objects.all()
+    data = [{"id": state.id, "name": state.name} for state in states]
+    return Response(data)
 
 @api_view(['GET'])
 def get_districts(request):
     state_id = request.GET.get('state_id')
-    # Add your logic to fetch districts based on state_id
-    districts = []  # Replace with database query
-    return Response(districts)
+    if not state_id:
+        return Response(
+            {"message": "state_id is required"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    districts = District.objects.filter(state_id=state_id)
+    data = [{"id": dist.id, "name": dist.name} for dist in districts]
+    return Response(data)
 
 @api_view(['GET'])
 def get_mandals(request):
     district_id = request.GET.get('district_id')
-    # Add your logic to fetch mandals based on district_id
-    mandals = []  # Replace with database query
-    return Response(mandals)
+    if not district_id:
+        return Response(
+            {"message": "district_id is required"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    mandals = Mandal.objects.filter(district_id=district_id)
+    data = [{"id": mandal.id, "name": mandal.name} for mandal in mandals]
+    return Response(data)
 
 @api_view(['GET'])
 def get_villages(request):
     mandal_id = request.GET.get('mandal_id')
-    # Add your logic to fetch villages based on mandal_id
-    villages = []  # Replace with database query
-    return Response(villages)
+    if not mandal_id:
+        return Response(
+            {"message": "mandal_id is required"}, 
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    
+    grampanchayats = GramPanchayat.objects.filter(mandal_id=mandal_id)
+    data = [{"id": grampanchayat.id, "name": grampanchayat.name} for grampanchayat in grampanchayats]
+    return Response(data)
+
+@api_view(['GET'])
+def get_user_details(request):
+    mobile_number = request.GET.get('mobile_number')
+    try:
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        return Response({
+            "full_name": user.full_name,
+            "mobile_number": user.mobile_number
+        }, status=status.HTTP_200_OK)
+    except UserSignUp.DoesNotExist:
+        return Response(
+            {"message": "User not found"}, 
+            status=status.HTTP_404_NOT_FOUND
+        )

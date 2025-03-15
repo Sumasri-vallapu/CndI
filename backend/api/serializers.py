@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import UserPhoto
 from .models import UserSignUp
+from .models import Registration
 
 
 class UserPhotoSerializer(serializers.ModelSerializer):
@@ -21,3 +22,29 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSignUp
         fields = ['id', 'mobile_number', 'surname', 'given_name', 'password', 'unique_number', 'created_at', 'ip_address', 'device_info']
+
+
+class RegistrationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Registration
+        fields = [
+            'user',
+            'mobile_number',
+            'full_name',
+            'date_of_birth',
+            'gender',
+            'caste_category',
+            'state',
+            'district',
+            'mandal',
+            'village',
+            'insert_timestamp',
+            'is_approved'
+        ]
+        read_only_fields = ['insert_timestamp', 'is_approved']
+
+    def create(self, validated_data):
+        # Ensure user is set from the view
+        if 'user' not in validated_data:
+            raise serializers.ValidationError("User is required")
+        return super().create(validated_data)

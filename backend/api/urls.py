@@ -14,7 +14,8 @@ from .views import (
     get_districts,
     get_mandals,
     get_villages,
-    register
+    register,
+    get_user_details
 )
 
 urlpatterns = [
@@ -33,4 +34,5 @@ urlpatterns = [
     path('mandals/', get_mandals, name='get_mandals'),
     path('villages/', get_villages, name='get_villages'),
     path('register/', register, name='register'),
+    path('user-details/', get_user_details, name='get_user_details'),
 ]

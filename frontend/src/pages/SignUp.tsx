@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { Copy } from "lucide-react";
 import { validateMobileNumber, getMobileErrorMessage } from "@/utils/validation";
-import { ENDPOINTS } from "@/utils/api";
+import { ENDPOINTS } from "@/utils/api";   
 
-const Register = () => {
+const SignUp = () => {
   const navigate = useNavigate();
   const [mobileNumber, setMobileNumber] = useState("");
   const [mobileError, setMobileError] = useState("");
@@ -176,4 +176,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default SignUp; 
