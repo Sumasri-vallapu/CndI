@@ -28,12 +28,14 @@ const Tasks = () => {
   const [task2Photo, setTask2Photo] = useState<File | null>(null);
   const [task1Status, setTask1Status] = useState<string>("Not Sent for Evaluation");
   const [task2Status, setTask2Status] = useState<string>("Not Sent for Evaluation");
+  const [state] = useState("36"); // Set Telangana state_id by default
 
-  // ✅ Fetch Districts (directly, as we're in Telangana)
+  // Fetch Districts using state
   useEffect(() => {
+    if (!state) return;
     const fetchDistricts = async () => {
       try {
-        const response = await fetch(ENDPOINTS.GET_DISTRICTS("2")); // Telangana state_id
+        const response = await fetch(ENDPOINTS.GET_DISTRICTS(state));
         if (!response.ok) throw new Error("Failed to fetch districts");
         const data = await response.json();
         setDistricts(data);
@@ -43,7 +45,7 @@ const Tasks = () => {
       }
     };
     fetchDistricts();
-  }, []);
+  }, [state]); // Depend on state value
 
   // ✅ Fetch Mandals with error handling
   useEffect(() => {
@@ -55,6 +57,7 @@ const Tasks = () => {
         if (!response.ok) throw new Error("Failed to fetch mandals");
         const data = await response.json();
         setMandals(data);
+        setSelectedMandal(""); // Reset mandal when district changes
       } catch (error) {
         console.error("Error fetching mandals:", error);
         alert("Failed to load mandals. Please try again.");
@@ -73,6 +76,7 @@ const Tasks = () => {
         if (!response.ok) throw new Error("Failed to fetch gram panchayats");
         const data = await response.json();
         setGramPanchayats(data);
+        setSelectedGramPanchayat(""); // Reset GP when mandal changes
       } catch (error) {
         console.error("Error fetching gram panchayats:", error);
         alert("Failed to load gram panchayats. Please try again.");
@@ -169,66 +173,66 @@ const Tasks = () => {
   }, [mobileNumber, navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-6 space-y-6">
-      {/* ✅ Page Title */}
-      <h2 className="text-2xl font-bold text-walnut flex items-center gap-2">
-        <CheckCircle size={24} /> Fellow Tasks
-      </h2>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-6 space-y-6">
+      {/* Header with Logo */}
+      <div className="flex flex-col items-center w-full max-w-4xl">
+        <img 
+          src="/Images/organization_logo.png" 
+          alt="Logo" 
+          className="h-16 w-auto object-contain mb-4" 
+          loading="eager" 
+        />
+        <h2 className="text-2xl font-bold text-center text-walnut mb-5">Fellow Tasks</h2>
+      </div>
 
-      {/* ✅ Task 1: Location Verification */}
-      <Card className="w-full max-w-lg shadow-lg rounded-lg">
+      {/* Task 1: Location Verification */}
+      <Card className="w-full max-w-4xl">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-walnut flex items-center gap-2">
-            <Video size={20} className="text-walnut" /> Task 1: Location Verification
-          </h3>
+          <h3 className="text-lg font-semibold text-walnut mb-4">Task 1: Location Verification</h3>
+          
+          {/* Location Selection */}
+          <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
+            <div className="flex items-center gap-4">
+              <Label className="w-1/3">District</Label>
+              <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
+                <SelectTrigger className="w-2/3">
+                  <SelectValue placeholder="Select District" />
+                </SelectTrigger>
+                <SelectContent className="select-content">
+                  {districts.map((d) => (
+                    <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <a href="https://youtube.com" target="_blank" className="text-sm text-blue-600 underline">
-            Watch SOP Video
-          </a>
+            <div className="flex items-center gap-4">
+              <Label className="w-1/3">Mandal</Label>
+              <Select value={selectedMandal} onValueChange={setSelectedMandal} disabled={!selectedDistrict}>
+                <SelectTrigger className="w-2/3">
+                  <SelectValue placeholder="Select Mandal" />
+                </SelectTrigger>
+                <SelectContent className="select-content">
+                  {mandals.map((m) => (
+                    <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          {/* ✅ Location Selection */}
-          <div className="space-y-3 mt-3">
-            <Label>District</Label>
-            <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Select District" />
-              </SelectTrigger>
-              <SelectContent>
-                {districts.map((d) => (
-                  <SelectItem key={d.id} value={d.id}>
-                    {d.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Label>Mandal</Label>
-            <Select onValueChange={setSelectedMandal} disabled={!selectedDistrict}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Mandal" />
-              </SelectTrigger>
-              <SelectContent>
-                {mandals.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>
-                    {m.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Label>Grampanchayat</Label>
-            <Select onValueChange={setSelectedGramPanchayat} disabled={!selectedMandal}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select Grampanchayat" />
-              </SelectTrigger>
-              <SelectContent>
-                {gramPanchayats.map((gp) => (
-                  <SelectItem key={gp.id} value={gp.id}>
-                    {gp.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center gap-4">
+              <Label className="w-1/3">Gram Panchayat</Label>
+              <Select value={selectedGramPanchayat} onValueChange={setSelectedGramPanchayat} disabled={!selectedMandal}>
+                <SelectTrigger className="w-2/3">
+                  <SelectValue placeholder="Select Gram Panchayat" />
+                </SelectTrigger>
+                <SelectContent className="select-content">
+                  {gramPanchayats.map((gp) => (
+                    <SelectItem key={gp.id} value={gp.id}>{gp.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           {/* ✅ Upload Photo */}
@@ -253,11 +257,9 @@ const Tasks = () => {
       </Card>
 
       {/* ✅ Task 2 */}
-      <Card className="w-full max-w-lg shadow-lg rounded-lg">
+      <Card className="w-full max-w-4xl">
         <CardContent className="p-6">
-          <h3 className="text-lg font-semibold text-walnut flex items-center gap-2">
-            <Video size={20} className="text-walnut" /> Task 2: Training Completion
-          </h3>
+          <h3 className="text-lg font-semibold text-walnut mb-4">Task 2: Training Completion</h3>
 
           <a href="https://youtube.com" target="_blank" className="text-sm text-blue-600 underline">
             Watch Training Video
@@ -281,7 +283,7 @@ const Tasks = () => {
       </Card>
 
       {/* ✅ Final Submit Button */}
-      <Button onClick={handleSubmitTasks} className="w-full max-w-lg bg-earth text-white">
+      <Button onClick={handleSubmitTasks} className="w-full max-w-4xl bg-earth text-white">
         Submit All Tasks
       </Button>
     </div>

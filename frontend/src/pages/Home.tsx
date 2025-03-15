@@ -16,21 +16,18 @@ const Home = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 px-4 py-6 space-y-6">
      
-      {/* ✅ Main Introduction Card with Logo and Title */}
+      {/* ✅ Main Introduction Card */}
       <Card className="w-full max-w-3xl text-center shadow-lg">
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center gap-4 mb-6">
-            <img 
-              src="/Images/organization_logo.png" 
-              alt="Yuva Chetana Logo" 
-              className="h-16 w-auto object-contain"
-              loading="eager"
-            />
-            <div className="text-left">
-              <h1 className="text-2xl font-bold text-walnut">Dear Young Citizen!</h1>
-              <h2 className="text-xl font-semibold text-earth">Youth of India</h2>
-            </div>
-          </div>
+        <CardContent className="flex justify-center">
+        <img 
+        src="/Images/organization_logo.png" 
+        alt="Yuva Chetana Logo" 
+        className="h-16 w-auto object-contain" 
+        loading="eager"
+        />
+        </CardContent>
+        <CardContent className="px-6 py-6">
+          <h1 className="text-2xl font-bold text-walnut">Dear Young Citizen! Youth of India</h1>
           <h2 className="text-xl font-semibold text-earth mt-2">Welcome to Yuva Chetana!</h2>
           <p className="mt-4 text-gray-700 leading-relaxed">
             Yuva Chetana is a platform for young individuals like you who want to bring change.
@@ -87,10 +84,7 @@ const Home = () => {
 
       {/* ✅ Login Button */}
       <div className="fixed bottom-8 text-white flex justify-center w-full hover:opacity-90 hover:scale-105 transition-all">
-        <Button 
-          onClick={() => navigate("/login")} 
-          className="max-w-lg w-full bg-walnut hover:bg-walnut/90"
-        >
+        <Button onClick={() => navigate("/login")} className="max-w-lg w-full">
           Login/Sign Up
         </Button>
       </div>
