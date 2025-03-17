@@ -4,22 +4,22 @@ import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import ImageCarousel from "@/components/ui/ImageCarousel"; // ✅ Importing ImageCarousel
 import { validateMobileNumber, getMobileErrorMessage } from "@/utils/validation";
-import { ENDPOINTS } from "@/utils/api";
+import { ENDPOINTS } from "@/utils/api";  
 
-const Login = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [mobileNumber, setMobileNumber] = useState("");
+const Login = () => { 
+  const navigate = useNavigate();   
+  const location = useLocation();  
+  const [mobileNumber, setMobileNumber] = useState(""); 
   const [mobileError, setMobileError] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [password, setPassword] = useState("");  
+  const [error, setError] = useState("");       
 
   // Get mobile number from navigation state if available
   useEffect(() => {
     if (location.state?.mobileNumber) {
       setMobileNumber(location.state.mobileNumber);
     }
-  }, [location.state]);
+  }, [location.state]); 
 
   // Handle mobile number input change
   const handleMobileChange = (value: string) => {
@@ -52,7 +52,7 @@ const Login = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Login failed");
 
-      localStorage.setItem("token", data.token); // Store JWT token (for future use)
+      localStorage.setItem("token", data.token); // Store JWT token (for future use) 
 
       // ✅ Redirect based on user_status from backend
       const userStatus = data.user_status;

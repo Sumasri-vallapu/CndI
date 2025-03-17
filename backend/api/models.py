@@ -88,6 +88,12 @@ class Registration(models.Model):
     village = models.ForeignKey(GramPanchayat, on_delete=models.CASCADE)
     insert_timestamp = models.DateTimeField(auto_now_add=True)
     is_approved = models.BooleanField(default=False)
+    
+    # Video and Task tracking fields
+    isvideo1seen = models.BooleanField(default=False)
+    isvideo2seen = models.BooleanField(default=False)
+    istask1submitted = models.BooleanField(default=False)
+    istask2submitted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.full_name} - {self.mobile_number}"
@@ -95,3 +101,27 @@ class Registration(models.Model):
     class Meta:
         db_table = 'api_registration'
         ordering = ['-insert_timestamp']
+
+
+class Task_details(models.Model):
+    # task 1
+    user = models.ForeignKey(UserSignUp, on_delete=models.CASCADE, related_name='learning_centers')
+    mobile_number = models.CharField(max_length=15)
+    lc_state = models.ForeignKey(State, on_delete=models.CASCADE, default=36)  # Telangana
+    lc_district = models.ForeignKey(District, on_delete=models.CASCADE)
+    lc_mandal = models.ForeignKey(Mandal, on_delete=models.CASCADE)
+    lc_grampanchayat = models.ForeignKey(GramPanchayat, on_delete=models.CASCADE)
+    lc_photo_s3_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    # task 2
+    students_marks_s3_url = models.URLField(max_length=500, blank=True, null=True)
+    
+    # timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Learning Center - {self.user.full_name} - {self.lc_grampanchayat.name}"
+
+    class Meta:
+        db_table = 'task_details' 

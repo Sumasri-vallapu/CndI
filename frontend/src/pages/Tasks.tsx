@@ -6,10 +6,17 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { ENDPOINTS } from "@/utils/api";
 import Dropzone from "react-dropzone";
+import { PlayCircle } from "lucide-react"; // Video Icons
 
+// ✅ Define TypeScript Interfaces
 interface LocationItem {
   id: string;
   name: string;
+}
+
+interface VideoStatus {
+  video1: boolean;
+  video2: boolean;
 }
 
 const Tasks = () => {
@@ -19,254 +26,195 @@ const Tasks = () => {
 
   const [districts, setDistricts] = useState<LocationItem[]>([]);
   const [mandals, setMandals] = useState<LocationItem[]>([]);
-  const [gramPanchayats, setGramPanchayats] = useState<LocationItem[]>([]);
+  const [villages, setVillages] = useState<LocationItem[]>([]);
   const [selectedDistrict, setSelectedDistrict] = useState<string>("");
   const [selectedMandal, setSelectedMandal] = useState<string>("");
-  const [selectedGramPanchayat, setSelectedGramPanchayat] = useState<string>("");
+  const [selectedVillage, setSelectedVillage] = useState<string>("");
   const [lcPhoto, setLcPhoto] = useState<File | null>(null);
   const [task2Photo, setTask2Photo] = useState<File | null>(null);
-  const [task1Status, setTask1Status] = useState<string>("Not Sent for Evaluation");
-  const [task2Status, setTask2Status] = useState<string>("Not Sent for Evaluation");
-  const [state] = useState("36"); // Set Telangana state_id by default
+  const [task1Status, setTask1Status] = useState<string>("Not Started");
+  const [task2Status, setTask2Status] = useState<string>("Not Started");
+  const [videosWatched, setVideosWatched] = useState<VideoStatus>({
+    video1: false,
+    video2: false,
+  });
 
-  // Fetch Districts using state
+  const [state] = useState("36"); // Telangana State ID
+
+  // ✅ Fetch Districts
   useEffect(() => {
     if (!state) return;
-    const fetchDistricts = async () => {
-      try {
-        const response = await fetch(ENDPOINTS.GET_DISTRICTS(state));
-        if (!response.ok) throw new Error("Failed to fetch districts");
-        const data = await response.json();
-        setDistricts(data);
-      } catch (error) {
-        console.error("Error fetching districts:", error);
-        alert("Failed to load districts. Please try again.");
-      }
-    };
-    fetchDistricts();
-  }, [state]); // Depend on state value
+    fetch(ENDPOINTS.GET_DISTRICTS(state))
+      .then((res) => res.json())
+      .then(setDistricts)
+      .catch((err) => console.error("Error fetching districts:", err));
+  }, [state]);
 
-  // ✅ Fetch Mandals with error handling
+  // ✅ Fetch Mandals
   useEffect(() => {
     if (!selectedDistrict) return;
-    
-    const fetchMandals = async () => {
-      try {
-        const response = await fetch(ENDPOINTS.GET_MANDALS(selectedDistrict));
-        if (!response.ok) throw new Error("Failed to fetch mandals");
-        const data = await response.json();
-        setMandals(data);
-        setSelectedMandal(""); // Reset mandal when district changes
-      } catch (error) {
-        console.error("Error fetching mandals:", error);
-        alert("Failed to load mandals. Please try again.");
-      }
-    };
-    fetchMandals();
+    fetch(ENDPOINTS.GET_MANDALS(selectedDistrict))
+      .then((res) => res.json())
+      .then(setMandals)
+      .catch((err) => console.error("Error fetching mandals:", err));
   }, [selectedDistrict]);
 
-  // ✅ Fetch Gram Panchayats with error handling
+  // ✅ Fetch Villages
   useEffect(() => {
     if (!selectedMandal) return;
-    
-    const fetchGramPanchayats = async () => {
-      try {
-        const response = await fetch(ENDPOINTS.GET_VILLAGES(selectedMandal));
-        if (!response.ok) throw new Error("Failed to fetch gram panchayats");
-        const data = await response.json();
-        setGramPanchayats(data);
-        setSelectedGramPanchayat(""); // Reset GP when mandal changes
-      } catch (error) {
-        console.error("Error fetching gram panchayats:", error);
-        alert("Failed to load gram panchayats. Please try again.");
-      }
-    };
-    fetchGramPanchayats();
+    fetch(ENDPOINTS.GET_VILLAGES(selectedMandal))
+      .then((res) => res.json())
+      .then(setVillages)
+      .catch((err) => console.error("Error fetching villages:", err));
   }, [selectedMandal]);
 
-  // ✅ Enhanced file upload handler with validation
-  const handleFileUpload = (acceptedFiles: File[], setFile: React.Dispatch<React.SetStateAction<File | null>>) => {
-    if (acceptedFiles.length === 0) return;
-    
-    const file = acceptedFiles[0];
-    if (file.size > 5 * 1024 * 1024) { // 5MB limit
-      alert("File size should be less than 5MB");
-      return;
-    }
+  // ✅ Fetch Task Status
+  useEffect(() => {
+    if (!mobileNumber) return;
+    fetch(ENDPOINTS.GET_TASK_STATUS(mobileNumber))
+      .then((res) => res.json())
+      .then((data) => {
+        setTask1Status(data.task1_status || "Not Started");
+        setTask2Status(data.task2_status || "Not Started");
+      })
+      .catch((err) => console.error("Error fetching task status:", err));
+  }, [mobileNumber]);
 
-    const allowedTypes = ['image/jpeg', 'image/png'];
-    if (!allowedTypes.includes(file.type)) {
-      alert("Only JPG and PNG files are allowed");
-      return;
-    }
-    
-    setFile(file);
+  // ✅ Mark video as watched
+  const handleVideoWatched = (videoId: "video1" | "video2") => {
+    fetch(ENDPOINTS.UPDATE_VIDEO_STATUS(videoId, mobileNumber!), { method: "POST" })
+      .then(() => setVideosWatched((prev) => ({ ...prev, [videoId]: true })))
+      .catch((err) => console.error("Error updating video status:", err));
   };
 
-  // ✅ Submit Task 1 with API integration
+  // ✅ Submit Task 1 (Location + Photo)
   const handleSubmitTask1 = async () => {
-    if (!selectedDistrict || !selectedMandal || !selectedGramPanchayat || !lcPhoto || !mobileNumber) {
+    if (!selectedDistrict || !selectedMandal || !selectedVillage || !lcPhoto || !mobileNumber) {
       alert("All fields and photo are required for Task 1!");
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append("mobile_number", mobileNumber);
-      formData.append("district_id", selectedDistrict);
-      formData.append("mandal_id", selectedMandal);
-      formData.append("grampanchayat_id", selectedGramPanchayat);
-      formData.append("lc_photo", lcPhoto);
+    const formData = new FormData();
+    formData.append("mobile_number", mobileNumber);
+    formData.append("district_id", selectedDistrict);
+    formData.append("mandal_id", selectedMandal);
+    formData.append("village_id", selectedVillage);
+    formData.append("lc_photo", lcPhoto);
 
-      const response = await fetch(ENDPOINTS.UPDATE_TASKS, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("Failed to submit task 1");
-      setTask1Status("Sent for Evaluation");
-    } catch (error) {
-      console.error("Error submitting task 1:", error);
-      alert("Failed to submit task 1. Please try again.");
-    }
+    fetch(ENDPOINTS.SUBMIT_TASK1, { method: "POST", body: formData })
+      .then(() => setTask1Status("Submitted for Review"))
+      .catch((err) => console.error("Error submitting Task 1:", err));
   };
 
-  // ✅ Submit Task 2
+  // ✅ Submit Task 2 (Upload Photo)
   const handleSubmitTask2 = async () => {
     if (!task2Photo || !mobileNumber) {
       alert("Photo upload is required for Task 2!");
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append("mobile_number", mobileNumber);
-      formData.append("task2_photo", task2Photo);
+    const formData = new FormData();
+    formData.append("mobile_number", mobileNumber);
+    formData.append("task2_photo", task2Photo);
 
-      const response = await fetch(ENDPOINTS.UPDATE_TASKS, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("Failed to submit task 2");
-      setTask2Status("Sent for Evaluation");
-    } catch (error) {
-      console.error("Error submitting task 2:", error);
-      alert("Failed to submit task 2. Please try again.");
-    }
+    fetch(ENDPOINTS.SUBMIT_TASK2, { method: "POST", body: formData })
+      .then(() => setTask2Status("Submitted for Review"))
+      .catch((err) => console.error("Error submitting Task 2:", err));
   };
-
-  // ✅ Navigate to Next Step
-  const handleSubmitTasks = () => {
-    if (task1Status !== "Sent for Evaluation" || task2Status !== "Sent for Evaluation") {
-      alert("Please complete and submit both tasks first!");
-      return;
-    }
-    navigate("/data-consent", { state: { mobileNumber } });
-  };
-
-  useEffect(() => {
-    if (!mobileNumber) {
-      navigate('/login');
-    }
-  }, [mobileNumber, navigate]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-6 space-y-6">
-      {/* Header with Logo */}
-      <div className="flex flex-col items-center w-full max-w-4xl">
-        <img 
-          src="/Images/organization_logo.png" 
-          alt="Logo" 
-          className="h-16 w-auto object-contain mb-4" 
-          loading="eager" 
-        />
-        <h2 className="text-2xl font-bold text-center text-walnut mb-5">Fellow Tasks</h2>
+    <div className="flex flex-col items-center min-h-screen px-6 space-y-6">
+      {/* ✅ Header */}
+      <div className="relative w-full flex flex-col items-center">
+        <button onClick={() => navigate("/login")} className="absolute right-4 top-2 md:top-4 bg-walnut text-white px-3 py-1 rounded-md">
+          Logout
+        </button>
+        <img src="/Images/organization_logo.png" alt="Logo" className="h-14 w-auto mt-20" />
       </div>
 
-      {/* Task 1: Location Verification */}
+      <h2 className="text-2xl font-bold text-walnut">Fellow Tasks</h2>
+                
+    {/* Welcome message */}
+    <div className="w-full max-w-4xl text-center mb-3">
+      <p className="text-earth font-medium">Dear Youth Volunteer,</p>
+      <p className="text-gray-700">Welcome to the next stage of your Application!</p>
+      <p className="text-gray-700">Watch these videos to know more!</p>
+    </div>
+
+
+      {/* ✅ Task Video Section */}
+      <Card className="w-full max-w-4xl">
+        <CardContent className="p-6">
+          <h3 className="text-lg font-semibold text-walnut mb-4">Videos</h3>
+          {(["video1", "video2"] as const).map((vid) => (
+            <div key={vid} className="flex justify-between items-center p-4 bg-gray-100 rounded-lg shadow mb-2">
+              <a href="https://youtube.com" target="_blank" className="flex items-center gap-2 text-blue-600 underline" onClick={() => handleVideoWatched(vid)}>
+                <PlayCircle className="w-6 h-6 text-blue-600" /> Watch Video {vid === "video1" ? "1" : "2"}
+              </a>
+              <div className={`px-4 py-2 rounded-full text-white text-sm ${videosWatched[vid] ? "bg-green-500" : "bg-gray-500"}`}>
+                {videosWatched[vid] ? "✅ Seen" : "⌛ Unseen"}
+              </div>
+            </div>
+          ))}
+        </CardContent>
+      </Card>
+
+
+      {/* ✅ Task 1 */}
       <Card className="w-full max-w-4xl">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-walnut mb-4">Task 1: Location Verification</h3>
-          
+
           {/* Location Selection */}
-          <div className="space-y-4 bg-gray-50 p-4 rounded-lg">
-            <div className="flex items-center gap-4">
-              <Label className="w-1/3">District</Label>
-              <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
-                <SelectTrigger className="w-2/3">
-                  <SelectValue placeholder="Select District" />
-                </SelectTrigger>
-                <SelectContent className="select-content">
-                  {districts.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Label className="w-1/3">Mandal</Label>
-              <Select value={selectedMandal} onValueChange={setSelectedMandal} disabled={!selectedDistrict}>
-                <SelectTrigger className="w-2/3">
-                  <SelectValue placeholder="Select Mandal" />
-                </SelectTrigger>
-                <SelectContent className="select-content">
-                  {mandals.map((m) => (
-                    <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <Label className="w-1/3">Gram Panchayat</Label>
-              <Select value={selectedGramPanchayat} onValueChange={setSelectedGramPanchayat} disabled={!selectedMandal}>
-                <SelectTrigger className="w-2/3">
-                  <SelectValue placeholder="Select Gram Panchayat" />
-                </SelectTrigger>
-                <SelectContent className="select-content">
-                  {gramPanchayats.map((gp) => (
-                    <SelectItem key={gp.id} value={gp.id}>{gp.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-4">
+            {[{ label: "District", value: selectedDistrict, setter: setSelectedDistrict, options: districts },
+              { label: "Mandal", value: selectedMandal, setter: setSelectedMandal, options: mandals },
+              { label: "Village", value: selectedVillage, setter: setSelectedVillage, options: villages }]
+              .map(({ label, value, setter, options }) => (
+                <div key={label} className="flex items-center gap-4">
+                  <Label className="w-1/3">{label}</Label>
+                  <Select value={value} onValueChange={setter}>
+                    <SelectTrigger className="w-2/3">
+                      <SelectValue placeholder={`Select ${label}`} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {options.map((opt) => (
+                        <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              ))}
           </div>
 
+          {/* ✅ Status Indicator */}
+          <div className={`mb-4 text-white px-3 py-2 rounded-lg text-sm ${task1Status === "Submitted for Review" ? "bg-yellow-500" : task1Status === "Approved" ? "bg-green-500" : task1Status === "Rejected" ? "bg-red-500" : "bg-gray-500"}`}>
+            Status: {task1Status}
+          </div>
           {/* ✅ Upload Photo */}
           <Label className="mt-4">Upload LC Photo</Label>
-          <Dropzone onDrop={(acceptedFiles) => handleFileUpload(acceptedFiles, setLcPhoto)}>
+          <Dropzone onDrop={(acceptedFiles) => setLcPhoto(acceptedFiles[0])}>
             {({ getRootProps, getInputProps }) => (
-              <div
-                {...getRootProps()}
-                className="border-2 border-dashed p-6 rounded-lg text-center cursor-pointer mt-2"
-              >
+              <div {...getRootProps()} className="border-2 border-dashed p-6 rounded-lg text-center cursor-pointer mt-2">
                 <input {...getInputProps()} />
                 {lcPhoto ? <p className="text-green-600">{lcPhoto.name}</p> : "Drop or Click to Upload"}
               </div>
             )}
           </Dropzone>
 
-          {/* ✅ Submit Task 1 */}
           <Button className="w-full mt-4 bg-walnut text-white" onClick={handleSubmitTask1}>
             Submit Task 1
           </Button>
         </CardContent>
       </Card>
 
+
       {/* ✅ Task 2 */}
       <Card className="w-full max-w-4xl">
         <CardContent className="p-6">
           <h3 className="text-lg font-semibold text-walnut mb-4">Task 2: Training Completion</h3>
-
-          <a href="https://youtube.com" target="_blank" className="text-sm text-blue-600 underline">
-            Watch Training Video
-          </a>
-
-          {/* ✅ Upload Task 2 Photo */}
-          <Label className="mt-4">Upload Photo</Label>
-          <Dropzone onDrop={(acceptedFiles) => handleFileUpload(acceptedFiles, setTask2Photo)}>
+          <Label className="mt-4">Upload Training Completion Photo</Label>
+          <Dropzone onDrop={(acceptedFiles) => setTask2Photo(acceptedFiles[0])}>
             {({ getRootProps, getInputProps }) => (
               <div {...getRootProps()} className="border-2 border-dashed p-6 rounded-lg text-center cursor-pointer mt-2">
                 <input {...getInputProps()} />
@@ -280,11 +228,6 @@ const Tasks = () => {
           </Button>
         </CardContent>
       </Card>
-
-      {/* ✅ Final Submit Button */}
-      <Button onClick={handleSubmitTasks} className="w-full max-w-4xl bg-earth text-white">
-        Submit All Tasks
-      </Button>
     </div>
   );
 };

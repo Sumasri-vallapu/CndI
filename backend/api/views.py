@@ -4,9 +4,18 @@ from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
-from .models import UserPhoto, State, District, Mandal, GramPanchayat, UserSignUp, Registration
+from .models import (
+    UserPhoto, 
+    State, 
+    District, 
+    Mandal, 
+    GramPanchayat, 
+    UserSignUp, 
+    Registration, 
+    Task_details
+)
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
 from .serializers import UserSerializer, RegistrationSerializer
 import json     
@@ -355,3 +364,133 @@ def get_user_details(request):
             {"message": "User not found"}, 
             status=status.HTTP_404_NOT_FOUND
         )
+
+@api_view(['GET'])
+def get_task_status(request, mobile_number):
+    try:
+        registration = Registration.objects.get(mobile_number=mobile_number)
+        task_details = Task_details.objects.filter(mobile_number=mobile_number).first()
+        
+        return Response({
+            'video1_watched': registration.isvideo1seen,
+            'video2_watched': registration.isvideo2seen,
+            'task1_submitted': registration.istask1submitted,
+            'task2_submitted': registration.istask2submitted,
+            'task1_details': {
+                'district': task_details.lc_district.name if task_details else None,
+                'mandal': task_details.lc_mandal.name if task_details else None,
+                'village': task_details.lc_grampanchayat.name if task_details else None,
+                'photo_url': task_details.lc_photo_s3_url if task_details else None
+            } if task_details else None,
+            'task2_details': {
+                'photo_url': task_details.students_marks_s3_url if task_details else None
+            } if task_details else None
+        })
+    except Registration.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+@api_view(['GET'])
+def get_video_status(request, mobile_number):
+    try:
+        registration = Registration.objects.get(mobile_number=mobile_number)
+        return Response({
+            'video1_watched': registration.isvideo1seen,
+            'video2_watched': registration.isvideo2seen
+        })
+    except Registration.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+@api_view(['POST'])
+def update_video_status(request):
+    video_id = request.GET.get('video_id')
+    mobile_number = request.GET.get('mobile_number')
+    
+    try:
+        registration = Registration.objects.get(mobile_number=mobile_number)
+        if video_id == 'video1':
+            registration.isvideo1seen = True
+        elif video_id == 'video2':
+            registration.isvideo2seen = True
+        registration.save()
+        return Response({"status": "success"})
+    except Registration.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+def submit_task1(request):
+    try:
+        mobile_number = request.POST.get('mobile_number')
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        registration = Registration.objects.get(mobile_number=mobile_number)
+        
+        # Save task details
+        task_details = Task_details.objects.create(
+            user=user,
+            mobile_number=mobile_number,
+            lc_district_id=request.POST.get('district_id'),
+            lc_mandal_id=request.POST.get('mandal_id'),
+            lc_grampanchayat_id=request.POST.get('village_id')
+        )
+        
+        # Handle photo upload
+        if 'lc_photo' in request.FILES:
+            task_details.lc_photo_s3_url = upload_to_s3(
+                request.FILES['lc_photo'], 
+                f"lc_photos/{mobile_number}"
+            )
+            
+        task_details.save()
+        
+        # Update registration status
+        registration.istask1submitted = True
+        registration.save()
+        
+        return Response({"status": "success"})
+    except (UserSignUp.DoesNotExist, Registration.DoesNotExist):
+        return Response({"error": "User not found"}, status=404)
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+def submit_task2(request):
+    try:
+        mobile_number = request.POST.get('mobile_number')
+        registration = Registration.objects.get(mobile_number=mobile_number)
+        
+        # Check if Task 1 is completed
+        if not registration.istask1submitted:
+            return Response({
+                "error": "Please complete Task 1 first"
+            }, status=400)
+            
+        task_details = Task_details.objects.get(mobile_number=mobile_number)
+        
+        # Handle photo upload
+        if 'training_photo' in request.FILES:
+            task_details.students_marks_s3_url = upload_to_s3(
+                request.FILES['training_photo'], 
+                f"training_photos/{mobile_number}"
+            )
+            
+        task_details.save()
+        
+        # Update registration status
+        registration.istask2submitted = True
+        registration.save()
+        
+        return Response({"status": "success"})
+    except Registration.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
+def upload_to_s3(file, path):
+    try:
+        s3_client.upload_fileobj(
+            file,
+            'yuvachetana-webapp',
+            path,
+            ExtraArgs={'ACL': 'public-read'}
+        )
+        return f"https://yuvachetana-webapp.s3.amazonaws.com/{path}"
+    except Exception as e:
+        logger.error(f"S3 upload error: {str(e)}")
+        raise e

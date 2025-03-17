@@ -1,7 +1,10 @@
 from rest_framework import serializers
-from .models import UserPhoto
-from .models import UserSignUp
-from .models import Registration
+from .models import (
+    UserPhoto,
+    UserSignUp,
+    Registration,
+    Task_details
+)
 
 
 class UserPhotoSerializer(serializers.ModelSerializer):
@@ -48,3 +51,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
         if 'user' not in validated_data:
             raise serializers.ValidationError("User is required")
         return super().create(validated_data)
+
+
+class TaskDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task_details
+        fields = [
+            'user', 'mobile_number', 'lc_district', 'lc_mandal', 
+            'lc_grampanchayat', 'lc_photo_s3_url', 'students_marks_s3_url'
+        ]
+
+class VideoStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Registration
+        fields = ['isvideo1seen', 'isvideo2seen']

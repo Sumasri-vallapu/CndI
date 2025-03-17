@@ -48,7 +48,7 @@ const Home = () => {
         <CardContent className="px-6 py-5">
           <h3 className="text-lg font-bold text-walnut cursor-pointer flex justify-between items-center" 
               onClick={() => toggleSection("aboutOrg")}>
-            About Organization
+            About Bharat Dekho
             <span>{activeSection === "aboutOrg" ? "▼" : "►"}</span>
           </h3>
           {activeSection === "aboutOrg" && (
@@ -66,15 +66,15 @@ const Home = () => {
         <CardContent className="px-6 py-5">
           <h3 className="text-lg font-bold text-walnut cursor-pointer flex justify-between items-center" 
               onClick={() => toggleSection("aboutFellowship")}>
-            About Fellowship
+            About Bose Fellowship
             <span>{activeSection === "aboutFellowship" ? "▼" : "►"}</span>
           </h3>
           {activeSection === "aboutFellowship" && (
-            <ul className="text-gray-700 list-disc list-inside mt-3">
-              <li>Bharat: A 1-year long volunteering program for local youth to work on learning and wellbeing of children.</li>
-              <li>Bose Fellowship: An opportunity for rural youth, and through them, a chance for children and the village.</li>
-              <li>Volunteers from ______ villages, supporting ______ children.</li>
-            </ul>
+            <div className="text-gray-700 mt-3">
+              <p className="mb-2">Bose Fellowship is an opportunity for rural youth to become a change leader for their community.</p>
+              <p className="mb-2">It is a 1 year volunteering opportunity for local youth to set up Learning Centers and work for education and well-being of children in their village.</p>
+              <p className="mb-2">147 Youth leaders have already set up more than 100 Learning Centers and are supporting 1700+ children across 5 districts in Telangana - Peddapalli, Adilabad, Asifabad, Vikarabad and Narayanpet.</p>
+            </div>
           )}
         </CardContent>
       </Card>

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { ENDPOINTS } from "@/utils/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { ArrowRight } from "lucide-react"; // ✅ Import the correct icon
 
 interface LocationOption {
   id: string;
@@ -31,12 +32,13 @@ const Register = () => {
   const [mandal, setMandal] = useState("");
   const [village, setVillage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // ✅ Location Data
   const [states, setStates] = useState<LocationOption[]>([]);
   const [districts, setDistricts] = useState<LocationOption[]>([]);
   const [mandals, setMandals] = useState<LocationOption[]>([]);
-  const [villages, setVillages] = useState<LocationOption[]>([]);
+  const [villages, setVillages] = useState<LocationOption[]>([]); 
 
   // ✅ Fetch Full Name using Mobile Number
   useEffect(() => {
@@ -75,7 +77,7 @@ const Register = () => {
       try {
         const response = await fetch(ENDPOINTS.GET_DISTRICTS(state));
         const data = await response.json();
-        setDistricts(data);
+        setDistricts(data); 
       } catch (error) {
         console.error("Error fetching districts:", error);
       }
@@ -111,8 +113,15 @@ const Register = () => {
     fetchVillages();
   }, [mandal]);
 
-  // ✅ Success Message State
-  const [showSuccess, setShowSuccess] = useState(false);
+  // ✅ Logout Function
+  const handleLogout = () => {
+    // Clear stored session (adjust based on your auth system)
+    localStorage.removeItem("user_token");
+    sessionStorage.clear();
+    
+    // Redirect to login page
+    navigate("/login");
+  };
 
   // ✅ Handle Registration
   const handleRegister = async () => {
@@ -140,15 +149,10 @@ const Register = () => {
       });
 
       if (!response.ok) throw new Error("Registration failed");
-      
-      // Show success message
+
+      // Show success message without auto-navigation
       setShowSuccess(true);
       
-      // Navigate after 3 seconds
-      setTimeout(() => {
-        navigate("/tasks", { state: { mobileNumber } });
-      }, 3000);
-
     } catch (error) {
       console.error("Registration Error:", error);
       alert("Error: " + (error as Error).message);
@@ -157,83 +161,97 @@ const Register = () => {
     }
   };
 
+  // ✅ Navigate to Tasks page
+  const proceedToTasks = () => {
+    navigate("/tasks", { state: { mobileNumber } });
+  };
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-6 space-y-20">
-      <div className="flex flex-col items-center bg-white px-6 py-8 w-96 shadow-lg rounded-lg">
-        <img src="/Images/organization_logo.png" alt="Logo" className="h-16 w-auto object-contain mb-4" loading="eager" />
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F4F1E3] px-6 space-y-6">
+      {/* ✅ Registration Form Container */}
+      <div className="flex flex-col items-center bg-[#F6F3E6] min-h-screen min-w-screen shadow-lg rounded-lg">
+        {/* ✅ Header Wrapper with Logout Button & Centered Logo */}
+        <div className="relative w-full flex flex-col items-center">
+          {/* Logout Button at the Top Right */}
+          <div className="absolute right-4 top-2 md:top-4">
+            <button 
+              onClick={handleLogout} 
+              className="bg-walnut text-white px-3 py-1 rounded-md text-xs md:text-sm hover:bg-white hover:text-walnut border border-walnut transition-all shadow-md"
+            >
+              Logout
+            </button>
+          </div>
+
+          {/* Centered Logo with Extra Margin for Separation */}
+          <div className="flex justify-center w-full mt-10">
+            <img src="/Images/organization_logo.png" alt="Logo" 
+              className="h-14 w-auto object-contain" loading="eager" />
+          </div>
+        </div> 
+
         <h2 className="text-2xl font-bold text-center text-walnut mt-2 mb-5">Fellow Registration</h2>
 
-        {/* Success Message */}
-        {showSuccess && (
-          <div className="w-full mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-600 text-center font-medium">
-              Successfully registered! Redirecting to tasks...
-            </p>
-          </div>
-        )}
-
         <CardContent className="space-y-6">
-                   {/* ✅ Personal Information */}
-                   <div className="flex flex-col bg-gray-50 p-4 rounded-lg shadow-sm">
+          {/* ✅ Personal Information */}
+          <div className="flex flex-col bg-gray-50 p-4 rounded-lg shadow-sm">
             <h3 className="text-lg font-semibold text-walnut mb-3">Personal Information</h3>
-            {[ 
-              { label: "Mobile", value: mobileNumber, isReadOnly: true },
-              { label: "Full Name", value: fullName, isReadOnly: true }
+            {[               
+              { label: "Full Name", value: fullName, isReadOnly: true },
+              { label: "Mobile", value: mobileNumber, isReadOnly: true }
             ].map(({ label, value, isReadOnly }) => (
-              <div key={label} className="flex items-center gap-4">
+              <div key={label} className="flex items-center">
                 <Label className="w-1/3">{label}</Label>
-                <Input type="text" value={value} readOnly={isReadOnly} className="w-2/3 bg-gray-100" />
+                <Input type="text" value={value} readOnly={isReadOnly} />
               </div>
             ))}
+            
+          {/* ✅ Date of Birth */}
+          <div className="flex items-center">
+  <Label className="w-1/3">Date of Birth</Label>
+  <div className="w-2/3">
+    <DatePicker
+      selected={dob}
+      onChange={(date: Date | null) => setDob(date)}
+      className="w-full select-trigger p-2 border border-gray-300 rounded-md"
+      placeholderText="Select Date of Birth"
+      dateFormat="yyyy-MM-dd"
+      showYearDropdown
+      scrollableYearDropdown
+    />
+  </div>
+</div>
 
-            {/* ✅ Date of Birth */}
-            <div className="flex items-center gap-4">
-              <Label className="w-1/3">DOB</Label>
-              <DatePicker
-                selected={dob}
-                onChange={(date) => setDob(date)}
-                dateFormat="dd-MM-yyyy"
-                className="w-2/3 border-gray-300 px-4 py-2 rounded-lg"
-                placeholderText="Select DOB"
-              />
-            </div>
-
-            {/* ✅ Gender */}
-            <div className="flex items-center gap-4">
-              <Label className="w-1/3">Gender</Label>
-              <div className="w-2/3">
-                <Select value={gender} onValueChange={setGender}>
-                  <SelectTrigger className="select-trigger">
-                    <SelectValue placeholder="Select Gender" />
-                  </SelectTrigger>
-                  <SelectContent className="select-content">
-                    <SelectItem value="male">Male</SelectItem>
-                    <SelectItem value="female">Female</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* ✅ Caste Category */}
-            <div className="flex items-center gap-4">
-              <Label className="w-1/3">Caste</Label>
-              <div className="w-2/3">
-                <Select value={casteCategory} onValueChange={setCasteCategory}>
-                  <SelectTrigger className="select-trigger">
-                    <SelectValue placeholder="Select Caste" />
-                  </SelectTrigger>
-                  <SelectContent className="select-content">
-                    <SelectItem value="sc">SC</SelectItem>
-                    <SelectItem value="st">ST</SelectItem>
-                    <SelectItem value="obc">OBC</SelectItem>
-                    <SelectItem value="general">General</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {/* ✅ Gender */}
+<div className="flex items-center mt-4">
+  <Label className="w-1/3">Gender</Label>
+  <Select value={gender} onValueChange={setGender}>
+    <SelectTrigger className="select-trigger">
+      <SelectValue placeholder="Select Gender" />
+    </SelectTrigger>
+    <SelectContent className="select-content">
+      <SelectItem value="male">Male</SelectItem>
+      <SelectItem value="female">Female</SelectItem>
+      <SelectItem value="other">Other</SelectItem>
+    </SelectContent>
+  </Select>
+</div>
+            
+            {/* Caste Category */}
+            <div className="flex items-center gap-4 mt-2">
+              <Label>Caste</Label>
+              <Select value={casteCategory} onValueChange={setCasteCategory}>
+                <SelectTrigger className="w-2/3">
+                  <SelectValue placeholder="Select Caste Category" />
+                </SelectTrigger>
+                <SelectContent className="select-content">
+                  <SelectItem value="general">General</SelectItem>
+                  <SelectItem value="obc">OBC</SelectItem>
+                  <SelectItem value="sc">SC</SelectItem>
+                  <SelectItem value="st">ST</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
-
 
           {/* ✅ Location Information */}
           <div className="flex flex-col bg-gray-50 p-4 rounded-lg shadow-sm">
@@ -261,20 +279,36 @@ const Register = () => {
               ))}
           </div>
 
-          <Button 
-            className="w-full bg-walnut text-white py-3 rounded-lg" 
-            onClick={handleRegister} 
-            disabled={loading || showSuccess}
-          >
-            {loading ? "Registering..." : "Submit Details"}
-          </Button>
+{/* ✅ Success Message with Proceed Button */}
+{showSuccess && (
+  <div className="w-full mb-4">
+    {/* ✅ Bold Green Text */}
+    <p className="text-green-600 font-bold text-center">
+      Dear Youth Volunteer, you have successfully registered for the Bose Fellowship!
+    </p>
+
+    {/* ✅ Proceed Button with Right-Aligned Icon */}
+    <Button 
+      className="w-full bg-walnut text-white py-1 rounded-lg flex items-center justify-between px-4 hover:bg-walnut/90"
+      onClick={proceedToTasks}
+    >
+      <span className="flex-1 text-center">Proceed to the next stage of your Application</span>
+      <ArrowRight size={20} strokeWidth={2} /> {/* ✅ Proper forward icon */}
+    </Button>
+  </div>
+)}
+
+
+          {/* Registration Button (only shown if not yet successful) */}
+          {!showSuccess && (
+            <Button className="w-full bg-walnut text-white py-3 rounded-lg" onClick={handleRegister} disabled={loading}>
+              {loading ? "Registering..." : "Submit Details"}
+            </Button>
+          )}
         </CardContent>
       </div>
     </div>
   );
 };
 
-export default Register;
-
-
-
+export default Register;  
