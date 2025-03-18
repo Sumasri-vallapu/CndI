@@ -12,11 +12,14 @@ import { ArrowLeft } from "lucide-react"; // Remove ArrowRight
 interface LocationOption {
   id: string;
   name: string;
-}
+} 
 
 const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Add state to track registration success
+  const [showSuccess, setShowSuccess] = useState(false);
 
   // ✅ Personal Information State
   const mobileNumber = location.state?.mobileNumber || "";
@@ -142,11 +145,19 @@ const Register = () => {
       });
 
       if (!response.ok) throw new Error("Registration failed");
-
+      
+      // Show success message and button on successful registration
+      setShowSuccess(true);
+      
     } catch (error) {
       console.error("Registration Error:", error);
       alert("Error: " + (error as Error).message);
     }
+  };
+
+  // ✅ Handle proceeding to tasks
+  const proceedToTasks = () => {
+    navigate("/tasks", { state: { mobileNumber } });
   };
 
   return (
@@ -251,13 +262,30 @@ const Register = () => {
             ))}
         </div>
 
-        {/* Submit Button */}
-        <Button 
-          onClick={handleRegister} 
-          className="w-full bg-walnut text-white py-3 rounded-lg shadow-md hover:bg-walnut/90"
-        >
-          Register
-        </Button>
+        {/* Success Message with Proceed Button */}
+        {showSuccess ? (
+          <div className="space-y-4">
+            <div className="bg-green-50 border border-green-200 p-4 rounded-lg">
+              <p className="text-green-600 font-medium text-center">
+                Dear Youth Volunteer, you have successfully registered for the Bose Fellowship!
+              </p>
+            </div>
+            
+            <Button 
+              className="btn-primary w-full"
+              onClick={proceedToTasks}
+            >
+              Click here to proceed to the next stage of your Application
+            </Button>
+          </div>
+        ) : (
+          <Button 
+            onClick={handleRegister} 
+            className="btn-primary w-full"
+          >
+            Register
+          </Button>
+        )}
       </div>
     </div>
   );
