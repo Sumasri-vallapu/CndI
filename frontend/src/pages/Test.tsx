@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { PlayCircle } from "lucide-react";
 
 const TasksPage = () => {

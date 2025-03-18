@@ -181,7 +181,12 @@ const Tasks = () => {
           <div className="space-y-3">
             {(["video1", "video2"] as const).map((vid) => (
               <div key={vid} className="flex justify-between items-center p-4 bg-gray-50 rounded-lg">
-                <a href="https://youtube.com" target="_blank" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                <a 
+                  href="https://youtube.com" 
+                  target="_blank" 
+                  onClick={() => handleVideoWatched(vid)}
+                  className="flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                >
                   <PlayCircle className="w-6 h-6" /> Watch Video {vid === "video1" ? "1" : "2"}
                 </a>
                 <div className={`px-4 py-2 rounded-full text-white text-sm ${videosWatched[vid] ? "bg-green-500" : "bg-gray-500"}`}>

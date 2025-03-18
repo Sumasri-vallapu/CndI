@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { ENDPOINTS } from "@/utils/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { ArrowRight, ArrowLeft } from "lucide-react"; // ✅ Import the correct icons
+import { ArrowLeft } from "lucide-react"; // Remove ArrowRight
 
 interface LocationOption {
   id: string;
@@ -30,14 +30,12 @@ const Register = () => {
   const [district, setDistrict] = useState("");
   const [mandal, setMandal] = useState("");
   const [village, setVillage] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [villages, setVillages] = useState<LocationOption[]>([]);
 
   // ✅ Location Data
   const [states, setStates] = useState<LocationOption[]>([]);
   const [districts, setDistricts] = useState<LocationOption[]>([]);
   const [mandals, setMandals] = useState<LocationOption[]>([]);
-  const [villages, setVillages] = useState<LocationOption[]>([]);
 
   // ✅ Fetch Full Name using Mobile Number
   useEffect(() => {
@@ -126,7 +124,6 @@ const Register = () => {
       return;
     }
 
-    setLoading(true);
     try {
       const response = await fetch(ENDPOINTS.REGISTER, {
         method: "POST",
@@ -146,12 +143,9 @@ const Register = () => {
 
       if (!response.ok) throw new Error("Registration failed");
 
-      setShowSuccess(true);
     } catch (error) {
       console.error("Registration Error:", error);
       alert("Error: " + (error as Error).message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -209,7 +203,7 @@ const Register = () => {
               <SelectTrigger className="w-full signup-input">
                 <SelectValue placeholder="Select Gender" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
                 <SelectItem value="male">Male</SelectItem>
                 <SelectItem value="female">Female</SelectItem>
                 <SelectItem value="other">Other</SelectItem>
@@ -223,7 +217,7 @@ const Register = () => {
               <SelectTrigger className="w-full signup-input">
                 <SelectValue placeholder="Select Caste Category" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
                 <SelectItem value="general">General</SelectItem>
                 <SelectItem value="obc">OBC</SelectItem>
                 <SelectItem value="sc">SC</SelectItem>
@@ -248,22 +242,21 @@ const Register = () => {
                     <SelectValue placeholder={`Select ${label}`} />
                   </SelectTrigger> 
                   <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
-                    {options.map((opt) => (
+                    {options.map((opt: LocationOption) => (
                       <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
-          ))}
+            ))}
         </div>
 
         {/* Submit Button */}
         <Button 
           onClick={handleRegister} 
           className="w-full bg-walnut text-white py-3 rounded-lg shadow-md hover:bg-walnut/90"
-          disabled={loading}
         >
-          {loading ? "Registering..." : "Submit Details"}
+          Register
         </Button>
       </div>
     </div>

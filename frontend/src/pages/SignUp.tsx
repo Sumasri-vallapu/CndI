@@ -13,9 +13,7 @@ const SignUp = () => {
   const [surname, setSurname] = useState("");
   const [givenName, setGivenName] = useState("");
   const [password, setPassword] = useState("");
-  const [copied, setCopied] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
 
   const generatePassword = (mobile: string, name: string) => {
     if (mobile.length >= 4 && name.length >= 4) {
@@ -41,8 +39,7 @@ const SignUp = () => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(password);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => {}, 2000);
   };
 
   const handleRegister = async () => {
@@ -55,8 +52,6 @@ const SignUp = () => {
       setMobileError("Please enter a valid 10-digit mobile number starting with 6, 7, 8, or 9");
       return;
     }
-
-    setLoading(true);
 
     try {
       const response = await fetch(ENDPOINTS.SIGNUP, {
@@ -80,8 +75,6 @@ const SignUp = () => {
       }, 2000);
     } catch (error: any) {
       alert(error.message);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -153,9 +146,9 @@ const SignUp = () => {
         <Button
           className="w-full mt-4 bg-walnut text-white py-3 rounded-lg transition-all transform hover:bg-walnut/90 hover:scale-105 hover:cursor-pointer focus:ring-2 focus:ring-earth/70"
           onClick={handleRegister}
-          disabled={loading || registrationSuccess}
+          disabled={registrationSuccess}
         >
-          {loading ? "Registering..." : "Save Password & Login"} 
+          Save Password & Login 
         </Button>
       </div>
     </div>
