@@ -55,9 +55,8 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-6 space-y-20">
-      {/* White Card Container */}
-      <div className="flex flex-col items-center bg-white px-6 py-8 w-96 shadow-lg rounded-lg">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F4F1E3] px-6 space-y-8">
+      <div className="flex flex-col items-center bg-white px-6 py-8 w-full max-w-md shadow-lg rounded-lg">
         {/* ✅ Organization Logo */}
         <img
           src="/Images/organization_logo.png"
@@ -74,7 +73,7 @@ const ForgotPassword = () => {
           placeholder="Enter Registered Mobile Number"
           value={mobileNumber}
           onChange={(e) => handleInputChange(e.target.value)}
-          className={`mb-3 border ${mobileError ? 'border-red-500' : 'border-gray-300'} w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-earth/70`}
+          className={`signup-input mb-3 ${mobileError ? 'border-red-500' : ''}`}
         />
         {mobileError && <p className="text-red-500 text-xs mb-2">{mobileError}</p>}
 
@@ -85,7 +84,7 @@ const ForgotPassword = () => {
               type="text"
               value={retrievedPassword}
               readOnly
-              className="mb-3 border border-gray-300 w-full px-4 py-2 rounded-lg bg-gray-100 focus:ring-2 focus:ring-earth/70"
+              className="signup-input mb-3 bg-gray-100"
             />
             <button
               type="button"

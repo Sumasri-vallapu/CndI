@@ -28,30 +28,23 @@ const SignUp = () => {
     return "";
   };
   
-  // Update handleInputChange to validate mobile number
   const handleInputChange = (setter: Function, value: string, field: string) => {
     setter(value);
     
     if (field === 'mobileNumber') {
-      // Use the shared validation utility
       setMobileError(getMobileErrorMessage(value));
-      
-      // Update password with what's available
       setPassword(generatePassword(value, givenName));
     } else if (field === 'givenName') {
-      // For given name changes, use existing mobile + new value
       setPassword(generatePassword(mobileNumber, value));
     }
   };
 
-  // Function to copy password to clipboard
   const copyToClipboard = () => {
     navigator.clipboard.writeText(password);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Update handleRegister to show success message
   const handleRegister = async () => {
     if (!mobileNumber || !surname || !givenName) {
       alert("All fields are required!");
@@ -93,9 +86,8 @@ const SignUp = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-6 space-y-20">      {/* White Card Container */}
-      <div className="flex flex-col items-center bg-white px-6 py-8 w-96 shadow-lg rounded-lg">
-        {/* ✅ Organization Logo */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#F4F1E3] px-6 space-y-8">      
+      <div className="flex flex-col items-center bg-white px-6 py-8 w-full max-w-md shadow-lg rounded-lg">
         <img
           src="/Images/organization_logo.png"
           alt="Yuva Chetana Logo"
@@ -105,65 +97,59 @@ const SignUp = () => {
 
         <h2 className="text-2xl font-bold text-center mb-4">Fellow SignUp</h2>
 
-        {/* Success Message */}
         {registrationSuccess && (
           <div className="w-full mb-4 p-3 bg-green-100 text-green-800 rounded-lg text-center">
             Registration successful! Redirecting to login page...
           </div>
         )}
 
-        {/* Input Fields */}
-        <Input
-          type="text"
-          placeholder="Mobile Number"
-          value={mobileNumber}
-          onChange={(e) => handleInputChange(setMobileNumber, e.target.value, 'mobileNumber')}
-          className={`mb-1 border ${mobileError ? 'border-red-500' : 'border-gray-300'} w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-earth/70`}
-        />
-        {mobileError && <p className="text-red-500 text-xs mb-2">{mobileError}</p>}
-        <Input
-          type="text"
-          placeholder="Surname"
-          value={surname}
-          onChange={(e) => handleInputChange(setSurname, e.target.value, 'surname')}
-          className="mb-3 border border-gray-300 w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-earth/70"
-        />
-        <Input
-          type="text"
-          placeholder="Given Name"
-          value={givenName}
-          onChange={(e) => handleInputChange(setGivenName, e.target.value, 'givenName')}
-          className="mb-3 border border-gray-300 w-full px-4 py-2 rounded-lg focus:ring-2 focus:ring-earth/70"
-        />
+<div className="w-full space-y-4">
+  <Input
+    type="text"
+    placeholder="Mobile Number"
+    value={mobileNumber}
+    onChange={(e) => handleInputChange(setMobileNumber, e.target.value, 'mobileNumber')}
+    className={`signup-input ${mobileError ? 'border-red-500' : ''}`}
+  />
+  {mobileError && <p className="text-red-500 text-xs">{mobileError}</p>}
 
-        {/* Auto-Generated Password */}
-        <div className="relative w-full">
-          <Input
-            type="text"
-            placeholder="Auto-Generated Password"
-            value={password}
-            readOnly
-            className="mb-3 border border-gray-300 w-full px-4 py-2 rounded-lg bg-gray-100 focus:ring-2 focus:ring-earth/70"
-          />
-          <button
-            type="button"
-            onClick={copyToClipboard}
-            className="absolute right-3 top-3 text-walnut hover:text-earth"
-          >
-            <Copy size={20} />
-          </button>
-          
-          {/* Password copied notification */}
-          {copied && (
-            <div className="absolute -top-10 right-0 bg-green-100 text-green-800 px-3 py-1 rounded-md text-sm shadow-md transition-opacity">
-              Password copied to clipboard!
-            </div>
-          )}
-        </div>
+  <Input
+    type="text"
+    placeholder="Surname"
+    value={surname}
+    onChange={(e) => handleInputChange(setSurname, e.target.value, 'surname')}
+    className="signup-input"
+  />
+
+  <Input
+    type="text"
+    placeholder="Given Name"
+    value={givenName}
+    onChange={(e) => handleInputChange(setGivenName, e.target.value, 'givenName')}
+    className="signup-input"
+  />
+
+  {/* Password Field */}
+  <div className="relative w-full">
+    <Input
+      type="text"
+      placeholder="Auto-Generated Password"
+      value={password}
+      readOnly
+      className="signup-input bg-gray-100"
+    />
+    <button
+      type="button"
+      onClick={copyToClipboard}
+      className="absolute right-3 top-3 text-walnut hover:text-earth"
+    >
+      <Copy size={20} />
+    </button>
+  </div>
+</div>
 
         <p className="text-sm text-earth font-medium text-center">Note: Save password & Login to complete Registration</p>
 
-        {/* Register Button */}
         <Button
           className="w-full mt-4 bg-walnut text-white py-3 rounded-lg transition-all transform hover:bg-walnut/90 hover:scale-105 hover:cursor-pointer focus:ring-2 focus:ring-earth/70"
           onClick={handleRegister}
@@ -176,4 +162,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp; 
+export default SignUp;

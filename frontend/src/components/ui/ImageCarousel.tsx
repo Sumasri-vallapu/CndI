@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Carousel, CarouselContent, CarouselItem } from "@/components/ui/carousel";
 import type { CarouselApi } from "@/components/ui/carousel";
 
@@ -44,16 +43,14 @@ const ImageCarousel = ({ className = "", autoPlay = true, interval = 3000 }: Ima
           {images.map((src, index) => (
             <CarouselItem key={index}>
               <div className="p-1">
-                <Card>
-                  <CardContent className="flex aspect-video items-center justify-center p-0">
-                    <img
-                      src={src}
-                      alt={`Gallery ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg"
-                      loading="lazy"
-                    />
-                  </CardContent>
-                </Card>
+                <div className="flex aspect-video items-center justify-center p-0 rounded-lg shadow-lg overflow-hidden">
+                  <img
+                    src={src}
+                    alt={`Gallery ${index + 1}`}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
               </div>
             </CarouselItem>
           ))}
