@@ -20,6 +20,7 @@ class UserSignUp(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     ip_address = models.GenericIPAddressField(null=True, blank=True)
     device_info = models.TextField(null=True, blank=True)
+    profile_photo_url = models.URLField(max_length=500, blank=True, null=True)
 
     # Progress tracking fields
     is_registered = models.BooleanField(default=False)

@@ -229,15 +229,14 @@ const Register = () => {
                 <SelectValue placeholder="Select Caste Category" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
-                <SelectItem value="bc">BC</SelectItem>
-                <SelectItem value="christian">Christian</SelectItem>
-                <SelectItem value="general">General</SelectItem>
-                <SelectItem value="muslim">Muslim</SelectItem>
-                <SelectItem value="oc">OC</SelectItem>
-                <SelectItem value="obc">OBC</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-                <SelectItem value="sc">SC</SelectItem>
                 <SelectItem value="st">ST</SelectItem>
+                <SelectItem value="sc">SC</SelectItem>
+                <SelectItem value="bc">BC</SelectItem>
+                <SelectItem value="obc">OBC</SelectItem>
+                <SelectItem value="oc">OC</SelectItem>
+                <SelectItem value="muslim">Muslim</SelectItem>
+                <SelectItem value="christian">Christian</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>

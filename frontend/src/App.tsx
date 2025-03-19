@@ -9,6 +9,7 @@ import DataConsent from '@/pages/DataConsent';
 import ChildProtectionConsent from '@/pages/ChildProtectionConsent';
 import FinalUI from '@/pages/FinalUI';   
 import Test from '@/pages/Test';
+import Main from '@/pages/Main';
 export default function App() {
   return (
     <BrowserRouter>
@@ -26,6 +27,7 @@ export default function App() {
               <Route path="/data-protection-consent" element={<DataConsent />} />
               <Route path="/final-ui" element={<FinalUI />} />
               <Route path="/test" element={<Test />} />
+              <Route path="/main" element={<Main />} />
             </Routes>
           </main>
         </div>

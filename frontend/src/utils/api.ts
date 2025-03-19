@@ -39,4 +39,5 @@ export const ENDPOINTS = {
   UPDATE_DATA_CONSENT: `${BASE_URL}/data-consent/update/`,
   UPDATE_CHILD_PROTECTION: `${BASE_URL}/child-protection/update/`,
 
+  UPLOAD_PROFILE_PHOTO: `${BASE_URL}/upload-profile-photo/`,
 } as const; 

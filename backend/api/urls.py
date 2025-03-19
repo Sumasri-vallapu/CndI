@@ -20,7 +20,8 @@ from .views import (
     get_video_status,
     update_video_status,
     submit_task1,
-    submit_task2
+    submit_task2,
+    upload_profile_photo
 )   
 
 urlpatterns = [
@@ -46,4 +47,5 @@ urlpatterns = [
 
     path('tasks/submit-task1/', submit_task1, name='submit_task1'),
     path('tasks/submit-task2/', submit_task2, name='submit_task2'),
+    path('upload-profile-photo/', upload_profile_photo, name='upload_profile_photo'),
 ]

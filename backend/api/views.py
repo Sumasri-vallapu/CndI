@@ -555,6 +555,37 @@ class UploadPhotoView(APIView):
 
         return Response({"username": username, "photo_url": photo_url}, status=status.HTTP_201_CREATED)
 
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+def upload_profile_photo(request):
+    try:
+        mobile_number = request.POST.get('mobile_number')
+        if not mobile_number:
+            return Response({"error": "mobile_number is required"}, status=400)
+
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        
+        if 'photo' in request.FILES:
+            photo_url = upload_to_s3(
+                request.FILES['photo'],
+                f"profile_photos/{mobile_number}"
+            )
+            user.profile_photo_url = photo_url
+            user.save()
+            
+            return Response({
+                "status": "success",
+                "photo_url": photo_url
+            })
+        else:
+            return Response({"error": "No photo provided"}, status=400)
+            
+    except UserSignUp.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except Exception as e:
+        logger.error(f"Profile photo upload error: {str(e)}")
+        return Response({"error": str(e)}, status=500)
+
 
 
 
