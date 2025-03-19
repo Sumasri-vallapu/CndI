@@ -229,8 +229,13 @@ const Register = () => {
                 <SelectValue placeholder="Select Caste Category" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
+                <SelectItem value="bc">BC</SelectItem>
+                <SelectItem value="christian">Christian</SelectItem>
                 <SelectItem value="general">General</SelectItem>
+                <SelectItem value="muslim">Muslim</SelectItem>
+                <SelectItem value="oc">OC</SelectItem>
                 <SelectItem value="obc">OBC</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
                 <SelectItem value="sc">SC</SelectItem>
                 <SelectItem value="st">ST</SelectItem>
               </SelectContent>
@@ -272,7 +277,7 @@ const Register = () => {
             </div>
             
             <Button 
-              className="btn-primary w-full"
+              className="btn-primary w-full py-3 text-sm whitespace-normal h-auto"
               onClick={proceedToTasks}
             >
               Click here to proceed to the next stage of your Application

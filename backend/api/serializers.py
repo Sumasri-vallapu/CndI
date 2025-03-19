@@ -24,7 +24,7 @@ class UserPhotoSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserSignUp
-        fields = ['id', 'mobile_number', 'surname', 'given_name', 'password', 'unique_number', 'created_at', 'ip_address', 'device_info']
+        fields = ['id', 'mobile_number', 'surname', 'given_name', 'password', 'unique_number']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
@@ -41,24 +41,22 @@ class RegistrationSerializer(serializers.ModelSerializer):
             'district',
             'mandal',
             'village',
-            'insert_timestamp',
-            'is_approved'
+            'task1_status',
+            'task2_status'
         ]
-        read_only_fields = ['insert_timestamp', 'is_approved']
-
-    def create(self, validated_data):
-        # Ensure user is set from the view
-        if 'user' not in validated_data:
-            raise serializers.ValidationError("User is required")
-        return super().create(validated_data)
 
 
 class TaskDetailsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task_details
         fields = [
-            'user', 'mobile_number', 'lc_district', 'lc_mandal', 
-            'lc_grampanchayat', 'lc_photo_s3_url', 'students_marks_s3_url'
+            'user',
+            'mobile_number',
+            'lc_district',
+            'lc_mandal',
+            'lc_grampanchayat',
+            'lc_photo_s3_url',
+            'students_marks_s3_url'
         ]
 
 class VideoStatusSerializer(serializers.ModelSerializer):

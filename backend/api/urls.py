@@ -41,8 +41,9 @@ urlpatterns = [
     path('register/', register, name='register'),
     path('user-details/', get_user_details, name='get_user_details'),
     path('tasks/status/<str:mobile_number>/', get_task_status, name='get_task_status'),
-    path('tasks/video-status/<str:mobile_number>/', get_video_status, name='get_video_status'),
     path('tasks/video-status/update/', update_video_status, name='update_video_status'),
+    path('tasks/video-status/<str:mobile_number>/', get_video_status, name='get_video_status'),
+
     path('tasks/submit-task1/', submit_task1, name='submit_task1'),
     path('tasks/submit-task2/', submit_task2, name='submit_task2'),
 ]

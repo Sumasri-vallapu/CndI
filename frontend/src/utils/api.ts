@@ -29,8 +29,7 @@ export const ENDPOINTS = {
     `${BASE_URL}/tasks/status/${mobile_number}/`,
   GET_VIDEO_STATUS: (mobile_number: string) => 
     `${BASE_URL}/tasks/video-status/${mobile_number}/`,
-  UPDATE_VIDEO_STATUS: (video_id: string, mobile_number: string) => 
-    `${BASE_URL}/tasks/video-status/update/?video_id=${video_id}&mobile_number=${mobile_number}`,
+  UPDATE_VIDEO_STATUS: `${BASE_URL}/tasks/video-status/update/`,
 
   SUBMIT_TASK1: `${BASE_URL}/tasks/submit-task1/`,
   SUBMIT_TASK2: `${BASE_URL}/tasks/submit-task2/`, 
