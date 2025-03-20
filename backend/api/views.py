@@ -468,11 +468,7 @@ def upload_to_s3(file, path):
         s3_client.upload_fileobj(
             file,
             'yuvachetana-webapp',
-            full_path,
-            ExtraArgs={
-                'ACL': 'public-read',
-                'ContentType': file.content_type  # Set proper content type
-            }
+            full_path
         )
 
         # Return the public URL
@@ -606,6 +602,8 @@ def upload_profile_photo(request):
 @api_view(['GET'])
 def get_fellow_profile(request, mobile_number):
     try:
+        print(f"DEBUG: Received GET request for profile")
+        print(f"DEBUG: Mobile number: {mobile_number}")
         profile = FellowProfile.objects.get(user__mobile_number=mobile_number)
         return Response({
             "hero_section": {
@@ -652,31 +650,48 @@ def get_fellow_profile(request, mobile_number):
 @api_view(['PUT'])
 def update_fellow_profile_section(request, mobile_number, section):
     try:
+        print(f"DEBUG: Received PUT request for section {section}")
+        print(f"DEBUG: Mobile number: {mobile_number}")
+        print(f"DEBUG: Request data: {request.data}")
+        
         profile = FellowProfile.objects.get(user__mobile_number=mobile_number)
         data = request.data
 
-        if section == 'personal_details':
-            fields = ['gender', 'caste_category', 'date_of_birth', 'state', 
-                     'district', 'mandal', 'village', 'whatsapp_number', 'email']
-        elif section == 'family_details':
+        if section == 'family_details':
             fields = ['mother_name', 'mother_occupation', 'father_name', 'father_occupation']
-        elif section == 'education_details':
-            fields = ['current_job', 'hobbies', 'college_name', 'college_type', 
-                     'study_mode', 'stream', 'course', 'subjects', 'semester', 
-                     'technical_skills', 'artistic_skills']
-        else:
-            return Response({"error": "Invalid section"}, status=400)
-
-        # Update only the fields for the specified section
-        for field in fields:
-            if field in data:
+            
+            # Validate required fields
+            for field in fields:
+                if field not in data:
+                    return Response(
+                        {"error": f"Missing required field: {field}"}, 
+                        status=400
+                    )
+            
+            # Update fields
+            for field in fields:
                 setattr(profile, field, data[field])
+            
+            profile.save()
+            
+            return Response({
+                "status": "success",
+                "message": f"{section} updated successfully",
+                "data": {
+                    "mother_name": profile.mother_name,
+                    "mother_occupation": profile.mother_occupation,
+                    "father_name": profile.father_name,
+                    "father_occupation": profile.father_occupation
+                }
+            })
         
-        profile.save()
-        return Response({"status": "success", "message": f"{section} updated successfully"})
+        # ... other sections remain the same
 
     except FellowProfile.DoesNotExist:
         return Response({"error": "Profile not found"}, status=404)
+    except Exception as e:
+        print("Error:", str(e))  # Debug log
+        return Response({"error": str(e)}, status=500)
 
 
 

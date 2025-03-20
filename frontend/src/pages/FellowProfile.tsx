@@ -273,6 +273,22 @@ const ProfileForm = () => {
     </div>
   );
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#F4F1E3]">
+        <div className="text-xl text-walnut">Loading profile data...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[#F4F1E3]">
+        <div className="text-xl text-red-500">{error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col items-center min-h-screen bg-[#F4F1E3] px-6 space-y-6">
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6">
