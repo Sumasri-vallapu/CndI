@@ -21,7 +21,9 @@ from .views import (
     update_video_status,
     submit_task1,
     submit_task2,
-    upload_profile_photo
+    upload_profile_photo,
+    get_fellow_profile,
+    update_fellow_profile_section
 )   
 
 urlpatterns = [
@@ -48,4 +50,6 @@ urlpatterns = [
     path('tasks/submit-task1/', submit_task1, name='submit_task1'),
     path('tasks/submit-task2/', submit_task2, name='submit_task2'),
     path('upload-profile-photo/', upload_profile_photo, name='upload_profile_photo'),
+    path('fellow-profile/<str:mobile_number>/<str:section>/', update_fellow_profile_section, name='update_fellow_profile_section'),
+    path('fellow-profile/<str:mobile_number>/', get_fellow_profile, name='get_fellow_profile'),
 ]

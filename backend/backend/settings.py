@@ -34,22 +34,41 @@ ALLOWED_HOSTS = ["localhost", "127.0.0.1", "yuvachetana.com", "www.yuvachetana.c
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
-    "https://yuvachetana.com",
-    "https://www.yuvachetana.com",
-    "http://localhost:5173",  # If testing locally (Vite default)
+    "http://localhost:5173",
+    "http://localhost:8000",
+    "https://yuvachetana.com"
 ]
 
-CORS_ALLOW_CREDENTIALS = True  # If using authentication
+# Important: Remove this if present
+# CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "PATCH",
+    "DELETE",
+    "OPTIONS"
+]
 
 CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
     "authorization",
     "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
     "x-csrftoken",
+    "x-requested-with"
 ]
 
 CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
     "https://yuvachetana.com",
-    "https://www.yuvachetana.com",
+    "https://www.yuvachetana.com"
 ]
 
 # Application definition
@@ -67,9 +86,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # This should be first
     'django.middleware.security.SecurityMiddleware',
-    "corsheaders.middleware.CorsMiddleware",  # Add this line
-
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -77,8 +95,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ] 
-
-CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'backend.urls'  
 

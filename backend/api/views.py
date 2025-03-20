@@ -12,7 +12,8 @@ from .models import (
     GramPanchayat, 
     UserSignUp, 
     Registration, 
-    Task_details
+    Task_details,
+    FellowProfile
 )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
@@ -22,6 +23,7 @@ import json
 from django.utils import timezone
 import datetime
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -455,20 +457,25 @@ def submit_task2(request):
     except Exception as e:
         logger.error(f"Task 2 submission error: {str(e)}")
         return Response({"error": str(e)}, status=500)
-import os
 
 def upload_to_s3(file, path):
     try:
-        # Extract file extension (.png, .jpg, etc.)
-        file_extension = os.path.splitext(file.name)[1]  # e.g., ".png"
-        full_path = f"{path}{file_extension}"  # Append extension
+        # Extract file extension
+        file_extension = os.path.splitext(file.name)[1]
+        full_path = f"{path}{file_extension}"
 
+        # Upload to S3
         s3_client.upload_fileobj(
             file,
             'yuvachetana-webapp',
-            full_path,  # Save with correct extension
+            full_path,
+            ExtraArgs={
+                'ACL': 'public-read',
+                'ContentType': file.content_type  # Set proper content type
+            }
         )
 
+        # Return the public URL
         return f"https://yuvachetana-webapp.s3.amazonaws.com/{full_path}"
     except Exception as e:
         logger.error(f"S3 upload error: {str(e)}")
@@ -565,11 +572,20 @@ def upload_profile_photo(request):
 
         user = UserSignUp.objects.get(mobile_number=mobile_number)
         
-        if 'photo' in request.FILES:
-            photo_url = upload_to_s3(
-                request.FILES['photo'],
-                f"profile_photos/{mobile_number}"
-            )
+        if 'photo' not in request.FILES:
+            return Response({"error": "No photo provided"}, status=400)
+            
+        photo = request.FILES['photo']
+        
+        # Generate unique filename with extension
+        file_extension = os.path.splitext(photo.name)[1]
+        filename = f"profile_photos/{mobile_number}{file_extension}"
+        
+        try:
+            # Upload to S3
+            photo_url = upload_to_s3(photo, filename)
+            
+            # Update user profile
             user.profile_photo_url = photo_url
             user.save()
             
@@ -577,14 +593,90 @@ def upload_profile_photo(request):
                 "status": "success",
                 "photo_url": photo_url
             })
-        else:
-            return Response({"error": "No photo provided"}, status=400)
+        except Exception as e:
+            logger.error(f"S3 upload error: {str(e)}")
+            return Response({"error": "Failed to upload to S3"}, status=500)
             
     except UserSignUp.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
     except Exception as e:
         logger.error(f"Profile photo upload error: {str(e)}")
         return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def get_fellow_profile(request, mobile_number):
+    try:
+        profile = FellowProfile.objects.get(user__mobile_number=mobile_number)
+        return Response({
+            "hero_section": {
+                "full_name": profile.user.full_name,
+                "fellow_id": profile.fellow_id,
+                "team_leader": profile.team_leader,
+                "fellow_status": profile.fellow_status,
+                "performance_score": profile.performance_score
+            },
+            "personal_details": {
+                "gender": profile.gender,
+                "caste_category": profile.caste_category,
+                "date_of_birth": profile.date_of_birth,
+                "state": profile.state,
+                "district": profile.district,
+                "mandal": profile.mandal,
+                "village": profile.village,
+                "whatsapp_number": profile.whatsapp_number,
+                "email": profile.email
+            },
+            "family_details": {
+                "mother_name": profile.mother_name,
+                "mother_occupation": profile.mother_occupation,
+                "father_name": profile.father_name,
+                "father_occupation": profile.father_occupation
+            },
+            "education_details": {
+                "current_job": profile.current_job,
+                "hobbies": profile.hobbies,
+                "college_name": profile.college_name,
+                "college_type": profile.college_type,
+                "study_mode": profile.study_mode,
+                "stream": profile.stream,
+                "course": profile.course,
+                "subjects": profile.subjects,
+                "semester": profile.semester,
+                "technical_skills": profile.technical_skills,
+                "artistic_skills": profile.artistic_skills
+            }
+        })
+    except FellowProfile.DoesNotExist:
+        return Response({"error": "Profile not found"}, status=404)
+
+@api_view(['PUT'])
+def update_fellow_profile_section(request, mobile_number, section):
+    try:
+        profile = FellowProfile.objects.get(user__mobile_number=mobile_number)
+        data = request.data
+
+        if section == 'personal_details':
+            fields = ['gender', 'caste_category', 'date_of_birth', 'state', 
+                     'district', 'mandal', 'village', 'whatsapp_number', 'email']
+        elif section == 'family_details':
+            fields = ['mother_name', 'mother_occupation', 'father_name', 'father_occupation']
+        elif section == 'education_details':
+            fields = ['current_job', 'hobbies', 'college_name', 'college_type', 
+                     'study_mode', 'stream', 'course', 'subjects', 'semester', 
+                     'technical_skills', 'artistic_skills']
+        else:
+            return Response({"error": "Invalid section"}, status=400)
+
+        # Update only the fields for the specified section
+        for field in fields:
+            if field in data:
+                setattr(profile, field, data[field])
+        
+        profile.save()
+        return Response({"status": "success", "message": f"{section} updated successfully"})
+
+    except FellowProfile.DoesNotExist:
+        return Response({"error": "Profile not found"}, status=404)
 
 
 

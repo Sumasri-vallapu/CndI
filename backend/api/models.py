@@ -138,3 +138,50 @@ class Task_details(models.Model):
 
     def __str__(self):
         return f"Learning Center - {self.user.full_name} - {self.lc_grampanchayat.name}"
+
+
+class FellowProfile(models.Model):
+    # Link to UserSignUp using mobile number
+    user = models.ForeignKey(UserSignUp, on_delete=models.CASCADE, related_name='fellow_profile')
+    
+    # Hero Section
+    fellow_id = models.CharField(max_length=50, blank=True)
+    team_leader = models.CharField(max_length=100, blank=True)
+    fellow_status = models.CharField(max_length=20, default="Active")
+    performance_score = models.CharField(max_length=20, blank=True)
+
+    # Personal Details
+    gender = models.CharField(max_length=20, blank=True)
+    caste_category = models.CharField(max_length=50, blank=True)
+    date_of_birth = models.DateField(null=True, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    district = models.CharField(max_length=100, blank=True)
+    mandal = models.CharField(max_length=100, blank=True)
+    village = models.CharField(max_length=100, blank=True)
+    whatsapp_number = models.CharField(max_length=15, blank=True)
+    email = models.EmailField(blank=True)
+
+    # Family Details
+    mother_name = models.CharField(max_length=100, blank=True)
+    mother_occupation = models.CharField(max_length=100, blank=True)
+    father_name = models.CharField(max_length=100, blank=True)
+    father_occupation = models.CharField(max_length=100, blank=True)
+
+    # Education Details
+    current_job = models.CharField(max_length=100, blank=True)
+    hobbies = models.TextField(blank=True)
+    college_name = models.CharField(max_length=200, blank=True)
+    college_type = models.CharField(max_length=50, blank=True)
+    study_mode = models.CharField(max_length=50, blank=True)
+    stream = models.CharField(max_length=100, blank=True)
+    course = models.CharField(max_length=100, blank=True)
+    subjects = models.TextField(blank=True)
+    semester = models.CharField(max_length=20, blank=True)
+    technical_skills = models.TextField(blank=True)
+    artistic_skills = models.TextField(blank=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Fellow Profile - {self.user.full_name}"

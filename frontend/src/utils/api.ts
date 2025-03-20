@@ -40,4 +40,12 @@ export const ENDPOINTS = {
   UPDATE_CHILD_PROTECTION: `${BASE_URL}/child-protection/update/`,
 
   UPLOAD_PROFILE_PHOTO: `${BASE_URL}/upload-profile-photo/`,
+  GET_PROFILE_PHOTO: `${BASE_URL}/get-profile-photo/`,
+  UPDATE_PROFILE_PHOTO: `${BASE_URL}/update-profile-photo/`,
+  UPDATE_PROFILE: `${BASE_URL}/update-profile/`, 
+
+  GET_FELLOW_PROFILE: (mobile_number: string) => 
+    `${BASE_URL}/fellow-profile/${mobile_number}/`,
+  UPDATE_FELLOW_PROFILE: (mobile_number: string, section: string) => 
+    `${BASE_URL}/fellow-profile/${mobile_number}/${section}/`,
 } as const; 

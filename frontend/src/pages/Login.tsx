@@ -63,7 +63,11 @@ const Login = () => {
       } else if (userStatus === "PENDING_CHILD_PROTECTION_CONSENT") {
         navigate("/child-protection-consent", { state: { mobileNumber } });
       } else if (userStatus === "ACCESS_GRANTED") {
-        navigate("/final-ui", { state: { mobileNumber } });
+        localStorage.setItem('mobile_number', mobileNumber);
+        navigate("/main", { 
+          state: { mobileNumber },
+          replace: true  // Use replace to prevent going back to login
+        });
       } else {
         setError("Unexpected status. Please try again.");
       }
