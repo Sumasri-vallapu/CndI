@@ -7,7 +7,6 @@ import Register from '@/pages/Register';
 import Tasks from '@/pages/Tasks';
 import DataConsent from '@/pages/DataConsent';
 import ChildProtectionConsent from '@/pages/ChildProtectionConsent';
-import FinalUI from '@/pages/FinalUI';   
 import Test from '@/pages/Test';
 import Main from '@/pages/Main';
 import FellowProfile from '@/pages/FellowProfile';
@@ -27,7 +26,6 @@ export default function App() {
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/child-protection-consent" element={<ChildProtectionConsent />} />
               <Route path="/data-protection-consent" element={<DataConsent />} />
-              <Route path="/final-ui" element={<FinalUI />} />
               <Route path="/test" element={<Test />} />
               <Route path="/main" element={<Main />} />
               <Route path="/fellow-profile" element={<FellowProfile />} />

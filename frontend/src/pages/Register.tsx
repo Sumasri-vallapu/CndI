@@ -182,7 +182,7 @@ const Register = () => {
             className="h-16 w-auto object-contain mb-4" 
             loading="eager" 
           />
-          <h2 className="text-2xl font-bold text-walnut">Fellow Registration</h2>
+          <h2 className="text-2xl font-bold text-walnut">Fellowship Registration</h2>
         </div>
 
         {/* Personal Information */}

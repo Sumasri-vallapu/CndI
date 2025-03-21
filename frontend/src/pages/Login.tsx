@@ -56,8 +56,6 @@ const Login = () => {
         navigate("/register", { state: { mobileNumber } });
       } else if (userStatus === "PENDING_TASK_SUBMISSION") {
         navigate("/tasks", { state: { mobileNumber } });
-      } else if (userStatus === "AWAITING_SELECTION") {
-        alert("Your tasks are under review. Please wait for approval.");
       } else if (userStatus === "PENDING_DATA_CONSENT") {
         navigate("/data-consent", { state: { mobileNumber } });
       } else if (userStatus === "PENDING_CHILD_PROTECTION_CONSENT") {

@@ -56,6 +56,10 @@ const Tasks = () => {
     setGlossaryOpen(!glossaryOpen);
   };
 
+  // Add these state variables after your existing state declarations
+  const [isAccepted, setIsAccepted] = useState(false);
+  const [acceptanceDate, setAcceptanceDate] = useState<string | null>(null);
+
   // ✅ Fetch Districts
   useEffect(() => {
     if (!state) return;
@@ -97,6 +101,29 @@ const Tasks = () => {
         setTask2Status(data.task2_status);
       })
       .catch((err) => console.error("Error fetching task status:", err));
+  }, [mobileNumber]);
+
+  // Add this function with your other fetch functions
+  const fetchAcceptanceStatus = async () => {
+    if (!mobileNumber) return;
+    
+    try {
+      const response = await fetch(ENDPOINTS.GET_FELLOW_ACCEPTANCE(mobileNumber));
+      if (!response.ok) throw new Error("Failed to fetch acceptance status");
+      
+      const data = await response.json();
+      setIsAccepted(data.is_accepted_offer_letter);
+      setAcceptanceDate(data.accepted_offer_letter_date);
+    } catch (error) {
+      console.error("Error fetching acceptance status:", error);
+    }
+  };
+
+  // Add a new useEffect to call fetchAcceptanceStatus
+  useEffect(() => {
+    if (mobileNumber) {
+      fetchAcceptanceStatus();
+    }
   }, [mobileNumber]);
 
   // Mark video as watched
@@ -189,6 +216,32 @@ const Tasks = () => {
     } catch (error) {
       console.error("Error submitting task 2:", error);
       alert("Failed to submit Task 2. Please try again.");
+    }
+  };
+
+  // Add the handleAcceptance function
+  const handleAcceptance = async () => {
+    if (!mobileNumber) {
+      alert("Mobile number not available. Please login again.");
+      return;
+    }
+
+    try {
+      const response = await fetch(ENDPOINTS.UPDATE_FELLOW_ACCEPTANCE(mobileNumber), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        }
+      });
+
+      if (!response.ok) throw new Error("Failed to update acceptance");
+      
+      setIsAccepted(true);
+      setAcceptanceDate(new Date().toISOString());
+      alert("Thank you for accepting the fellowship!");
+    } catch (error) {
+      console.error("Error updating acceptance:", error);
+      alert("Failed to update acceptance. Please try again.");
     }
   };
 
@@ -384,45 +437,89 @@ const Tasks = () => {
         {glossaryOpen && (
           <div className="mt-4 bg-gray-50 p-5 rounded-lg space-y-3">
             <div className="grid grid-cols-1 gap-3">
-              <div className="bg-white p-3 rounded-lg">
-                <span className="font-semibold">Not Started:</span> You have not started the task
-              </div>
-              
-              <div className="bg-white p-3 rounded-lg">
-                <span className="font-semibold">Under Review:</span> You have submitted the task to the District Lead for review
-              </div>
-              
-              <div className="bg-white p-3 rounded-lg">
-                <span className="font-semibold">Sent Back:</span> The District Lead has sent the task back to you asking for more details. Discuss with District Lead and submit again.
-              </div>
-              
-              <div className="bg-white p-3 rounded-lg">
-                <span className="font-semibold">Approved:</span> You have cleared the application and are selected as a Bose Fellow
-              </div>
-              
-              <div className="bg-white p-3 rounded-lg">
-                <span className="font-semibold">Not Approved:</span> You could not clear the application this time, please try again later.
-              </div>
+              {[
+                {
+                  status: "Not Started",
+                  description: "You have not started the task"
+                },
+                {
+                  status: "Under Review",
+                  description: "You have submitted the task to the District Lead for review"
+                },
+                {
+                  status: "Sent Back",
+                  description: "The District Lead has sent the task back to you asking for more details. Discuss with District Lead and submit again."
+                },
+                {
+                  status: "Approved",
+                  description: "You have cleared the application and are selected as a Bose Fellow"
+                },
+                {
+                  status: "Not Approved",
+                  description: "You could not clear the application this time, please try again later."
+                }
+              ].map((item, index) => (
+                <div key={index} className="bg-white p-3 rounded-lg">
+                  <span className="font-semibold">{item.status}:</span> {item.description}
+                </div>
+              ))}
             </div>
           </div>
         )}
       </div>
 
-      {/* Application Status Message */}
+      {/* Application Status Message - Consolidated Flow */}
       {(task1Status !== "NOT_STARTED" && task2Status !== "NOT_STARTED") && (
         <div className="w-full max-w-4xl bg-white p-6 rounded-lg shadow-lg text-center">
           {task1Status === "APPROVED" && task2Status === "APPROVED" ? (
-            <div className="py-4">
-              
-              <h3 className="text-xl font-bold text-green-600 mb-2">Congratulations!</h3>
-              <p className="text-green-700 mb-4">You have been selected for the Bose fellowship.</p>
-              <p className="text-gray-700 mb-3">We would love to know more about our new Bose Fellow.</p>
-              <button 
-                onClick={() => navigate("/child-protection-consent")} 
-                className="px-4 py-2 bg-walnut text-white rounded-lg hover:bg-walnut/90 transition-colors"
-              >
-                Click here to complete your profile
-              </button>
+            <div className="py-4 space-y-6">
+              {/* Always show congratulations */}
+              <div>
+                <h3 className="text-xl font-bold text-green-600 mb-2">Congratulations!</h3>
+                <p className="text-green-700 mb-4">You have been selected for the Bose Fellowship.</p>
+              </div>
+
+              {/* Acceptance section */}
+              <div className="pt-2 border-t border-gray-200">
+                <h4 className="text-lg font-semibold text-walnut mb-4">Fellowship Acceptance</h4>
+                
+                {!isAccepted ? (
+                  <div className="space-y-4">
+                    <p className="text-gray-700">
+                      By accepting this fellowship, you agree to uphold the values and responsibilities 
+                      of a Bose Fellow and commit to making a positive impact in your community.
+                    </p>
+                    <Button
+                      onClick={handleAcceptance}
+                      className="w-full bg-walnut text-white hover:bg-walnut/90 py-3 rounded-lg text-lg font-medium"
+                    >
+                      Accept Fellowship
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-center mb-4">
+                      <span className="px-4 py-2 bg-green-100 text-green-800 rounded-full">
+                        Accepted on {acceptanceDate ? new Date(acceptanceDate).toLocaleDateString() : ""}
+                      </span>
+                    </div>
+                    <p className="text-green-700 mb-6">
+                      Thank you for accepting the Bose Fellowship. We look forward to your contributions!
+                    </p>
+                    
+                    {/* Profile completion section - only if accepted */}
+                    <div className="pt-2 border-t border-gray-200">
+                      <p className="text-gray-700 my-4">We would love to know more about our new Bose Fellow.</p>
+                      <button 
+                        onClick={() => navigate("/child-protection-consent")} 
+                        className="px-6 py-3 bg-walnut text-white rounded-lg hover:bg-walnut/90 transition-colors"
+                      >
+                        Complete Your Profile
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="py-4">

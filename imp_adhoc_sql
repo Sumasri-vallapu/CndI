@@ -1,0 +1,17 @@
+SELECT id, mobile_number, surname, given_name, password, unique_number, created_at, ip_address, device_info, full_name, final_access_granted, has_agreed_to_child_protection, has_agreed_to_data_consent, has_submitted_tasks, is_registered, is_selected, profile_photo_url
+	FROM public.api_usersignup;
+
+
+
+
+-- after submission of tasks run this
+
+UPDATE public.api_usersignup
+set is_selected = True
+WHERE ID = 84   
+
+
+
+
+
+

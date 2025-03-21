@@ -48,4 +48,8 @@ export const ENDPOINTS = {
     `${BASE_URL}/fellow-profile/${mobile_number}/`,
   UPDATE_FELLOW_PROFILE: (mobile_number: string, section: string) => 
     `${BASE_URL}/fellow-profile/${mobile_number}/${section}/`,
+  UPDATE_FELLOW_ACCEPTANCE: (mobile_number: string) => 
+    `${BASE_URL}/fellow-profile/${mobile_number}/accept/`,
+  GET_FELLOW_ACCEPTANCE: (mobile_number: string) => 
+    `${BASE_URL}/fellow-profile/${mobile_number}/acceptance-status/`,
 } as const; 

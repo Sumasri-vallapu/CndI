@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import { ENDPOINTS } from "@/utils/api";
 
 export default function ChildProtectionConsent() {
@@ -50,88 +50,99 @@ export default function ChildProtectionConsent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F4F1E3] px-6 py-6 flex flex-col items-center">
-      {/* ✅ Navigation Bar */}
+    <div className="min-h-screen flex flex-col items-center bg-[#F4F1E3] px-6 space-y-6">
+      {/* Navigation Bar - stays outside */}
       <div className="w-full flex items-center justify-between max-w-3xl py-4">
-        <button onClick={() => navigate(-1)} className="text-walnut hover:text-earth">
-          <ArrowLeft size={24} />
+        <button onClick={() => navigate(-1)} className="text-walnut hover:text-earth flex items-center gap-2">
+          <ArrowLeft size={20} />
+          <span className="text-base font-medium">Back</span>
         </button>
-        <button onClick={() => navigate("/login")} className="bg-walnut text-white px-3 py-1 rounded-md text-xs md:text-sm">
+        <button onClick={() => navigate("/login")} className="bg-walnut text-white px-4 py-2 rounded-lg text-sm">
           Logout
         </button>
       </div>
 
-      {/* ✅ Page Title */}
-      <h1 className="text-2xl font-bold text-center text-walnut mb-6">
-        Undertaking for Child Protection Policy
-      </h1>
-
-      {/* ✅ Content Section */}
-      <div className="max-w-3xl bg-white p-6 rounded-lg shadow-lg space-y-4">
-        <p>
-          I hereby declare that I am voluntarily engaging in activities involving children as part of 
-          the <b>Bose Fellowship program</b>, an initiative of the NGO <b>Bharat Dekho</b>.
-        </p>
-        <p>
-          I acknowledge that the protection and well-being of children are of the highest priority. 
-          I agree to comply with the <b>Child Protection Policy</b> and all related guidelines issued 
-          by the concerned authorities.
-        </p>
-
-        {/* ✅ Key Points List */}
-        <div className="bg-gray-50 p-5 rounded-lg space-y-2">
-          {[
-            "I have never been convicted of or charged with any offense related to child abuse, exploitation, or endangerment.",
-            "I will act in the best interests of children and provide a safe and supportive environment for them at all times.",
-            "I will not participate in or tolerate any form of violence, neglect, exploitation, discrimination, or abuse against children.",
-            "I will respect and protect the confidentiality of sensitive information about children and their families that I may encounter during my voluntary work.",
-            "I will immediately report any concerns regarding child safety or any violations of the Child Protection Policy to the designated authority within the organization/program.",
-            "I will maintain professional and appropriate boundaries in all interactions with children and will not engage in any conduct that could be deemed inappropriate or harmful.",
-            "I will follow the organization's code of conduct and ethical standards in all my engagements with children.",
-            "I understand that non-compliance with these commitments may result in the termination of my volunteer service and could lead to legal consequences as per applicable laws."
-          ].map((point, index) => (
-            <p key={index} className="text-sm text-gray-700">
-              <b>{index + 1}.</b> {point}
-            </p>
-          ))}
+      {/* Main Content Container */}
+      <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6">
+        {/* Logo and Title Section - Matching Register.tsx */}
+        <div className="flex flex-col items-center mb-6">
+          <img 
+            src="/Images/organization_logo.png" 
+            alt="Logo" 
+            className="h-16 w-auto object-contain mb-4" 
+            loading="eager" 
+          />
+          <h2 className="text-2xl font-bold text-walnut">Child Protection Policy</h2>
         </div>
 
-        {/* ✅ Agreement Section */}
-        <div className="space-y-4">
-          <p className="text-gray-700">
-            I affirm that all the information provided in this declaration is true and correct to the best of my knowledge.
-            I understand that any false statement or breach of these commitments may lead to disciplinary action against me.
+        {/* ✅ Content Section */}
+        <div className="w-full max-w-md bg-white p-6 rounded-xl shadow-lg space-y-5">
+          <p className="text-gray-800 text-sm leading-relaxed">
+            I hereby declare that I am voluntarily engaging in activities involving children as part of 
+            the <strong>Bose Fellowship program</strong>, an initiative of the NGO <strong>Bharat Dekho</strong>.
+          </p>
+          <p className="text-gray-800 text-sm leading-relaxed">
+            I acknowledge that the protection and well-being of children are of the highest priority. 
+            I agree to comply with the <strong>Child Protection Policy</strong> and all related guidelines issued 
+            by the concerned authorities.
           </p>
 
-          {/* ✅ Auto-Filled Fields */}
-          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-            <p><b>Full Name:</b> {fellowName}</p>
-            <p><b>Place:</b> {place}</p>
-            <p><b>Date:</b> {currentDate}</p>
+          {/* ✅ Key Points with Icons */}
+          <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+            {[
+              "I have never been <strong>convicted of or charged</strong> with any offense related to child abuse, exploitation, or endangerment.",
+              "I will act in the <strong>best interests of children</strong> and provide a safe and supportive environment for them at all times.",
+              "I will <strong>not participate in or tolerate</strong> any form of violence, neglect, exploitation, discrimination, or abuse against children.",
+              "I will respect and protect the <strong>confidentiality</strong> of sensitive information about children and their families that I may encounter during my voluntary work.",
+              "I will <strong>immediately report</strong> any concerns regarding child safety or any violations of the Child Protection Policy to the designated authority within the organization/program.",
+              "I will maintain <strong>professional and appropriate boundaries</strong> in all interactions with children and will not engage in any conduct that could be deemed inappropriate or harmful.",
+              "I will follow the organization's <strong>code of conduct</strong> and ethical standards in all my engagements with children.",
+              "I understand that <strong>non-compliance</strong> with these commitments may result in the <strong>termination</strong> of my volunteer service and could lead to legal consequences as per applicable laws."
+            ].map((point, index) => (
+              <div key={index} className="flex items-start gap-2">
+                <CheckCircle className="w-5 h-5 text-earth" />
+                <p className="text-gray-700 text-sm" dangerouslySetInnerHTML={{ __html: point }} />
+              </div>
+            ))}
           </div>
 
-          {/* ✅ Acknowledgment Checkbox */}
-          <div className="flex items-center space-x-3">
-            <input 
-              type="checkbox" 
-              id="agree" 
-              className="w-5 h-5 text-walnut border-gray-300 rounded"
-              checked={isAgreed}
-              onChange={(e) => setIsAgreed(e.target.checked)} 
-            />
-            <label htmlFor="agree" className="text-gray-700">
-              I acknowledge that I have read, understood, and agree to abide by the terms outlined in this self-declaration.
-            </label>
-          </div>
+          {/* ✅ Agreement Section */}
+          <div className="space-y-3">
+            <p className="text-gray-700 text-sm">
+              I affirm that all the information provided in this declaration is true and correct to the best of my knowledge.
+              I understand that any false statement or breach of these commitments may lead to disciplinary action against me.
+            </p>
 
-          {/* ✅ Submit Button */}
-          <Button 
-            onClick={handleAgree}
-            disabled={isSubmitting}
-            className="w-full bg-walnut text-white hover:bg-walnut/90 py-3 rounded-lg shadow-md"
-          >
-            {isSubmitting ? "Submitting..." : "I Agree"}
-          </Button>
+            {/* ✅ Auto-Filled Fields */}
+            <div className="bg-gray-50 p-4 rounded-lg text-sm space-y-2">
+              <p><span className="font-semibold">Full Name:</span> {fellowName}</p>
+              <p><span className="font-semibold">Place:</span> {place}</p>
+              <p><span className="font-semibold">Date:</span> {currentDate}</p>
+            </div>
+
+            {/* ✅ Acknowledgment Checkbox */}
+            <div className="flex items-start space-x-3">
+              <input 
+                type="checkbox" 
+                id="agree" 
+                className="w-5 h-5 text-walnut border-gray-300 rounded"
+                checked={isAgreed}
+                onChange={(e) => setIsAgreed(e.target.checked)} 
+              />
+              <label htmlFor="agree" className="text-gray-700 text-sm leading-tight">
+                I acknowledge that I have read, understood, and agree to abide by the terms outlined in this self-declaration.
+              </label>
+            </div>
+
+            {/* ✅ Submit Button */}
+            <Button 
+              onClick={handleAgree}
+              disabled={isSubmitting}
+              className="w-full bg-walnut text-white hover:bg-walnut/90 py-3 rounded-lg text-lg font-medium"
+            >
+              {isSubmitting ? "Submitting..." : "I Agree"}
+            </Button>
+          </div>
         </div>
       </div>
     </div>

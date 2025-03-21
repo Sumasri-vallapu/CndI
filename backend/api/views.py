@@ -154,14 +154,13 @@ def login(request):
         # Determine User Status
         if not user.is_registered:
             user_status = "PENDING_REGISTRATION"
-        elif not user.has_submitted_tasks:
+        elif not user.has_submitted_tasks and not user.is_accepted_offer_letter:
             user_status = "PENDING_TASK_SUBMISSION"
-        elif not user.is_selected:
-            user_status = "AWAITING_SELECTION"
-        elif not user.has_agreed_to_data_consent:
-            user_status = "PENDING_DATA_CONSENT"
         elif not user.has_agreed_to_child_protection:
             user_status = "PENDING_CHILD_PROTECTION_CONSENT"
+        elif not user.has_agreed_to_data_consent:
+            user_status = "PENDING_DATA_CONSENT"
+
         else:
             user_status = "ACCESS_GRANTED"
 
@@ -278,31 +277,34 @@ def get_castes(request):
 @api_view(['GET'])
 def get_user_details(request):
     mobile_number = request.GET.get('mobile_number')
+    if not mobile_number:
+        return Response({"error": "Mobile number is required"}, status=400)
+    
     try:
         user = UserSignUp.objects.get(mobile_number=mobile_number)
         return Response({
             "full_name": user.full_name,
-            "mobile_number": user.mobile_number
-        }, status=status.HTTP_200_OK)
+            "profile_photo_url": user.profile_photo_url
+        })
     except UserSignUp.DoesNotExist:
-        return Response(
-            {"message": "User not found"}, 
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "User not found"}, status=404)
 
 @api_view(['GET'])
 def get_task_status(request, mobile_number):
     try:
         registration = Registration.objects.get(mobile_number=mobile_number)
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
         return Response({
             'video1_watched': registration.isvideo1seen,
             'video2_watched': registration.isvideo2seen,
             'task1_submitted': registration.istask1submitted,
             'task2_submitted': registration.istask2submitted,
             'task1_status': registration.task1_status,
-            'task2_status': registration.task2_status
+            'task2_status': registration.task2_status,
+            'is_accepted_offer_letter': user.is_accepted_offer_letter,
+            'accepted_offer_letter_date': user.accepted_offer_letter_date
         })
-    except Registration.DoesNotExist:
+    except Registration.DoesNotExist: 
         return Response({"error": "User not found"}, status=404)
 
 @api_view(['GET'])
@@ -450,6 +452,11 @@ def submit_task2(request):
         registration.istask2submitted = True
         registration.task2_status = 'UNDER_REVIEW'
         registration.save()
+ 
+        # Update has_submitted_tasks to True in api_usersignup
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user.has_submitted_tasks = True
+        user.save()
         
         return Response({"status": "success"})
     except Registration.DoesNotExist:
@@ -559,44 +566,41 @@ class UploadPhotoView(APIView):
         return Response({"username": username, "photo_url": photo_url}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
-@parser_classes([MultiPartParser, FormParser])
+@parser_classes([MultiPartParser])
 def upload_profile_photo(request):
+    mobile_number = request.data.get('mobile_number')
+    photo = request.FILES.get('photo')
+    
+    if not mobile_number or not photo:
+        return Response({"error": "Both mobile number and photo are required"}, status=400)
+    
     try:
-        mobile_number = request.POST.get('mobile_number')
-        if not mobile_number:
-            return Response({"error": "mobile_number is required"}, status=400)
-
         user = UserSignUp.objects.get(mobile_number=mobile_number)
         
-        if 'photo' not in request.FILES:
-            return Response({"error": "No photo provided"}, status=400)
-            
-        photo = request.FILES['photo']
+        # Generate unique filename
+        ext = photo.name.split('.')[-1]
+        filename = f"profile_photos/{user.unique_number}.{ext}"
         
-        # Generate unique filename with extension
-        file_extension = os.path.splitext(photo.name)[1]
-        filename = f"profile_photos/{mobile_number}{file_extension}"
+        # Upload to S3
+        s3_client.upload_fileobj(
+            photo,
+            AWS_STORAGE_BUCKET_NAME,
+            filename,
+            ExtraArgs={'ContentType': photo.content_type}
+        )
         
-        try:
-            # Upload to S3
-            photo_url = upload_to_s3(photo, filename)
-            
-            # Update user profile
-            user.profile_photo_url = photo_url
-            user.save()
-            
-            return Response({
-                "status": "success",
-                "photo_url": photo_url
-            })
-        except Exception as e:
-            logger.error(f"S3 upload error: {str(e)}")
-            return Response({"error": "Failed to upload to S3"}, status=500)
-            
+        # Update user's photo URL
+        photo_url = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{filename}"
+        user.profile_photo_url = photo_url
+        user.save()
+        
+        return Response({
+            "status": "success",
+            "photo_url": photo_url
+        })
     except UserSignUp.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
     except Exception as e:
-        logger.error(f"Profile photo upload error: {str(e)}")
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
@@ -693,7 +697,30 @@ def update_fellow_profile_section(request, mobile_number, section):
         print("Error:", str(e))  # Debug log
         return Response({"error": str(e)}, status=500)
 
+@api_view(['POST'])
+def update_fellow_acceptance(request, mobile_number):
+    try:
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user.is_accepted_offer_letter = True
+        user.accepted_offer_letter_date = timezone.now()
+        user.save()
+        return Response({
+            "status": "success",
+            "message": "Fellowship acceptance updated successfully"
+        })
+    except UserSignUp.DoesNotExist:
+        return Response({"error": "Profile not found"}, status=404)
 
+@api_view(['GET'])
+def get_fellow_acceptance(request, mobile_number):
+    try:
+        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        return Response({
+            "is_accepted_offer_letter": user.is_accepted_offer_letter,
+            "accepted_offer_letter_date": user.accepted_offer_letter_date
+        })
+    except UserSignUp.DoesNotExist:
+        return Response({"error": "Profile not found"}, status=404)     
 
 
 

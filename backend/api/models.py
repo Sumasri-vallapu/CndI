@@ -28,7 +28,10 @@ class UserSignUp(models.Model):
     is_selected = models.BooleanField(default=False)
     has_agreed_to_data_consent = models.BooleanField(default=False)
     has_agreed_to_child_protection = models.BooleanField(default=False)
-    final_access_granted = models.BooleanField(default=False)
+    final_access_granted = models.BooleanField(default=False) 
+    
+    is_accepted_offer_letter = models.BooleanField(default=False)
+    accepted_offer_letter_date = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         self.surname = self.surname.upper()
@@ -108,7 +111,8 @@ class Registration(models.Model):
 
     # Metadata
     insert_timestamp = models.DateTimeField(auto_now_add=True)
-    is_approved = models.BooleanField(default=False)
+    is_approved = models.BooleanField(default=False) 
+
 
     def __str__(self):
         return f"{self.full_name} - {self.mobile_number}"
@@ -182,6 +186,7 @@ class FellowProfile(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
     def __str__(self):
         return f"Fellow Profile - {self.user.full_name}"

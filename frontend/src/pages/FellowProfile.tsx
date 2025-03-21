@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { ENDPOINTS } from "@/utils/api";
+import { ProfilePhoto } from "@/components/ui/ProfilePhoto";
+import { Menu, ArrowLeft } from "lucide-react";
 
 const ProfileForm = () => {
   const location = useLocation();
@@ -13,6 +15,9 @@ const ProfileForm = () => {
   const [isEditing, setIsEditing] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
+
   
   // Get mobile number from both location state and localStorage
   const mobileNumber = location.state?.mobileNumber || localStorage.getItem('mobile_number');
@@ -273,6 +278,16 @@ const ProfileForm = () => {
     </div>
   );
 
+  const toggleSidebar = (section: string) => {
+    setActiveSidebar(activeSidebar === section ? null : section);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('mobile_number');
+    localStorage.removeItem('profile_photo');
+    navigate('/login');
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#F4F1E3]">
@@ -290,9 +305,36 @@ const ProfileForm = () => {
   }
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-[#F4F1E3] px-6 space-y-6">
-      <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6">
-        <h2 className="text-2xl font-bold text-walnut text-center">My Profile</h2>
+    <div className="relative flex flex-col items-center min-h-screen bg-[#F4F1E3] px-4 py-6">
+      {/* Navigation Bar with Back and Logout - Matching Register.tsx */}
+      <div className="w-full flex items-center justify-between max-w-3xl py-4">
+        <button 
+          onClick={() => navigate('/main')} 
+          className="text-walnut hover:text-earth flex items-center gap-2"
+        >
+          <ArrowLeft size={20} />
+          <span className="text-base font-medium">Back</span>
+        </button>
+        <button 
+          onClick={handleLogout}
+          className="bg-walnut text-white px-4 py-2 rounded-lg text-sm"
+        >
+          Logout
+        </button>
+      </div>
+
+  
+
+      {/* Main Content Container - Following Register.tsx style */}
+      <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6 mt-6">
+        <div className="flex flex-col items-center mb-6">
+          <ProfilePhoto 
+            initialPhotoUrl={localStorage.getItem('profile_photo')}
+            mobileNumber={mobileNumber || ''}
+          />
+          <h2 className="text-2xl font-bold text-walnut mt-4">{formData.fullName}</h2>
+        </div>
+
         {/* Hero Section - Always Visible */}
         <div className="w-full bg-white p-6 shadow-lg rounded-lg space-y-4">
           {["fullName", "fellowId", "teamLeader", "fellowStatus", "performanceScore"].map((field) => (
@@ -306,6 +348,57 @@ const ProfileForm = () => {
         {renderSection("Personal Details", ["gender", "casteCategory", "dateOfBirth", "state", "district", "mandal", "village", "whatsappNumber", "email"])}
         {renderSection("Family Details", ["motherName", "motherOccupation", "fatherName", "fatherOccupation"])}
         {renderSection("Education Details", ["currentJob", "hobbies", "collegeName", "collegeType", "studyMode", "stream", "course", "subjects", "semester", "technicalSkills", "artisticSkills"], ["semester", "course", "technicalSkills", "artisticSkills"])}
+      </div>
+
+      {/* Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setIsSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <div
+        className={`fixed inset-y-0 left-0 w-64 bg-[#F4F1E3] p-5 shadow-lg transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } transition-transform z-50`}
+      >
+        <button onClick={() => setIsSidebarOpen(false)} className="mb-5">
+          <Menu className="h-6 w-6 text-walnut" />
+        </button>
+        {[
+          { 
+            title: "Navigation",
+            subItems: ["Main Dashboard"]
+          },
+          { 
+            title: "Profiles", 
+            subItems: ["My Profile", "Children", "Learning Center (LC)"]
+          },
+          { title: "Assessments", subItems: ["Baseline", "Endline"] },
+          { title: "Reflections", subItems: ["Monthly Reflections", "Quarterly Feedbacks", "Annual Testimonials"] },
+        ].map((section) => (
+          <div key={section.title} className="w-full p-3 bg-white shadow-md rounded-lg mb-3">
+            <h3
+              className="text-base font-bold text-walnut cursor-pointer flex justify-between items-center"
+              onClick={() => toggleSidebar(section.title)}
+            >
+              {section.title}
+              <span>{activeSidebar === section.title ? "▼" : "►"}</span>
+            </h3>
+            {activeSidebar === section.title && (
+              <div className="mt-2">
+                {section.subItems.map((item) => (
+                  <Link 
+                    key={item} 
+                    to={item === "Main Dashboard" ? "/main" : item === "My Profile" ? "/fellow-profile" : "#"}
+                    className="block text-blue-700 hover:text-blue-900 py-2 px-3 text-sm border-b border-gray-100 last:border-b-0"
+                  >
+                    {item}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
