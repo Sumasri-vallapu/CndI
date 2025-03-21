@@ -154,8 +154,10 @@ def login(request):
         # Determine User Status
         if not user.is_registered:
             user_status = "PENDING_REGISTRATION"
-        elif not user.has_submitted_tasks and not user.is_accepted_offer_letter:
+        elif not user.has_submitted_tasks:
             user_status = "PENDING_TASK_SUBMISSION"
+        elif not user.is_accepted_offer_letter:
+             user_status = "PENDING_TASK_SUBMISSION"
         elif not user.has_agreed_to_child_protection:
             user_status = "PENDING_CHILD_PROTECTION_CONSENT"
         elif not user.has_agreed_to_data_consent:
