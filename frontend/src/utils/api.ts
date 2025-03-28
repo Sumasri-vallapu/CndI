@@ -10,6 +10,7 @@ export const ENDPOINTS = {
   REGISTER: `${BASE_URL}/fellow-registration/`,        // register api
   FORGOT_PASSWORD: `${BASE_URL}/forgot-password/`,  
   LOGIN: `${BASE_URL}/fellow-login/`,  // login api
+  SAVE_USER_TESTIMONIAL_RECORDING: `${BASE_URL}/save-user-testimonial-recording/`,
 
 
   GET_USER_STATUS: (mobile_number: string) => `${BASE_URL}/user-status/${mobile_number}/`,
