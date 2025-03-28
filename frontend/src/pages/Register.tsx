@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { ENDPOINTS } from "@/utils/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { ArrowLeft } from "lucide-react"; // Remove ArrowRight
+import { ArrowLeft } from "lucide-react"; // Remove ArrowRight 
 
 interface LocationOption {
   id: string;
@@ -206,6 +206,9 @@ const Register = () => {
               dateFormat="yyyy-MM-dd"
               showYearDropdown
               scrollableYearDropdown
+              minDate={new Date("2000-01-01")}
+              maxDate={new Date()}
+              yearDropdownItemNumber={new Date().getFullYear() - 2000 + 1} // 👈 Key fix
             />
           </div>
           <div className="space-y-2">
@@ -215,12 +218,12 @@ const Register = () => {
                 <SelectValue placeholder="Select Gender" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="FEMALE">Female</SelectItem>
+                <SelectItem value="MALE">Male</SelectItem>
+                <SelectItem value="OTHER">Other</SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div>   
           
           <div className="space-y-2">
             <Label>Caste Category</Label>
@@ -229,14 +232,14 @@ const Register = () => {
                 <SelectValue placeholder="Select Caste Category" />
               </SelectTrigger>
               <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
-                <SelectItem value="st">ST</SelectItem>
-                <SelectItem value="sc">SC</SelectItem>
-                <SelectItem value="bc">BC</SelectItem>
-                <SelectItem value="obc">OBC</SelectItem>
-                <SelectItem value="oc">OC</SelectItem>
-                <SelectItem value="muslim">Muslim</SelectItem>
-                <SelectItem value="christian">Christian</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="ST">ST</SelectItem>
+                <SelectItem value="SC">SC</SelectItem>
+                <SelectItem value="BC">BC</SelectItem>
+                <SelectItem value="OBC">OBC</SelectItem>
+                <SelectItem value="OC">OC</SelectItem>
+                <SelectItem value="MUSLIM">Muslim</SelectItem>
+                <SelectItem value="CHRISTIAN">Christian</SelectItem>
+                <SelectItem value="OTHER">Other</SelectItem>
               </SelectContent>
             </Select>
           </div>

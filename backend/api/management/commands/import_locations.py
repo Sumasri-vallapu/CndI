@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **kwargs):
         # ✅ Path to your CSV file (update if needed)
-        csv_file_path = "ts_grampanchayatelectionsdata.csv"
+        csv_file_path = "backend/data/ts_grampanchayatelectionsdata.csv"
 
         try:
             df = pd.read_csv(csv_file_path)
@@ -25,7 +25,7 @@ class Command(BaseCommand):
             if row["state_id"] not in state_cache:
                 state, _ = State.objects.get_or_create(
                     id=row["state_id"],
-                    defaults={"name": row["state_name"]}
+                    defaults={"state_name": row["state_name"]}
                 )
                 state_cache[row["state_id"]] = state
             else:
@@ -35,7 +35,7 @@ class Command(BaseCommand):
             if row["district_id"] not in district_cache:
                 district, _ = District.objects.get_or_create(
                     id=row["district_id"],
-                    defaults={"name": row["district_name"], "state": state}
+                    defaults={"district_name": row["district_name"], "state": state}
                 )
                 district_cache[row["district_id"]] = district
             else:
@@ -45,7 +45,7 @@ class Command(BaseCommand):
             if row["mandal_id"] not in mandal_cache:
                 mandal, _ = Mandal.objects.get_or_create(
                     id=row["mandal_id"],
-                    defaults={"name": row["mandal_name"], "district": district}
+                    defaults={"mandal_name": row["mandal_name"], "district": district}
                 )
                 mandal_cache[row["mandal_id"]] = mandal
             else:
@@ -53,8 +53,8 @@ class Command(BaseCommand):
 
             # ✅ Insert Village
             GramPanchayat.objects.get_or_create(
-                name=row["gp_name"],
-                mandal=mandal
+                id=row["gp_code"],
+                defaults={"gram_panchayat_name": row["gp_name"], "mandal": mandal}
             )
 
         self.stdout.write(self.style.SUCCESS("✅ Successfully imported location data"))

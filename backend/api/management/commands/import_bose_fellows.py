@@ -9,7 +9,7 @@ class Command(BaseCommand):
     def handle(self, *args, **kwargs):
         try:
             # Read CSV file
-            df = pd.read_csv('Cleaned_Bose_Fellows_Data.csv')
+            df = pd.read_csv('backend/data/Cleaned_Bose_Fellows_Data.csv')
             
             # Track statistics
             created_count = 0

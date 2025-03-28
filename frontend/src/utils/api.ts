@@ -1,27 +1,25 @@
 // API configuration
-//const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'http://localhost:8000/api';
 
-const BASE_URL = 'https://yuvachetana.com/api';
+//const BASE_URL = 'https://yuvachetana.com/api';
 
 
 // API endpoints
 export const ENDPOINTS = {
-  SIGNUP: `${BASE_URL}/signup/`,  // signup api
-  FORGOT_PASSWORD: `${BASE_URL}/forgot-password/`,
-  LOGIN: `${BASE_URL}/login/`,  // login api
+  SIGNUP: `${BASE_URL}/fellow-signup/`,  // signup api
+  REGISTER: `${BASE_URL}/fellow-registration/`,        // register api
+  FORGOT_PASSWORD: `${BASE_URL}/forgot-password/`,  
+  LOGIN: `${BASE_URL}/fellow-login/`,  // login api
+
 
   GET_USER_STATUS: (mobile_number: string) => `${BASE_URL}/user-status/${mobile_number}/`,
-  GET_USER_DETAILS: `${BASE_URL}/user-details/`,
+  GET_USER_DETAILS: `${BASE_URL}/fellow-details/`,
   
   // location api
   GET_STATES: `${BASE_URL}/states/`,
   GET_DISTRICTS: (state_id: string) => `${BASE_URL}/districts/?state_id=${state_id}`,
   GET_MANDALS: (district_id: string) => `${BASE_URL}/mandals/?district_id=${district_id}`,
   GET_VILLAGES: (mandal_id: string) => `${BASE_URL}/villages/?mandal_id=${mandal_id}`,
-
-  GET_CASTES: `${BASE_URL}/castes/`,  // get castes api
-
-  REGISTER: `${BASE_URL}/register/`,        // register api
 
   // task api
 

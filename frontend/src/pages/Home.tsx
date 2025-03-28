@@ -76,11 +76,17 @@ const Home = () => {
       <Testimonials /> 
 
       {/* ✅ Login Button */}
-      <div className="fixed bottom-8 text-white flex justify-center w-full hover:opacity-90 hover:scale-105 transition-all">
-        <Button onClick={() => navigate("/login")} className="max-w-lg w-full bg-walnut text-white py-3 rounded-lg shadow-lg">
-          Login/Sign Up
-        </Button>   
-      </div>
+      <div className="fixed bottom-8 w-full flex justify-center">
+  <div className="w-full max-w-3xl px-6">
+    <Button 
+      onClick={() => navigate("/login")} 
+      className="w-full bg-walnut text-white py-3 rounded-lg shadow-lg hover:opacity-90 hover:scale-105 transition-all"
+    >
+      Login/Sign Up
+    </Button>
+  </div>
+</div>
+
     </div>
   );
 };

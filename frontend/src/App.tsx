@@ -10,6 +10,8 @@ import ChildProtectionConsent from '@/pages/ChildProtectionConsent';
 import Test from '@/pages/Test';
 import Main from '@/pages/Main';
 import FellowProfile from '@/pages/FellowProfile';
+import RecordUserTestimonial from '@/pages/RecordUserTestimonial';
+import Recording from '@/pages/Recording';
 
 export default function App() {
   return (
@@ -29,6 +31,8 @@ export default function App() {
               <Route path="/test" element={<Test />} />
               <Route path="/main" element={<Main />} />
               <Route path="/fellow-profile" element={<FellowProfile />} />
+              <Route path="/record-user-testimonial" element={<RecordUserTestimonial />} />
+              <Route path="/record-user-testimonial/record" element={<Recording />} />
             </Routes>
           </main>
         </div>

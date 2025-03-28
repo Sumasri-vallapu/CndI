@@ -1,10 +1,17 @@
 from django.urls import path
 from .views import (
+
+    FellowSignUp,
+
+
+
+
+
     UploadPhotoView, 
     HelloworldView, 
-    signup, 
     forgot_password,
-    login,
+    fellow_login,
+    fellow_signup,
     update_tasks,
     update_data_consent,
     update_child_protection_consent,
@@ -14,7 +21,7 @@ from .views import (
     get_districts,
     get_mandals,
     get_villages,
-    register,
+    fellow_register,
     get_user_details,
     get_task_status,
     get_video_status,
@@ -25,13 +32,18 @@ from .views import (
     get_fellow_profile,
     update_fellow_profile_section,
     update_fellow_acceptance,
-    get_fellow_acceptance
+    get_fellow_acceptance,
 )   
 
 urlpatterns = [
     path('', HelloworldView.as_view(), name='hello-world'),
-    path('signup/', signup, name='signup'),
+    path('fellow-signup/', fellow_signup, name='fellow_signup'), 
+    path('fellow-registration/', fellow_register, name='fellow_registration'),
     path('forgot-password/', forgot_password, name='forgot_password'),
+    path('fellow-login/', fellow_login, name='fellow_login'),
+
+
+
     path('login/', login, name='login'),
     path('data-consent/update/', update_data_consent, name='update_data_consent'),
     path('child-protection/update/', update_child_protection_consent, name='update_child_protection'),
@@ -44,7 +56,6 @@ urlpatterns = [
     path('districts/', get_districts, name='get_districts'),
     path('mandals/', get_mandals, name='get_mandals'),
     path('villages/', get_villages, name='get_villages'),
-    path('register/', register, name='register'),
 
     # task api
     path('user-details/', get_user_details, name='get_user_details'),

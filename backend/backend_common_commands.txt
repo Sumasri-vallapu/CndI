@@ -1,0 +1,75 @@
+sudo nginx -t  # Test for syntax errors
+sudo systemctl status nginx.service
+sudo systemctl status gunicorn
+
+sudo systemctl restart nginx.service
+sudo systemctl restart gunicorn
+
+
+sudo tail -f /var/log/nginx/error.log  
+sudo tail -f /var/log/nginx/access.log
+
+
+sudo nano /etc/nginx/sites-available/yuvachetana
+sudo journalctl -u gunicorn --no-pager --since "10 minutes ago"
+
+
+
+ sudo certbot certificates
+ sudo certbot renew --dry-run
+ 
+ systemctl list-timers | grep certbot     # Want to confirm auto-renew is set up correctly?
+ 
+ 
+ Logs
+ cat /etc/logrotate.d/nginx
+ 
+ ls -lh /var/log/nginx/
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+                             CLIENT-SIDE
+                          ┌────────────┐
+                          │  Browser   │
+                          └─────┬──────┘
+                                │
+                  1. HTTP GET/POST Requests
+                                │
+                     ┌──────────▼──────────┐
+                     │     NGINX Server    │
+                     │ (Receives ALL reqs) │
+                     └─────────┬───────────┘
+            ┌──────────────────┼─────────────────────┐
+            │                  │                     │
+ 2. Static files         3. /api/ requests     7. WebSocket requests
+(HTML, CSS, JS, etc.)     (Proxy to Gunicorn)     (Optional setup)
+            │                  │                     │
+   ┌────────▼───────┐   ┌──────▼─────────┐
+   │ React Frontend │   │   Gunicorn     │
+   │  (dist folder) │   │ (App Server)   │
+   └────────────────┘   └──────┬─────────┘
+                               │
+                       4. Calls Django
+                               │
+                   ┌───────────▼──────────┐
+                   │      Django App      │
+                   └──────────┬───────────┘
+                              │
+                      5. Talks to DB
+                              │
+                   ┌──────────▼──────────┐
+                   │   PostgreSQL (RDS)  │
+                   └─────────────────────┘
+
+
+
+
+
+

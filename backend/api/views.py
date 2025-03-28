@@ -5,6 +5,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (
+    FellowSignUp,
+    FellowRegistration,
     UserPhoto, 
     State, 
     District, 
@@ -14,11 +16,11 @@ from .models import (
     Registration, 
     Task_details,
     FellowProfile
-)
+    )
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework import status
-from .serializers import UserSerializer, RegistrationSerializer
+from .serializers import FellowSignUpSerializer, FellowRegistrationSerializer
 import json     
 from django.utils import timezone
 import datetime
@@ -47,19 +49,12 @@ def get_client_ip(request):
     return x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
 
 @api_view(['POST'])
-def signup(request):  
-    
+def fellow_signup(request):  
     data = request.data.copy()
-    
-    # Convert name fields to uppercase
-    if 'surname' in data:
-        data['surname'] = data['surname'].upper()
-    if 'given_name' in data: 
-        data['given_name'] = data['given_name'].upper()
     data['ip_address'] = get_client_ip(request)
     data['device_info'] = json.dumps(dict(request.headers))
 
-    serializer = UserSerializer(data=data)
+    serializer = FellowSignUpSerializer(data=data)
     if serializer.is_valid():
         user = serializer.save()
         logger.info(f"User signed up successfully with ID: {user.id}")
@@ -69,55 +64,62 @@ def signup(request):
             "user_id": serializer.data['id']
         }, status=status.HTTP_201_CREATED) 
     
-    logger.error(f"Signup validation failed: {serializer.errors}")
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST']) 
-def forgot_password(request):
-    mobile_number = request.data.get('mobile_number')
-    try:
-        user =  UserSignUp.objects.get(mobile_number=mobile_number)
-        return Response({"status": "success", "password": user.password}, status=status.HTTP_200_OK)
-    except UserSignUp.DoesNotExist:
-        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+    logger.warning(f"Signup failed: {serializer.errors}")
+    return Response({
+        "status": "error",
+        "errors": serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
-def register(request):
+def fellow_register(request):
     try:
-        # Get the user first since mobile_number is required
         mobile_number = request.data.get('mobile_number')
-        if not mobile_number:
+        password = request.data.get('password')
+
+        if not mobile_number or not password:
             return Response({
                 "status": "error",
-                "message": "Mobile number is required"
+                "message": "Mobile number and password are required"
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
-        
-        # Create registration data with user
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+
+        # Password check
+        if password != fellow.password:
+            return Response({
+                "status": "error",
+                "message": "Invalid password"
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        # Duplicate registration check
+        if hasattr(fellow, 'fellow_registration'):
+            return Response({
+                "status": "error",
+                "message": "User is already registered"
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Prepare data
         data = request.data.copy()
-        data['user'] = user.id  # Add user ID to the data
-        
-        serializer = RegistrationSerializer(data=data)
+        data['fellow'] = fellow.id
+
+        serializer = FellowRegistrationSerializer(data=data)
         if serializer.is_valid():
-            # Save registration
             registration = serializer.save()
-            
-            # Update UserSignUp status
-            user.is_registered = True
-            user.save()
-            
+
+            fellow.is_registered = True
+            fellow.save()
+
             return Response({
                 "status": "success",
                 "message": "Registration successful"
             }, status=status.HTTP_201_CREATED)
-        
+
         return Response({
             "status": "error",
             "errors": serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
-        
-    except UserSignUp.DoesNotExist:
+
+    except FellowSignUp.DoesNotExist:
         return Response({
             "status": "error",
             "message": "User not found. Please sign up first."
@@ -129,66 +131,62 @@ def register(request):
             "message": str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-# User Login
+@api_view(['POST']) 
+def get_fellow_details(request):
+    mobile_number = request.data.get('mobile_number')
+
+    if not mobile_number:
+        return Response({
+            "status": "error",
+            "message": "Mobile number is required."
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+        return Response({
+            "status": "success",
+            "password": fellow.password,     # plain text return — only for testing.
+            "fellow_status": fellow.get_user_status(),
+            "full_name": fellow.full_name,
+        }, status=status.HTTP_200_OK)
+
+    except FellowSignUp.DoesNotExist:
+        return Response({
+            "status": "error",
+            "message": "User not found."
+        }, status=status.HTTP_404_NOT_FOUND)
+
 @api_view(['POST'])
-def login(request):
+def fellow_login(request):
     mobile_number = request.data.get("mobile_number")
     password = request.data.get("password")
 
     if not mobile_number or not password:
-        return Response(
-            {"error": "Mobile number and password are required"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({"status": "error", "message": "Mobile number and password are required"},
+                        status=status.HTTP_400_BAD_REQUEST)
 
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
 
-        # Check password
-        if user.password != password:
-            return Response(
-                {"error": "Invalid credentials"},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-
-        # Determine User Status
-        if not user.is_registered:
-            user_status = "PENDING_REGISTRATION"
-        elif not user.has_submitted_tasks:
-            user_status = "PENDING_TASK_SUBMISSION"
-        elif not user.is_accepted_offer_letter:
-             user_status = "PENDING_TASK_SUBMISSION"
-        elif not user.has_agreed_to_child_protection:
-            user_status = "PENDING_CHILD_PROTECTION_CONSENT"
-        elif not user.has_agreed_to_data_consent:
-            user_status = "PENDING_DATA_CONSENT"
-
-        else:
-            user_status = "ACCESS_GRANTED"
+        if fellow.password != password:
+            return Response({"status": "error", "message": "Invalid credentials"},
+                            status=status.HTTP_401_UNAUTHORIZED)
 
         return Response({
             "status": "success",
             "message": "Login successful",
-            "user_status": user_status,
+            "user_status": fellow.get_user_status(),  # ✅ Refactored
             "user": {
-                "mobile_number": user.mobile_number,
-                "full_name": user.full_name,
-                "is_selected": user.is_selected,
-                "unique_number": user.unique_number
+                "mobile_number": fellow.mobile_number,
+                "full_name": fellow.full_name,
+                "is_selected": fellow.is_selected,
+                "unique_number": fellow.unique_number
             }
         }, status=status.HTTP_200_OK)
 
-    except UserSignUp.DoesNotExist:
-        return Response(
-            {"error": "User not found"},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    except Exception as e:
-        return Response(
-            {"error": "An error occurred during login"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
-
+    except FellowSignUp.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"},
+                        status=status.HTTP_404_NOT_FOUND)
 
 @api_view(['GET'])
 def get_user_status(request, mobile_number):  
@@ -264,18 +262,6 @@ def update_child_protection_consent(request):
         }, status=status.HTTP_404_NOT_FOUND)
 
 
-
-@api_view(['GET'])
-def get_castes(request):
-    # Add your logic to fetch castes
-    castes = [
-        {"id": 1, "name": "OC"},
-        {"id": 2, "name": "BC"},
-        {"id": 3, "name": "SC"},
-        {"id": 4, "name": "ST"}
-    ]  # Replace with database query
-    return Response(castes)
-
 @api_view(['GET'])
 def get_user_details(request):
     mobile_number = request.GET.get('mobile_number')
@@ -285,7 +271,6 @@ def get_user_details(request):
     try:
         user = UserSignUp.objects.get(mobile_number=mobile_number)
         return Response({
-            "full_name": user.full_name,
             "profile_photo_url": user.profile_photo_url
         })
     except UserSignUp.DoesNotExist:

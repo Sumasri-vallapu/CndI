@@ -196,6 +196,7 @@ const Tasks = () => {
 
   // Submit Task 2
   const handleSubmitTask2 = async () => {
+    console.log("Task 2 submitted");
     if (!task2Photo || !mobileNumber) {
       alert("Photo upload is required for Task 2!");
       return;
