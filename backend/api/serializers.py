@@ -36,10 +36,36 @@ class FellowSignUpSerializer(serializers.ModelSerializer):
 
 
 class FellowRegistrationSerializer(serializers.ModelSerializer):
+    mobile_number = serializers.CharField(write_only=True)
+
     class Meta:
         model = FellowRegistration
-        fields = '__all__'
-        read_only_fields = ['mobile_number', 'academic_year', 'batch']
+        fields = [
+            'mobile_number',
+            'date_of_birth',
+            'gender',
+            'caste_category',
+            'state',
+            'district',
+            'mandal',
+            'grampanchayat',
+        ]
+
+    def create(self, validated_data):
+        mobile_number = validated_data.pop('mobile_number')
+        try:
+            fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+            registration = FellowRegistration.objects.create(
+                fellow=fellow,
+                mobile_number=mobile_number,
+                **validated_data
+            )
+            # Update fellow's registration status
+            fellow.is_registered = True
+            fellow.save()
+            return registration
+        except FellowSignUp.DoesNotExist:
+            raise serializers.ValidationError("Fellow not found with this mobile number")
 
 
 class TaskDetailsSerializer(serializers.ModelSerializer):
@@ -125,13 +151,29 @@ class FellowProfileEducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = FellowProfile
         fields = [
-            'university', 'university_name',
-            'college', 'college_name',
-            'course', 'course_name',
-            'semester', 'college_type', 
-            'study_mode', 'stream', 
-            'subjects'
+            'university_name',
+            'college_name',
+            'course_name',
+            'semester',
+            'type_of_college',
+            'study_mode',
+            'stream',
+            'subjects',
+            'type_of_college',
+            'mode_of_study',
+            'technical_skills',
+            'artistic_skills'
         ]
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Convert comma-separated strings to lists for multi-select fields
+        for field in ['technical_skills', 'artistic_skills']:
+            if data.get(field):
+                data[field] = [s.strip() for s in data[field].split(',') if s.strip()]
+            else:
+                data[field] = []
+        return data
 
 class FellowProfileFamilySerializer(serializers.ModelSerializer):
     class Meta:
@@ -161,6 +203,24 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = ['id', 'name']
+
+class FellowProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowProfile
+        fields = [
+            'university',
+            'college',
+            'course',
+            'semester',
+            'type_of_college',
+            'study_mode',
+            'stream',
+            'subjects',
+            'type_of_college',
+            'mode_of_study',
+            'technical_skills',
+            'artistic_skills',
+        ]
 
 
 

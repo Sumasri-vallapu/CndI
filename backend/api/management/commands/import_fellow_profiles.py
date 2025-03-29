@@ -58,7 +58,7 @@ class Command(BaseCommand):
                             'current_job': row.get('current_job', ''),
                             'hobbies': row.get('hobbies', ''),
                             'college_name': row.get('college_name', ''),
-                            'college_type': row.get('college_type', ''),
+                            'type_of_college': row.get('type_of_college', ''),
                             'study_mode': row.get('study_mode', ''),
                             'stream': row.get('stream', ''),
                             'course': row.get('course', ''),

@@ -35,14 +35,14 @@ class GramPanchayat(models.Model):
 
 
 class University(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.TextField()
 
     def __str__(self):
         return self.name
 
 
 class College(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.TextField()
     university = models.ForeignKey(University, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -236,20 +236,21 @@ class FellowProfile(models.Model):
     any_job_at_present = models.BooleanField(default=False)
     current_job = models.CharField(max_length=100, blank=True)
 
-    # Education Details (Editable)
-    university = models.ForeignKey('University', on_delete=models.SET_NULL, null=True)
-    college = models.ForeignKey('College', on_delete=models.SET_NULL, null=True)
-    course = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True)
-    semester = models.CharField(max_length=20, blank=True)
-    college_type = models.CharField(max_length=50, blank=True)
-    study_mode = models.CharField(max_length=50, blank=True)
-    stream = models.CharField(max_length=100, blank=True)
-    subjects = models.TextField(blank=True)
+    # Education Details
+    university = models.ForeignKey('University', on_delete=models.SET_NULL, null=True, blank=True)
+    college = models.ForeignKey('College', on_delete=models.SET_NULL, null=True, blank=True)
+    course = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True, blank=True)
+    semester = models.CharField(max_length=20, blank=True, null=True)
+    type_of_college = models.CharField(max_length=50, blank=True, null=True)
+    study_mode = models.CharField(max_length=50, blank=True, null=True)
+    stream = models.CharField(max_length=100, blank=True, null=True)
+    subjects = models.TextField(blank=True, null=True)
+    mode_of_study = models.CharField(max_length=100, blank=True, null=True)
+    technical_skills = models.TextField(blank=True, null=True)
+    artistic_skills = models.TextField(blank=True, null=True)
 
     # Skills & Interests (Editable)
     hobbies = models.TextField(blank=True)
-    technical_skills = models.TextField(blank=True)
-    artistic_skills = models.TextField(blank=True)
 
     # Timestamps
     created_at = models.DateTimeField(auto_now_add=True)

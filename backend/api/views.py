@@ -97,22 +97,30 @@ def fellow_signup(request):
 @api_view(['POST'])
 def fellow_register(request):
     mobile_number = request.data.get('mobile_number')
+    if not mobile_number:
+        return Response({
+            'status': 'error',
+            'message': 'Mobile number is required'
+        }, status=400)
 
-    fellow = FellowSignUp.objects.filter(mobile_number=mobile_number).first()
-    if not fellow:
-        return Response({'status': 'error', 'message': 'Fellow not found. Please sign up first.'}, status=404)
-
-    data = request.data.copy()
-    data['fellow'] = fellow.id  # Ensure fellow ID is passed
-
-    serializer = FellowRegistrationSerializer(data=data)
-    if serializer.is_valid():
-        serializer.save()
-        fellow.is_registered = True
-        fellow.save()
-        return Response({'status': 'success', 'message': 'Registration successful', 'data': serializer.data})
-    else:
-        return Response({'status': 'error', 'errors': serializer.errors}, status=400)
+    try:
+        serializer = FellowRegistrationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({
+                'status': 'success',
+                'message': 'Registration successful',
+                'data': serializer.data
+            })
+        return Response({
+            'status': 'error',
+            'errors': serializer.errors
+        }, status=400)
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=400)
    
 
 
@@ -558,7 +566,6 @@ def upload_profile_photo(request):
 
 @api_view(['GET'])
 def get_fellow_profile(request, mobile_number):
-    """Get fellow profile details"""
     try:
         profile = FellowProfile.objects.get(mobile_number=mobile_number)
         
@@ -567,6 +574,11 @@ def get_fellow_profile(request, mobile_number):
         education_data = FellowProfileEducationSerializer(profile).data
         family_data = FellowProfileFamilySerializer(profile).data
         skills_data = FellowProfileSkillsSerializer(profile).data
+
+        # Convert empty strings to None for new fields
+        for field in ['type_of_college', 'mode_of_study', 'technical_skills', 'artistic_skills']:
+            if field in education_data and education_data[field] == '':
+                education_data[field] = None
 
         return Response({
             "status": "success",
@@ -584,40 +596,68 @@ def get_fellow_profile(request, mobile_number):
         }, status=404)
 
 @api_view(['PATCH'])
-def update_fellow_profile_section(request, mobile_number, section):
-    """Update a specific section of fellow profile"""
+def update_fellow_profile(request, mobile_number, section):
     try:
-        profile = FellowProfile.objects.get(mobile_number=mobile_number)
+        fellow = FellowProfile.objects.get(mobile_number=mobile_number)
         
-        # Map section names to serializers
+        if section == 'education_details':
+            serializer = FellowProfileEducationSerializer(
+                fellow, 
+                data=request.data,
+                partial=True
+            )
+            if serializer.is_valid():
+                # Handle multi-select fields
+                if 'technical_skills' in request.data:
+                    # Ensure it's stored as comma-separated string
+                    if isinstance(request.data['technical_skills'], list):
+                        request.data['technical_skills'] = ', '.join(request.data['technical_skills'])
+                
+                if 'artistic_skills' in request.data:
+                    if isinstance(request.data['artistic_skills'], list):
+                        request.data['artistic_skills'] = ', '.join(request.data['artistic_skills'])
+                
+                serializer.save()
+                return Response({
+                    'status': 'success',
+                    'message': 'Profile updated successfully'
+                })
+            return Response({
+                'status': 'error',
+                'message': serializer.errors
+            }, status=400)
+        
+        # Handle other sections
         section_serializers = {
             'personal_details': FellowProfilePersonalSerializer,
-            'education_details': FellowProfileEducationSerializer,
             'family_details': FellowProfileFamilySerializer,
             'skills': FellowProfileSkillsSerializer
         }
         
-        # Get the appropriate serializer
         SerializerClass = section_serializers.get(section)
         if not SerializerClass:
             return Response({
-                "error": f"Invalid section: {section}. Valid sections are: {', '.join(section_serializers.keys())}"
+                'status': 'error',
+                'message': f'Invalid section: {section}'
             }, status=400)
             
-        serializer = SerializerClass(profile, data=request.data, partial=True)
+        serializer = SerializerClass(fellow, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response({
-                "status": "success",
-                "message": f"{section} updated successfully"
+                'status': 'success',
+                'message': f'{section} updated successfully'
             })
         return Response({
-            "status": "error",
-            "errors": serializer.errors
+            'status': 'error',
+            'message': serializer.errors
         }, status=400)
-        
+            
     except FellowProfile.DoesNotExist:
-        return Response({"error": "Profile not found"}, status=404)
+        return Response({
+            'status': 'error',
+            'message': 'Profile not found'
+        }, status=404)
 
 @api_view(['POST'])
 def update_fellow_acceptance(request, mobile_number):

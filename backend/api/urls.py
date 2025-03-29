@@ -22,7 +22,7 @@ from .views import (
     submit_task2,
     upload_profile_photo,
     get_fellow_profile,
-    update_fellow_profile_section,
+    update_fellow_profile,
     update_fellow_acceptance,
     get_fellow_acceptance,
     save_fellow_testimonial,
@@ -36,7 +36,7 @@ urlpatterns = [
     path('fellow/profile/<str:mobile_number>/accept/', update_fellow_acceptance, name='update_fellow_acceptance'),
     path('fellow/profile/<str:mobile_number>/acceptance-status/', get_fellow_acceptance, name='get_fellow_acceptance'),
     path('fellow/profile/details/<str:mobile_number>/', get_fellow_profile, name='get_fellow_profile'),
-    path('fellow/profile/<str:mobile_number>/<str:section>/', update_fellow_profile_section, name='update_fellow_profile_section'),
+    path('fellow/profile/<str:mobile_number>/<str:section>/', update_fellow_profile, name='update_fellow_profile'),
     
     path('', HelloworldView.as_view(), name='hello-world'),
     path('fellow/signup/', fellow_signup, name='fellow_signup'),

@@ -16,10 +16,14 @@ interface ProfileData {
     gender: string;
     caste_category: string;
     date_of_birth: string;
-    state_name: string;
-    district_name: string;
-    mandal_name: string;
-    grampanchayat_name: string;
+    state: string;
+    state_name: string | null;
+    district: string;
+    district_name: string | null;
+    mandal: string;
+    mandal_name: string | null;
+    grampanchayat: string;
+    grampanchayat_name: string | null;
     fellow_id: string;
     team_leader: string;
     fellow_status: string;
@@ -32,7 +36,7 @@ interface ProfileData {
     college_name: string | null;
     course_name: string | null;
     semester: string;
-    college_type: string;
+    type_of_college: string;
     study_mode: string;
     stream: string;
     subjects: string;
@@ -52,23 +56,59 @@ interface ProfileData {
   };
 }
 
-interface Location {
-  id: number;
+interface LocationOption {
+  id: string;
   name: string;
+  state_name?: string;
+  district_name?: string;
+  mandal_name?: string;
+  gram_panchayat_name?: string;
 }
 
 interface LocationData {
-  states: Location[];
-  districts: Location[];
-  mandals: Location[];
-  grampanchayats: Location[];
+  states: LocationOption[];
+  districts: LocationOption[];
+  mandals: LocationOption[];
+  grampanchayats: LocationOption[];
 }
 
 interface EducationData {
-  universities: Location[];
-  colleges: Location[];
-  courses: Location[];
+  universities: LocationOption[];
+  colleges: LocationOption[];
+  courses: LocationOption[];
 }
+
+type ProfileSection = {
+  [key: string]: string | boolean;
+};
+
+const GENDER_OPTIONS = [
+  { value: "MALE", label: "Male" },
+  { value: "FEMALE", label: "Female" },
+  { value: "OTHER", label: "Other" }
+];
+
+const CASTE_OPTIONS = [
+  { value: "ST", label: "ST" },
+  { value: "SC", label: "SC" },
+  { value: "BC", label: "BC" },
+  { value: "OBC", label: "OBC" },
+  { value: "OC", label: "OC" },
+  { value: "MUSLIM", label: "Muslim" },
+  { value: "CHRISTIAN", label: "Christian" },
+  { value: "OTHER", label: "Other" }
+];
+
+const dropdownOptions = {
+  gender: ["MALE", "FEMALE", "OTHER"],
+  caste_category: ["OC", "BC", "SC", "ST", "OTHER"],
+  type_of_college: ["Government", "Private"], 
+  mode_of_study: ["College Hostel", "Private Hostel", "Day-Scholar", "Distance"],
+  type_of_college: ["Government", "Private"],
+  study_mode: ["Regular", "Distance", "Online"],
+  semester: ["1", "2", "3", "4", "5", "6",  "other"],
+  stream: ["Arts", "Science", "Commerce", "Engineering", "Other"],
+};
 
 const ProfileForm = () => {
   const location = useLocation();
@@ -133,45 +173,62 @@ const ProfileForm = () => {
   }, [mobileNumber, navigate]);
 
   useEffect(() => {
-    const fetchLocations = async () => {
+    const fetchInitialLocations = async () => {
       try {
-        // Always fetch states
+        // Always fetch states first
         const statesResponse = await fetch(ENDPOINTS.GET_STATES);
         if (!statesResponse.ok) throw new Error('Failed to fetch states');
-        const statesData = await statesResponse.json();
-        setLocationData(prev => ({ ...prev, states: statesData }));
+        const states = await statesResponse.json();
+        setLocationData(prev => ({ ...prev, states }));
 
-        // Only fetch dependent data if we have the parent ID
-        const state = profileData?.personal_details.state;
-        if (state) {
-          const districtsResponse = await fetch(`${ENDPOINTS.GET_DISTRICTS}?state=${state}`);
-          if (!districtsResponse.ok) throw new Error('Failed to fetch districts');
-          const districtsData = await districtsResponse.json();
-          setLocationData(prev => ({ ...prev, districts: districtsData }));
+        // By default, fetch districts for Telangana (state_id: 36)
+        const defaultStateId = "36";
+        const districtsResponse = await fetch(`${ENDPOINTS.GET_DISTRICTS}?state_id=${defaultStateId}`);
+        if (!districtsResponse.ok) throw new Error('Failed to fetch districts');
+        const districts = await districtsResponse.json();
+        setLocationData(prev => ({ ...prev, districts }));
 
-          const district = profileData?.personal_details.district;
-          if (district) {
-            const mandalsResponse = await fetch(`${ENDPOINTS.GET_MANDALS}?district=${district}`);
-            if (!mandalsResponse.ok) throw new Error('Failed to fetch mandals');
-            const mandalsData = await mandalsResponse.json();
-            setLocationData(prev => ({ ...prev, mandals: mandalsData }));
+        // If we have a district in profile, fetch its mandals
+        if (profileData?.personal_details.district) {
+          const mandalsResponse = await fetch(`${ENDPOINTS.GET_MANDALS}?district_id=${profileData.personal_details.district}`);
+          if (!mandalsResponse.ok) throw new Error('Failed to fetch mandals');
+          const mandals = await mandalsResponse.json();
+          setLocationData(prev => ({ ...prev, mandals }));
 
-            const mandal = profileData?.personal_details.mandal;
-            if (mandal) {
-              const grampanchayatsResponse = await fetch(`${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal=${mandal}`);
-              if (!grampanchayatsResponse.ok) throw new Error('Failed to fetch grampanchayats');
-              const grampanchayatsData = await grampanchayatsResponse.json();
-              setLocationData(prev => ({ ...prev, grampanchayats: grampanchayatsData }));
-            }
+          // If we have a mandal in profile, fetch its grampanchayats
+          if (profileData?.personal_details.mandal) {
+            const grampanchayatsResponse = await fetch(`${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal_id=${profileData.personal_details.mandal}`);
+            if (!grampanchayatsResponse.ok) throw new Error('Failed to fetch grampanchayats');
+            const grampanchayats = await grampanchayatsResponse.json();
+            setLocationData(prev => ({ ...prev, grampanchayats }));
           }
         }
       } catch (error) {
-        console.error('Error fetching locations:', error);
+        console.error('Error fetching location data:', error);
       }
     };
 
-    fetchLocations();
-  }, [profileData?.personal_details.state, profileData?.personal_details.district, profileData?.personal_details.mandal]);
+    fetchInitialLocations();
+  }, [profileData?.personal_details.district, profileData?.personal_details.mandal]);
+
+  // Transform location data to match education data structure
+  useEffect(() => {
+    const fetchStates = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.GET_STATES);
+        const data = await response.json();
+        // Transform the data to match education data structure
+        const transformedData = data.map((state: any) => ({
+          id: state.id,
+          name: state.state_name  // Use state_name as name
+        }));
+        setLocationData(prev => ({ ...prev, states: transformedData }));
+      } catch (error) {
+        console.error("Error fetching states:", error);
+      }
+    };
+    fetchStates();
+  }, []);
 
   const handleChange = (section: string, key: string, value: string) => {
     if (!profileData) return;
@@ -244,7 +301,7 @@ const ProfileForm = () => {
             current_job: profileData.family_details.current_job,
             hobbies: profileData.skills.hobbies,
             college_name: profileData.education_details.college_name,
-            college_type: profileData.education_details.college_type,
+            type_of_college: profileData.education_details.type_of_college,
             study_mode: profileData.education_details.study_mode,
             stream: profileData.education_details.stream,
             course: profileData.education_details.course_name,
@@ -268,16 +325,79 @@ const ProfileForm = () => {
     return label.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase()).trim();
   };
 
-  const dropdownOptions = {
-    gender: ["MALE", "FEMALE", "OTHER"],
-    caste_category: ["OC", "BC", "SC", "ST", "OTHER"],
-    college_type: ["Government", "Private"],
-    study_mode: ["Regular", "Distance", "Online"],
-    semester: ["1", "2", "3", "4", "5", "6", "7", "8"],
-    stream: ["Arts", "Science", "Commerce", "Engineering", "Other"],
-  };
+  const renderDropdown = (key: string, label: string, options: { value: string, label: string }[]) => (
+    <Select 
+      name={key} 
+      value={getFieldValue('Education Details', key) || ''} 
+      onValueChange={(value) => handleChange('Education Details', key, value)}
+    >
+      <SelectTrigger className="w-full signup-input">
+        <SelectValue placeholder={`Select ${label}`} />
+      </SelectTrigger>
+      <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
+        {options.map((option) => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
 
-  const renderSection = (title: string, fields: Array<{key: string, label: string, type?: string, readonly?: boolean}>, dropdowns: string[] = []) => (
+  const renderLocationDropdown = (key: string, label: string, options: LocationOption[], onChange: (value: string) => void) => (
+    <Select 
+      name={key} 
+      value={getFieldValue('Personal Details', key)?.toString() || ''} 
+      onValueChange={onChange}
+    >
+      <SelectTrigger className="w-full signup-input">
+        <SelectValue placeholder={`Select ${label}`} />
+      </SelectTrigger>
+      <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
+        {options.map((opt: LocationOption) => (
+          <SelectItem 
+            key={opt.id} 
+            value={opt.id.toString()}
+            className="cursor-pointer hover:bg-gray-100"
+          >
+            {opt.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
+  const renderEducationDropdown = (key: string, label: string, options: any[], onChange: (value: string) => void) => (
+    <Select 
+      name={key} 
+      value={getFieldValue('Education Details', key)?.toString() || ''} 
+      onValueChange={onChange}
+    >
+      <SelectTrigger className="w-full signup-input">
+        <SelectValue placeholder={`Select ${label}`} />
+      </SelectTrigger>
+      <SelectContent className="bg-white border border-gray-300 shadow-lg rounded-md text-black">
+        {options.map((option) => (
+          <SelectItem 
+            key={option.id} 
+            value={option.id.toString()}
+            className="cursor-pointer hover:bg-gray-100"
+          >
+            {option.name}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  );
+
+  const renderSection = (title: string, fields: Array<{
+    key: string, 
+    label: string, 
+    type?: string, 
+    readonly?: boolean,
+    render?: () => React.ReactNode,
+    display?: string | null
+  }>) => (
     <div className="w-full p-6 bg-white shadow-lg rounded-lg">
       <h3 className="text-lg font-bold text-walnut cursor-pointer flex justify-between items-center"
           onClick={() => toggleSection(title)}>
@@ -286,31 +406,18 @@ const ProfileForm = () => {
       </h3>
       {activeSection === title && (
         <div className="mt-3 space-y-4">
-          {fields.map(({key, label, type, readonly}) => (
+          {fields.map(({key, label, type, readonly, render, display}) => (
             <div key={key} className="space-y-2">
               <Label>{label}</Label>
               {isEditing === title && !readonly ? (
-                type === "dropdown" ? (
-                  <Select 
-                    name={key} 
-                    value={getFieldValue(title, key)} 
-                    onValueChange={(value) => handleChange(title, key, value)}
-                  >
-                    <SelectTrigger className="w-full">
-                      <SelectValue placeholder={`Select ${label}`} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {dropdownOptions[key as keyof typeof dropdownOptions]?.map((option) => (
-                        <SelectItem key={option} value={option}>{option}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : type === "date" ? (
+                render ? render() :
+                type === "date" ? (
                   <Input
                     type="date"
                     name={key}
                     value={getFieldValue(title, key)}
                     onChange={(e) => handleChange(title, key, e.target.value)}
+                    className="signup-input"
                   />
                 ) : (
                   <Input
@@ -319,11 +426,12 @@ const ProfileForm = () => {
                     value={getFieldValue(title, key)}
                     onChange={(e) => handleChange(title, key, e.target.value)}
                     placeholder={`Enter ${label}`}
+                    className="signup-input"
                   />
                 )
               ) : (
                 <p className="bg-gray-100 p-3 rounded text-gray-700">
-                  {getFieldValue(title, key) || "Please Provide"}
+                  {display || getFieldValue(title, key) || "Please Provide"}
                 </p>
               )}
             </div>
@@ -342,19 +450,12 @@ const ProfileForm = () => {
   );
 
   // Helper function to get field value from the correct section
-  const getFieldValue = (section: string, key: string) => {
+  const getFieldValue = (section: string, key: string): string => {
     if (!profileData) return "";
     
-    switch (section) {
-      case "Personal Details":
-        return profileData.personal_details[key as keyof typeof profileData.personal_details] || "";
-      case "Family Details":
-        return profileData.family_details[key as keyof typeof profileData.family_details] || "";
-      case "Education Details":
-        return profileData.education_details[key as keyof typeof profileData.education_details] || "";
-      default:
-        return "";
-    }
+    const sectionData = profileData[section.toLowerCase().replace(' ', '_') as keyof typeof profileData] as ProfileSection;
+    const value = sectionData[key];
+    return typeof value === 'string' ? value : '';
   };
 
   const toggleSidebar = (section: string) => {
@@ -403,7 +504,7 @@ const ProfileForm = () => {
       handleChange('Personal Details', 'mandal', '');
       handleChange('Personal Details', 'grampanchayat', '');
       
-      const response = await fetch(`${ENDPOINTS.GET_DISTRICTS}?state=${stateId}`);
+      const response = await fetch(`${ENDPOINTS.GET_DISTRICTS}?state_id=${stateId}`);
       if (!response.ok) throw new Error('Failed to fetch districts');
       const districts = await response.json();
       
@@ -425,7 +526,7 @@ const ProfileForm = () => {
       handleChange('Personal Details', 'mandal', '');
       handleChange('Personal Details', 'grampanchayat', '');
       
-      const response = await fetch(`${ENDPOINTS.GET_MANDALS}?district=${districtId}`);
+      const response = await fetch(`${ENDPOINTS.GET_MANDALS}?district_id=${districtId}`);
       if (!response.ok) throw new Error('Failed to fetch mandals');
       const mandals = await response.json();
       
@@ -442,10 +543,10 @@ const ProfileForm = () => {
 
   const handleMandalChange = async (mandalId: string) => {
     try {
-      // Clear dependent field first
+      // Clear grampanchayat field
       handleChange('Personal Details', 'grampanchayat', '');
       
-      const response = await fetch(`${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal=${mandalId}`);
+      const response = await fetch(`${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal_id=${mandalId}`);
       if (!response.ok) throw new Error('Failed to fetch grampanchayats');
       const grampanchayats = await response.json();
       
@@ -458,28 +559,6 @@ const ProfileForm = () => {
       console.error('Error fetching grampanchayats:', error);
     }
   };
-
-  const renderLocationDropdown = (key: string, label: string, options: Location[], onChange: (value: string) => void) => (
-    <Select 
-      name={key} 
-      value={getFieldValue('Personal Details', key) || ''} 
-      onValueChange={onChange}
-    >
-      <SelectTrigger className="w-full">
-        <SelectValue placeholder={`Select ${label}`} />
-      </SelectTrigger>
-      <SelectContent>
-        {options.map((option) => (
-          <SelectItem key={option.id} value={option.id.toString()}>
-            {option[key === 'state' ? 'state_name' : 
-                    key === 'district' ? 'district_name' : 
-                    key === 'mandal' ? 'mandal_name' : 
-                    'gram_panchayat_name']}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
-  );
 
   // Add education-related handlers
   const handleUniversityChange = async (universityId: string) => {
@@ -622,37 +701,51 @@ const ProfileForm = () => {
         </div>
 
         {renderSection("Personal Details", [
-          { key: "gender", label: "Gender", type: "dropdown" },
-          { key: "caste_category", label: "Caste Category", type: "dropdown" },
+          { 
+            key: "gender", 
+            label: "Gender", 
+            type: "dropdown",
+            render: () => renderDropdown("gender", "Gender", GENDER_OPTIONS)
+          },
+          { 
+            key: "caste_category", 
+            label: "Caste Category", 
+            type: "dropdown",
+            render: () => renderDropdown("caste_category", "Caste Category", CASTE_OPTIONS)
+          },
           { key: "date_of_birth", label: "Date of Birth", type: "date" },
           { 
             key: "state", 
             label: "State", 
             type: "location",
-            render: () => renderLocationDropdown("state", "State", locationData.states, handleStateChange)
+            render: () => renderLocationDropdown("state", "State", locationData.states, handleStateChange),
+            display: profileData?.personal_details.state_name
           },
           { 
             key: "district", 
             label: "District", 
             type: "location",
-            render: () => renderLocationDropdown("district", "District", locationData.districts, handleDistrictChange)
+            render: () => renderLocationDropdown("district", "District", locationData.districts, handleDistrictChange),
+            display: profileData?.personal_details.district_name
           },
           { 
             key: "mandal", 
             label: "Mandal", 
             type: "location",
-            render: () => renderLocationDropdown("mandal", "Mandal", locationData.mandals, handleMandalChange)
+            render: () => renderLocationDropdown("mandal", "Mandal", locationData.mandals, handleMandalChange),
+            display: profileData?.personal_details.mandal_name
           },
           { 
             key: "grampanchayat", 
-            label: "Village", 
+            label: "Grampanchayat", 
             type: "location",
-            render: () => renderLocationDropdown("grampanchayat", "Village", locationData.grampanchayats, 
-              (value) => handleChange('Personal Details', 'grampanchayat', value))
+            render: () => renderLocationDropdown("grampanchayat", "Grampanchayat", locationData.grampanchayats, 
+              (value) => handleChange('Personal Details', 'grampanchayat', value)),
+            display: profileData?.personal_details.grampanchayat_name
           },
           { key: "mobile_number", label: "WhatsApp Number", type: "text", readonly: true },
           { key: "email", label: "Email" }
-        ], ["gender", "caste_category"])}
+        ])}
         {renderSection("Family Details", [
           { key: "mother_name", label: "Mother's Name" },
           { key: "mother_occupation", label: "Mother's Occupation" },
@@ -665,26 +758,50 @@ const ProfileForm = () => {
             key: "university", 
             label: "University",
             type: "education",
-            render: () => renderLocationDropdown("university", "University", educationData.universities, handleUniversityChange)
+            render: () => renderEducationDropdown("university", "University", educationData.universities, handleUniversityChange),
+            display: profileData?.education_details.university_name
           },
           { 
             key: "college", 
             label: "College",
             type: "education",
-            render: () => renderLocationDropdown("college", "College", educationData.colleges, handleCollegeChange)
+            render: () => renderEducationDropdown("college", "College", educationData.colleges, handleCollegeChange),
+            display: profileData?.education_details.college_name
           },
           { 
             key: "course", 
             label: "Course",
             type: "education",
-            render: () => renderLocationDropdown("course", "Course", educationData.courses, 
-              (value) => handleChange('Education Details', 'course', value))
+            render: () => renderEducationDropdown("course", "Course", educationData.courses, 
+              (value) => handleChange('Education Details', 'course', value)),
+            display: profileData?.education_details.course_name
           },
-          { key: "college_type", label: "College Type", type: "dropdown" },
-          { key: "study_mode", label: "Study Mode", type: "dropdown" },
-          { key: "stream", label: "Stream", type: "dropdown" },
-          { key: "semester", label: "Semester", type: "dropdown" }
-        ], ["college_type", "study_mode", "stream", "semester"])}
+          { 
+            key: "type_of_college", 
+            label: "Type of College", 
+            render: () => renderDropdown("type_of_college", "Type of College", dropdownOptions.type_of_college.map(value => ({ value, label: value })))
+          },
+          { 
+            key: "mode_of_study", 
+            label: "Mode of Study", 
+            render: () => renderDropdown("mode_of_study", "Mode of Study", dropdownOptions.mode_of_study.map(value => ({ value, label: value })))
+          },
+          { 
+            key: "type_of_college", 
+            label: "College Type", 
+            render: () => renderDropdown("type_of_college", "College Type", dropdownOptions.type_of_college.map(value => ({ value, label: value })))
+          },
+          { 
+            key: "semester", 
+            label: "Semester", 
+            render: () => renderDropdown("semester", "Semester", dropdownOptions.semester.map(value => ({ value, label: value })))
+          },
+          { 
+            key: "stream", 
+            label: "Stream", 
+            render: () => renderDropdown("stream", "Stream", dropdownOptions.stream.map(value => ({ value, label: value })))
+          },
+        ], ["type_of_college", "study_mode", "stream", "semester"])}
       </div>
 
       {/* Sidebar Overlay */}

@@ -164,7 +164,6 @@ const Register = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           mobile_number: mobileNumber,
-          full_name: fullName,
           date_of_birth: dob.toISOString().split("T")[0],
           gender,
           caste_category: casteCategory,
@@ -175,9 +174,11 @@ const Register = () => {
         }),
       });
 
-      if (!response.ok) throw new Error("Registration failed");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Registration failed");
+      }
       
-      // Show success message and button on successful registration
       setShowSuccess(true);
       
     } catch (error) {

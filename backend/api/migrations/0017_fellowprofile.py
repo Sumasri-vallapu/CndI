@@ -35,7 +35,7 @@ class Migration(migrations.Migration):
                 ('current_job', models.CharField(blank=True, max_length=100)),
                 ('hobbies', models.TextField(blank=True)),
                 ('college_name', models.CharField(blank=True, max_length=200)),
-                ('college_type', models.CharField(blank=True, max_length=50)),
+                ('type_of_college', models.CharField(blank=True, max_length=50)),
                 ('study_mode', models.CharField(blank=True, max_length=50)),
                 ('stream', models.CharField(blank=True, max_length=100)),
                 ('course', models.CharField(blank=True, max_length=100)),
