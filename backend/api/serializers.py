@@ -1,18 +1,19 @@
 from rest_framework import serializers
 from .models import (
     FellowSignUp,
-
-    
-    Registration,
-    Task_details,
-
-
-    UserPhoto,
-    FellowProfile
+    FellowRegistration,
+    FellowPhoto,
+    FellowProfile,
+    FellowTestimonial,
+    TaskDetails,
+    State,
+    District,
+    Mandal,
+    GramPanchayat,
+    University,
+    College,
+    Course
 )
-
-from rest_framework import serializers
-from .models import FellowSignUp
 
 class FellowSignUpSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,28 +38,8 @@ class FellowSignUpSerializer(serializers.ModelSerializer):
 class FellowRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = FellowRegistration
-        fields = [
-            'fellow',
-            'mobile_number',
-            'full_name',
-            'date_of_birth',
-            'gender',
-            'caste_category',
-            'state',
-            'district',
-            'mandal',
-            'grampanchayat', 
-            'academic_year',
-            'batch',
-            'task1_status',
-            'task2_status',
-            'isvideo1seen',
-            'isvideo2seen',
-            'istask1submitted',
-            'istask2submitted',
-            'is_approved'
-        ]
-        read_only_fields = ['fellow']
+        fields = '__all__'
+        read_only_fields = ['mobile_number', 'academic_year', 'batch']
 
 
 class TaskDetailsSerializer(serializers.ModelSerializer):
@@ -76,22 +57,110 @@ class TaskDetailsSerializer(serializers.ModelSerializer):
 
 class VideoStatusSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Registration
+        model = FellowRegistration
         fields = ['isvideo1seen', 'isvideo2seen']
 
 
+class FellowPhotoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowPhoto
+        fields = ['fellow', 'photo_url']
 
+class FellowTestimonialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowTestimonial
+        fields = ['fellow', 'recorder_type', 'audio_url', 'created_at']
 
-class UserPhotoSerializer(serializers.ModelSerializer):
-    photo = serializers.ImageField(required=True)  # ✅ Add this to handle file uploads
+class LocationSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = ['id', 'name']
+
+class StateSerializer(LocationSerializer):
+    class Meta(LocationSerializer.Meta):
+        model = State
+        fields = ['id', 'state_name']
+
+class DistrictSerializer(LocationSerializer):
+    class Meta(LocationSerializer.Meta):
+        model = District
+        fields = ['id', 'district_name']
+
+class MandalSerializer(LocationSerializer):
+    class Meta(LocationSerializer.Meta):
+        model = Mandal
+        fields = ['id', 'mandal_name']
+
+class GramPanchayatSerializer(LocationSerializer):
+    class Meta(LocationSerializer.Meta):
+        model = GramPanchayat
+        fields = ['id', 'gram_panchayat_name']
+
+class FellowProfilePersonalSerializer(serializers.ModelSerializer):
+    state_name = serializers.CharField(source='state.state_name', read_only=True)
+    district_name = serializers.CharField(source='district.district_name', read_only=True)
+    mandal_name = serializers.CharField(source='mandal.mandal_name', read_only=True)
+    grampanchayat_name = serializers.CharField(source='grampanchayat.gram_panchayat_name', read_only=True)
+    full_name = serializers.CharField(source='user.full_name', read_only=True)
 
     class Meta:
-        model = UserPhoto
-        fields = ['username', 'photo']  # ✅ Remove 'photo_url' from here
+        model = FellowProfile
+        fields = [
+            'full_name', 'mobile_number', 'email', 'gender', 
+            'caste_category', 'date_of_birth', 
+            'state', 'state_name',
+            'district', 'district_name',
+            'mandal', 'mandal_name',
+            'grampanchayat', 'grampanchayat_name',
+            'fellow_id', 'team_leader', 
+            'fellow_status', 'performance_score',
+            'batch', 'academic_year'
+        ]
+        read_only_fields = ['full_name', 'mobile_number', 'state_name', 'district_name', 'mandal_name', 'grampanchayat_name']
 
-    def create(self, validated_data):
-        validated_data.pop('photo')  # ✅ Remove 'photo' from validated_data
-        return UserPhoto.objects.create(**validated_data)
+class FellowProfileEducationSerializer(serializers.ModelSerializer):
+    university_name = serializers.CharField(source='university.name', read_only=True)
+    college_name = serializers.CharField(source='college.name', read_only=True)
+    course_name = serializers.CharField(source='course.name', read_only=True)
+
+    class Meta:
+        model = FellowProfile
+        fields = [
+            'university', 'university_name',
+            'college', 'college_name',
+            'course', 'course_name',
+            'semester', 'college_type', 
+            'study_mode', 'stream', 
+            'subjects'
+        ]
+
+class FellowProfileFamilySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowProfile
+        fields = [
+            'mother_name', 'mother_occupation', 
+            'father_name', 'father_occupation',
+            'any_job_at_present', 'current_job'
+        ]
+
+class FellowProfileSkillsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowProfile
+        fields = ['hobbies', 'technical_skills', 'artistic_skills']
+
+class UniversitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = University
+        fields = ['id', 'name']
+
+class CollegeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = College
+        fields = ['id', 'name']
+
+class CourseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Course
+        fields = ['id', 'name']
 
 
 

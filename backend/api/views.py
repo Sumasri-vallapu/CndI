@@ -1,31 +1,45 @@
 import boto3
 import uuid
+import json
+import logging
+import os
 from django.conf import settings
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework import status
 from .models import (
     FellowSignUp,
     FellowRegistration,
-    UserPhoto, 
-    State, 
-    District, 
-    Mandal, 
-    GramPanchayat, 
-    UserSignUp, 
-    Registration, 
-    Task_details,
-    FellowProfile
-    )
-from rest_framework.response import Response
-from rest_framework.decorators import api_view, parser_classes
-from rest_framework import status
-from .serializers import FellowSignUpSerializer, FellowRegistrationSerializer
-import json     
-from django.utils import timezone
-import datetime
-import logging
-import os
+    FellowPhoto,
+    FellowProfile,
+    FellowTestimonial,
+    TaskDetails,
+    State,
+    District,
+    Mandal,
+    GramPanchayat,
+    University,
+    College,
+    Course,
+)
+from .serializers import (
+    FellowSignUpSerializer,
+    FellowRegistrationSerializer,
+    FellowPhotoSerializer,
+    FellowTestimonialSerializer,
+    TaskDetailsSerializer,
+    VideoStatusSerializer,
+    FellowProfilePersonalSerializer,
+    FellowProfileEducationSerializer,
+    FellowProfileFamilySerializer,
+    FellowProfileSkillsSerializer,
+    UniversitySerializer,
+    CollegeSerializer,
+    CourseSerializer,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +63,10 @@ def get_client_ip(request):
     return x_forwarded_for.split(',')[0] if x_forwarded_for else request.META.get('REMOTE_ADDR')
 
 @api_view(['POST'])
-def fellow_signup(request):  
+def fellow_signup(request):
+    print("\n=== FELLOW SIGNUP ===")
+    print("Signup data received:", request.data)
+    
     data = request.data.copy()
     data['ip_address'] = get_client_ip(request)
     data['device_info'] = json.dumps(dict(request.headers))
@@ -57,79 +74,65 @@ def fellow_signup(request):
     serializer = FellowSignUpSerializer(data=data)
     if serializer.is_valid():
         user = serializer.save()
-        logger.info(f"User signed up successfully with ID: {user.id}")
+        print(f"Created new fellow: ID={user.id}, Mobile={user.mobile_number}, Name={user.full_name}")
+        
+        # Verify the record exists
+        verify = FellowSignUp.objects.get(id=user.id)
+        print(f"Verified fellow exists: ID={verify.id}, Mobile={verify.mobile_number}")
+        
         return Response({
-            "status": "success", 
-            "message": "User signed up successfully", 
-            "user_id": serializer.data['id']
-        }, status=status.HTTP_201_CREATED) 
-    
-    logger.warning(f"Signup failed: {serializer.errors}")
-    return Response({
-        "status": "error",
-        "errors": serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['POST'])
-def fellow_register(request):
-    try:
-        mobile_number = request.data.get('mobile_number')
-        password = request.data.get('password')
-
-        if not mobile_number or not password:
-            return Response({
-                "status": "error",
-                "message": "Mobile number and password are required"
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
-
-        # Password check
-        if password != fellow.password:
-            return Response({
-                "status": "error",
-                "message": "Invalid password"
-            }, status=status.HTTP_401_UNAUTHORIZED)
-
-        # Duplicate registration check
-        if hasattr(fellow, 'fellow_registration'):
-            return Response({
-                "status": "error",
-                "message": "User is already registered"
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # Prepare data
-        data = request.data.copy()
-        data['fellow'] = fellow.id
-
-        serializer = FellowRegistrationSerializer(data=data)
-        if serializer.is_valid():
-            registration = serializer.save()
-
-            fellow.is_registered = True
-            fellow.save()
-
-            return Response({
-                "status": "success",
-                "message": "Registration successful"
-            }, status=status.HTTP_201_CREATED)
-
+            "status": "success",
+            "message": "User signed up successfully",
+            "user_id": user.id
+        }, status=201)
+    else:
+        print("Signup validation errors:", serializer.errors)
         return Response({
             "status": "error",
             "errors": serializer.errors
-        }, status=status.HTTP_400_BAD_REQUEST)
+        }, status=400)
 
-    except FellowSignUp.DoesNotExist:
-        return Response({
-            "status": "error",
-            "message": "User not found. Please sign up first."
-        }, status=status.HTTP_404_NOT_FOUND)
-    except Exception as e:
-        logger.error(f"Registration error: {str(e)}")
-        return Response({
-            "status": "error",
-            "message": str(e)
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@api_view(['POST'])
+def fellow_register(request):
+    mobile_number = request.data.get('mobile_number')
+
+    fellow = FellowSignUp.objects.filter(mobile_number=mobile_number).first()
+    if not fellow:
+        return Response({'status': 'error', 'message': 'Fellow not found. Please sign up first.'}, status=404)
+
+    data = request.data.copy()
+    data['fellow'] = fellow.id  # Ensure fellow ID is passed
+
+    serializer = FellowRegistrationSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        fellow.is_registered = True
+        fellow.save()
+        return Response({'status': 'success', 'message': 'Registration successful', 'data': serializer.data})
+    else:
+        return Response({'status': 'error', 'errors': serializer.errors}, status=400)
+   
+
+
+
+# @api_view(['GET'])
+# def get_fellow_details(request):
+#     mobile_number = request.GET.get('mobile_number')
+#     if not mobile_number:
+#         return Response({"error": "Mobile number is required"}, status=400)
+    
+#     try:
+#         fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+#         return Response({
+#             "full_name": fellow.full_name,
+#             "profile_photo_url": fellow.profile_photo_url
+#         })
+#     except FellowSignUp.DoesNotExist:
+#         return Response({"error": "User not found"}, status=404)
+
+
 
 @api_view(['POST']) 
 def get_fellow_details(request):
@@ -188,10 +191,21 @@ def fellow_login(request):
         return Response({"status": "error", "message": "User not found"},
                         status=status.HTTP_404_NOT_FOUND)
 
+
+
+@api_view(['POST']) 
+def forgot_password(request):
+    mobile_number = request.data.get('mobile_number')
+    try:
+        user =  FellowSignUp.objects.get(mobile_number=mobile_number)
+        return Response({"status": "success", "password": user.password}, status=status.HTTP_200_OK)
+    except FellowSignUp.DoesNotExist:
+        return Response({"status": "error", "message": "User not found"}, status=status.HTTP_404_NOT_FOUND)
+
 @api_view(['GET'])
 def get_user_status(request, mobile_number):  
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         return Response({
             "status": "success",
             "user_status": {
@@ -203,7 +217,7 @@ def get_user_status(request, mobile_number):
                 "final_access_granted": user.final_access_granted
             }
         }, status=status.HTTP_200_OK)
-    except UserSignUp.DoesNotExist:
+    except FellowSignUp.DoesNotExist:
         return Response({
             "status": "error",
             "message": "User not found"
@@ -214,14 +228,14 @@ def get_user_status(request, mobile_number):
 def update_tasks(request):
     mobile_number = request.data.get('mobile_number')
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         user.has_submitted_tasks = True
         user.save()
         return Response({
             "status": "success",
             "message": "Tasks submitted successfully"
         }, status=status.HTTP_200_OK)
-    except UserSignUp.DoesNotExist:
+    except FellowSignUp.DoesNotExist:
         return Response({
             "status": "error",
             "message": "User not found"
@@ -231,14 +245,14 @@ def update_tasks(request):
 def update_data_consent(request):
     mobile_number = request.data.get('mobile_number')
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         user.has_agreed_to_data_consent = True
         user.save()
         return Response({
             "status": "success",
             "message": "Data consent updated successfully"
         }, status=status.HTTP_200_OK)
-    except UserSignUp.DoesNotExist:
+    except FellowSignUp.DoesNotExist:
         return Response({
             "status": "error",
             "message": "User not found"
@@ -248,14 +262,14 @@ def update_data_consent(request):
 def update_child_protection_consent(request):
     mobile_number = request.data.get('mobile_number')
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         user.has_agreed_to_child_protection = True
         user.save()
         return Response({
             "status": "success",
             "message": "Child protection consent updated successfully"
         }, status=status.HTTP_200_OK)
-    except UserSignUp.DoesNotExist:
+    except FellowSignUp.DoesNotExist:
         return Response({
             "status": "error",
             "message": "User not found"
@@ -269,18 +283,19 @@ def get_user_details(request):
         return Response({"error": "Mobile number is required"}, status=400)
     
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
         return Response({
-            "profile_photo_url": user.profile_photo_url
+            "full_name": fellow.full_name,
+            "profile_photo_url": fellow.fellow_photo.photo_url if hasattr(fellow, 'fellow_photo') else None
         })
-    except UserSignUp.DoesNotExist:
-        return Response({"error": "User not found"}, status=404)
+    except FellowSignUp.DoesNotExist:
+        return Response({"error": "Fellow not found"}, status=404)
 
 @api_view(['GET'])
 def get_task_status(request, mobile_number):
     try:
-        registration = Registration.objects.get(mobile_number=mobile_number)
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        registration = FellowRegistration.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         return Response({
             'video1_watched': registration.isvideo1seen,
             'video2_watched': registration.isvideo2seen,
@@ -291,18 +306,18 @@ def get_task_status(request, mobile_number):
             'is_accepted_offer_letter': user.is_accepted_offer_letter,
             'accepted_offer_letter_date': user.accepted_offer_letter_date
         })
-    except Registration.DoesNotExist: 
+    except FellowRegistration.DoesNotExist: 
         return Response({"error": "User not found"}, status=404)
 
 @api_view(['GET'])
 def get_video_status(request, mobile_number):
     try:
-        registration = Registration.objects.get(mobile_number=mobile_number)
+        registration = FellowRegistration.objects.get(mobile_number=mobile_number)
         return Response({
             'video1_watched': registration.isvideo1seen,
             'video2_watched': registration.isvideo2seen
         })
-    except Registration.DoesNotExist:
+    except FellowRegistration.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
 
 @api_view(['POST'])
@@ -319,7 +334,7 @@ def update_video_status(request):
                 "error": "Both video_id and mobile_number are required"
             }, status=400)
 
-        registration = Registration.objects.get(mobile_number=mobile_number)
+        registration = FellowRegistration.objects.get(mobile_number=mobile_number)
         
         if video_id == 'video1':
             registration.isvideo1seen = True
@@ -337,7 +352,7 @@ def update_video_status(request):
             "message": f"{video_id} marked as watched"
         })
 
-    except Registration.DoesNotExist:
+    except FellowRegistration.DoesNotExist:
         return Response({
             "error": "User registration not found"
         }, status=404)
@@ -362,11 +377,11 @@ def submit_task1(request):
             }, status=400)
 
         # Get user and registration
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
-        registration = Registration.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
+        registration = FellowRegistration.objects.get(mobile_number=mobile_number)
         
         # Create or update task details
-        task_details, created = Task_details.objects.get_or_create(
+        task_details, created = TaskDetails.objects.get_or_create(
             mobile_number=mobile_number,
             defaults={
                 'user': user,
@@ -402,7 +417,7 @@ def submit_task1(request):
             "message": "Task 1 submitted successfully"
         })
 
-    except (UserSignUp.DoesNotExist, Registration.DoesNotExist) as e:
+    except (FellowSignUp.DoesNotExist, FellowRegistration.DoesNotExist) as e:
         return Response({
             "error": f"User not found: {str(e)}"
         }, status=404)
@@ -420,12 +435,12 @@ def submit_task2(request):
         if not mobile_number:
             return Response({"error": "mobile_number is required"}, status=400)
             
-        registration = Registration.objects.get(mobile_number=mobile_number)
+        registration = FellowRegistration.objects.get(mobile_number=mobile_number)
         
         if not registration.istask1submitted:
             return Response({"error": "Please complete Task 1 first"}, status=400)
             
-        task_details = Task_details.objects.get(mobile_number=mobile_number)
+        task_details = TaskDetails.objects.get(mobile_number=mobile_number)
         
         if 'training_photo' in request.FILES:
             task_details.students_marks_s3_url = upload_to_s3(
@@ -441,12 +456,12 @@ def submit_task2(request):
         registration.save()
  
         # Update has_submitted_tasks to True in api_usersignup
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         user.has_submitted_tasks = True
         user.save()
         
         return Response({"status": "success"})
-    except Registration.DoesNotExist:
+    except FellowRegistration.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
     except Exception as e:
         logger.error(f"Task 2 submission error: {str(e)}")
@@ -455,7 +470,7 @@ def submit_task2(request):
 def upload_to_s3(file, path):
     try:
         # Extract file extension
-        file_extension = os.path.splitext(file.name)[1]
+        file_extension = file.name.split('.')[-1]
         full_path = f"{path}{file_extension}"
 
         # Upload to S3
@@ -478,79 +493,30 @@ def upload_to_s3(file, path):
 @api_view(['GET'])
 def get_states(request):
     states = State.objects.all()
-    data = [{"id": state.id, "name": state.name} for state in states]
-    return Response(data)
+    return Response([{"id": state.id, "name": state.state_name} for state in states])
 
 @api_view(['GET'])
 def get_districts(request):
     state_id = request.GET.get('state_id')
-    if not state_id:
-        return Response(
-            {"message": "state_id is required"}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
     districts = District.objects.filter(state_id=state_id)
-    data = [{"id": dist.id, "name": dist.name} for dist in districts]
-    return Response(data)
+    return Response([{"id": district.id, "name": district.district_name} for district in districts])
 
 @api_view(['GET'])
 def get_mandals(request):
     district_id = request.GET.get('district_id')
-    if not district_id:
-        return Response(
-            {"message": "district_id is required"}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
     mandals = Mandal.objects.filter(district_id=district_id)
-    data = [{"id": mandal.id, "name": mandal.name} for mandal in mandals]
-    return Response(data)
+    return Response([{"id": mandal.id, "name": mandal.mandal_name} for mandal in mandals])
 
 @api_view(['GET'])
-def get_villages(request):
+def get_grampanchayats(request):
     mandal_id = request.GET.get('mandal_id')
-    if not mandal_id:
-        return Response(
-            {"message": "mandal_id is required"}, 
-            status=status.HTTP_400_BAD_REQUEST
-        )
-    
     grampanchayats = GramPanchayat.objects.filter(mandal_id=mandal_id)
-    data = [{"id": grampanchayat.id, "name": grampanchayat.name} for grampanchayat in grampanchayats]
-    return Response(data)
+    return Response([{"id": grampanchayat.id, "name": grampanchayat.gram_panchayat_name} for grampanchayat in grampanchayats])
 
 
 
 
 # tesing file upload
-
-class UploadPhotoView(APIView):
-    parser_classes = (MultiPartParser, FormParser)  # ✅ Add parser classes for file upload
-
-    def post(self, request, *args, **kwargs):
-        username = request.data.get("username")
-        photo = request.FILES.get("photo")  # ✅ Ensure file is extracted correctly
-
-        if not username or not photo:
-            return Response({"error": "Username and photo are required"}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Generate unique filename
-        file_extension = photo.name.split('.')[-1]
-        file_name = f"volunteers/photos/{uuid.uuid4()}.{file_extension}"
-
-        # Upload to S3
-        s3_bucket_name = "yuvachetana-webapp"
-        s3_client.upload_fileobj(photo, s3_bucket_name, file_name)
-
-        # Generate S3 URL
-        photo_url = f"https://{s3_bucket_name}.s3.amazonaws.com/{file_name}"
-
-        # Save to database
-        user_photo = UserPhoto(username=username, photo_url=photo_url)
-        user_photo.save()
-
-        return Response({"username": username, "photo_url": photo_url}, status=status.HTTP_201_CREATED)
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
@@ -562,7 +528,7 @@ def upload_profile_photo(request):
         return Response({"error": "Both mobile number and photo are required"}, status=400)
     
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         
         # Generate unique filename
         ext = photo.name.split('.')[-1]
@@ -585,109 +551,78 @@ def upload_profile_photo(request):
             "status": "success",
             "photo_url": photo_url
         })
-    except UserSignUp.DoesNotExist:
+    except FellowSignUp.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
 @api_view(['GET'])
 def get_fellow_profile(request, mobile_number):
+    """Get fellow profile details"""
     try:
-        print(f"DEBUG: Received GET request for profile")
-        print(f"DEBUG: Mobile number: {mobile_number}")
-        profile = FellowProfile.objects.get(user__mobile_number=mobile_number)
+        profile = FellowProfile.objects.get(mobile_number=mobile_number)
+        
+        # Serialize different sections
+        personal_data = FellowProfilePersonalSerializer(profile).data
+        education_data = FellowProfileEducationSerializer(profile).data
+        family_data = FellowProfileFamilySerializer(profile).data
+        skills_data = FellowProfileSkillsSerializer(profile).data
+
         return Response({
-            "hero_section": {
-                "full_name": profile.user.full_name,
-                "fellow_id": profile.fellow_id,
-                "team_leader": profile.team_leader,
-                "fellow_status": profile.fellow_status,
-                "performance_score": profile.performance_score
-            },
-            "personal_details": {
-                "gender": profile.gender,
-                "caste_category": profile.caste_category,
-                "date_of_birth": profile.date_of_birth,
-                "state": profile.state,
-                "district": profile.district,
-                "mandal": profile.mandal,
-                "village": profile.village,
-                "whatsapp_number": profile.whatsapp_number,
-                "email": profile.email
-            },
-            "family_details": {
-                "mother_name": profile.mother_name,
-                "mother_occupation": profile.mother_occupation,
-                "father_name": profile.father_name,
-                "father_occupation": profile.father_occupation
-            },
-            "education_details": {
-                "current_job": profile.current_job,
-                "hobbies": profile.hobbies,
-                "college_name": profile.college_name,
-                "college_type": profile.college_type,
-                "study_mode": profile.study_mode,
-                "stream": profile.stream,
-                "course": profile.course,
-                "subjects": profile.subjects,
-                "semester": profile.semester,
-                "technical_skills": profile.technical_skills,
-                "artistic_skills": profile.artistic_skills
+            "status": "success",
+            "data": {
+                "personal_details": personal_data,
+                "education_details": education_data,
+                "family_details": family_data,
+                "skills": skills_data
             }
         })
     except FellowProfile.DoesNotExist:
-        return Response({"error": "Profile not found"}, status=404)
+        return Response({
+            "status": "error",
+            "message": "Profile not found"
+        }, status=404)
 
-@api_view(['PUT'])
+@api_view(['PATCH'])
 def update_fellow_profile_section(request, mobile_number, section):
+    """Update a specific section of fellow profile"""
     try:
-        print(f"DEBUG: Received PUT request for section {section}")
-        print(f"DEBUG: Mobile number: {mobile_number}")
-        print(f"DEBUG: Request data: {request.data}")
+        profile = FellowProfile.objects.get(mobile_number=mobile_number)
         
-        profile = FellowProfile.objects.get(user__mobile_number=mobile_number)
-        data = request.data
-
-        if section == 'family_details':
-            fields = ['mother_name', 'mother_occupation', 'father_name', 'father_occupation']
+        # Map section names to serializers
+        section_serializers = {
+            'personal_details': FellowProfilePersonalSerializer,
+            'education_details': FellowProfileEducationSerializer,
+            'family_details': FellowProfileFamilySerializer,
+            'skills': FellowProfileSkillsSerializer
+        }
+        
+        # Get the appropriate serializer
+        SerializerClass = section_serializers.get(section)
+        if not SerializerClass:
+            return Response({
+                "error": f"Invalid section: {section}. Valid sections are: {', '.join(section_serializers.keys())}"
+            }, status=400)
             
-            # Validate required fields
-            for field in fields:
-                if field not in data:
-                    return Response(
-                        {"error": f"Missing required field: {field}"}, 
-                        status=400
-                    )
-            
-            # Update fields
-            for field in fields:
-                setattr(profile, field, data[field])
-            
-            profile.save()
-            
+        serializer = SerializerClass(profile, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
             return Response({
                 "status": "success",
-                "message": f"{section} updated successfully",
-                "data": {
-                    "mother_name": profile.mother_name,
-                    "mother_occupation": profile.mother_occupation,
-                    "father_name": profile.father_name,
-                    "father_occupation": profile.father_occupation
-                }
+                "message": f"{section} updated successfully"
             })
+        return Response({
+            "status": "error",
+            "errors": serializer.errors
+        }, status=400)
         
-        # ... other sections remain the same
-
     except FellowProfile.DoesNotExist:
         return Response({"error": "Profile not found"}, status=404)
-    except Exception as e:
-        print("Error:", str(e))  # Debug log
-        return Response({"error": str(e)}, status=500)
 
 @api_view(['POST'])
 def update_fellow_acceptance(request, mobile_number):
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         user.is_accepted_offer_letter = True
         user.accepted_offer_letter_date = timezone.now()
         user.save()
@@ -695,19 +630,152 @@ def update_fellow_acceptance(request, mobile_number):
             "status": "success",
             "message": "Fellowship acceptance updated successfully"
         })
-    except UserSignUp.DoesNotExist:
+    except FellowSignUp.DoesNotExist:
         return Response({"error": "Profile not found"}, status=404)
 
 @api_view(['GET'])
 def get_fellow_acceptance(request, mobile_number):
     try:
-        user = UserSignUp.objects.get(mobile_number=mobile_number)
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
         return Response({
             "is_accepted_offer_letter": user.is_accepted_offer_letter,
             "accepted_offer_letter_date": user.accepted_offer_letter_date
         })
-    except UserSignUp.DoesNotExist:
-        return Response({"error": "Profile not found"}, status=404)     
+    except FellowSignUp.DoesNotExist:
+        return Response({"error": "Profile not found"}, status=404)
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+def save_fellow_testimonial(request):
+    try:
+        logger.info(f"Received files: {request.FILES}")
+        logger.info(f"Received POST data: {request.POST}")
+        
+        audio_file = request.FILES.get('audio')
+        if not audio_file:
+            logger.error("No audio file received")
+            return Response({"error": "No audio file received"}, status=400)
+            
+        logger.info(f"Audio file details: size={audio_file.size}, content_type={audio_file.content_type}")
+        
+        mobile_number = request.POST.get('mobile_number')
+        recorder_type = request.POST.get('recorder_type')
+
+        if not all([audio_file, mobile_number, recorder_type]):
+            return Response({
+                "error": "Missing required fields"
+            }, status=400)
+
+        # Generate unique filename
+        file_extension = audio_file.name.split('.')[-1]
+        file_name = f"testimonials/{uuid.uuid4()}.{file_extension}"
+
+        # Upload to S3
+        s3_bucket_name = "yuvachetana-webapp"
+        s3_client.upload_fileobj(audio_file, s3_bucket_name, file_name)
+
+        # Generate S3 URL
+        audio_url = f"https://{s3_bucket_name}.s3.amazonaws.com/{file_name}"
+
+        # Get fellow instance
+        #fellow = FellowProfile.objects.get(mobile_number=mobile_number)
+
+        # Save testimonial
+        # testimonial = FellowTestimonial.objects.create(
+        #     fellow=fellow,
+        #     recorder_type=recorder_type,
+        #     audio_url=audio_url
+        # )
+
+        return Response({
+            "status": "success",
+            "audio_url": audio_url
+            #"testimonial_id": testimonial.id
+        })
+
+    except Exception as e:
+        logger.error(f"Error in save_fellow_testimonial: {str(e)}", exc_info=True)
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def get_fellow_details_for_consent(request, mobile_number):
+    print(f"Fetching details for mobile: {mobile_number}")
+    try:
+        # Get fellow and their registration details
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+        print(f"Found fellow: {fellow.full_name}")
+        
+        registration = FellowRegistration.objects.get(fellow=fellow)
+        print(f"Found registration for fellow")
+        
+        # Get location names through foreign key relationships
+        state_name = registration.state.state_name
+        district_name = registration.district.district_name
+        mandal_name = registration.mandal.mandal_name
+        grampanchayat_name = registration.grampanchayat.gram_panchayat_name
+        
+        # Combine location names with hyphens
+        place = f"{grampanchayat_name}-{mandal_name}-{district_name}-{state_name}"
+        print(f"Generated place: {place}")
+        
+        # Get current date in IST
+        current_date = timezone.localtime(timezone.now()).date()
+        
+        response_data = {
+            "status": "success",
+            "data": {
+                "full_name": fellow.full_name,
+                "place": place,
+                "current_date": current_date
+            }
+        }
+        print("Sending response:", response_data)
+        return Response(response_data)
+        
+    except FellowSignUp.DoesNotExist:
+        print(f"Fellow not found with mobile: {mobile_number}")
+        return Response({
+            "status": "error",
+            "message": "Fellow not found"
+        }, status=404)
+    except FellowRegistration.DoesNotExist:
+        print(f"Registration not found for fellow with mobile: {mobile_number}")
+        return Response({
+            "status": "error",
+            "message": "Fellow registration not found"
+        }, status=404)
+    except Exception as e:
+        print(f"Error processing request: {str(e)}")
+        return Response({
+            "status": "error",
+            "message": str(e)
+        }, status=500)
+
+@api_view(['GET'])
+def get_universities(request):
+    universities = University.objects.all()
+    serializer = UniversitySerializer(universities, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_colleges(request):
+    university_id = request.GET.get('university')
+    if university_id:
+        colleges = College.objects.filter(university_id=university_id)
+    else:
+        colleges = College.objects.all()
+    serializer = CollegeSerializer(colleges, many=True)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_courses(request):
+    college_id = request.GET.get('college')
+    if college_id:
+        courses = Course.objects.filter(college_id=college_id)
+    else:
+        courses = Course.objects.all()
+    serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
 
 
 

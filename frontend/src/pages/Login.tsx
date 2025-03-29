@@ -39,7 +39,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch(ENDPOINTS.LOGIN, {
+      const response = await fetch(ENDPOINTS.FELLOW_LOGIN, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ mobile_number: mobileNumber, password }),
@@ -55,6 +55,8 @@ const Login = () => {
       if (userStatus === "PENDING_REGISTRATION") {
         navigate("/register", { state: { mobileNumber } });
       } else if (userStatus === "PENDING_TASK_SUBMISSION") {
+        navigate("/tasks", { state: { mobileNumber } });
+      } else if (userStatus === "PENDING_OFFER_ACCEPTANCE") {
         navigate("/tasks", { state: { mobileNumber } });
       } else if (userStatus === "PENDING_DATA_CONSENT") {
         navigate("/data-consent", { state: { mobileNumber } });

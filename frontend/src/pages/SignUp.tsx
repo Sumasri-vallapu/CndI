@@ -54,7 +54,7 @@ const SignUp = () => {
     }
 
     try {
-      const response = await fetch(ENDPOINTS.SIGNUP, {
+      const response = await fetch(ENDPOINTS.FELLOW_SIGNUP, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

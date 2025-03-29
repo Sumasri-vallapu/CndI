@@ -63,28 +63,46 @@ const Tasks = () => {
   // ✅ Fetch Districts
   useEffect(() => {
     if (!state) return;
-    fetch(ENDPOINTS.GET_DISTRICTS(state))
-      .then((res) => res.json())
-      .then(setDistricts)
-      .catch((err) => console.error("Error fetching districts:", err));
+    const fetchDistricts = async () => {
+      try {
+        const response = await fetch(`${ENDPOINTS.GET_DISTRICTS}?state_id=${state}`);
+        const data = await response.json();
+        setDistricts(data);
+      } catch (error) {
+        console.error("Error fetching districts:", error);
+      }
+    };
+    fetchDistricts();
   }, [state]);
 
   // ✅ Fetch Mandals
   useEffect(() => {
     if (!selectedDistrict) return;
-    fetch(ENDPOINTS.GET_MANDALS(selectedDistrict))
-      .then((res) => res.json())
-      .then(setMandals)
-      .catch((err) => console.error("Error fetching mandals:", err));
+    const fetchMandals = async () => {
+      try {
+        const response = await fetch(`${ENDPOINTS.GET_MANDALS}?district_id=${selectedDistrict}`);
+        const data = await response.json();
+        setMandals(data);
+      } catch (error) {
+        console.error("Error fetching mandals:", error);
+      }
+    };
+    fetchMandals();
   }, [selectedDistrict]);
 
-  // ✅ Fetch Villages
+  // ✅ Fetch Grampanchayats (previously villages)
   useEffect(() => {
     if (!selectedMandal) return;
-    fetch(ENDPOINTS.GET_VILLAGES(selectedMandal))
-      .then((res) => res.json())
-      .then(setVillages)
-      .catch((err) => console.error("Error fetching villages:", err));
+    const fetchGrampanchayats = async () => {
+      try {
+        const response = await fetch(`${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal_id=${selectedMandal}`);
+        const data = await response.json();
+        setVillages(data); // Consider renaming this state to setGrampanchayats
+      } catch (error) {
+        console.error("Error fetching grampanchayats:", error);
+      }
+    };
+    fetchGrampanchayats();
   }, [selectedMandal]);
 
   // Fetch task status on component mount
@@ -222,27 +240,25 @@ const Tasks = () => {
 
   // Add the handleAcceptance function
   const handleAcceptance = async () => {
-    if (!mobileNumber) {
-      alert("Mobile number not available. Please login again.");
-      return;
-    }
-
+    if (!mobileNumber) return;
+    
     try {
       const response = await fetch(ENDPOINTS.UPDATE_FELLOW_ACCEPTANCE(mobileNumber), {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json'
         }
       });
 
-      if (!response.ok) throw new Error("Failed to update acceptance");
+      if (!response.ok) {
+        throw new Error('Failed to update acceptance status');
+      }
+
+      // Refresh the acceptance status
+      await fetchAcceptanceStatus();
       
-      setIsAccepted(true);
-      setAcceptanceDate(new Date().toISOString());
-      alert("Thank you for accepting the fellowship!");
     } catch (error) {
-      console.error("Error updating acceptance:", error);
-      alert("Failed to update acceptance. Please try again.");
+      console.error('Error updating acceptance:', error);
     }
   };
 

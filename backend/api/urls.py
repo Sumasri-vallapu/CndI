@@ -1,27 +1,19 @@
 from django.urls import path
 from .views import (
-
-    FellowSignUp,
-
-
-
-
-
-    UploadPhotoView, 
-    HelloworldView, 
-    forgot_password,
-    fellow_login,
+    HelloworldView,
     fellow_signup,
+    fellow_login,
+    fellow_register,
+    forgot_password,
     update_tasks,
     update_data_consent,
     update_child_protection_consent,
     get_user_status,
-    get_castes,
     get_states,
+    get_fellow_details,
     get_districts,
     get_mandals,
-    get_villages,
-    fellow_register,
+    get_grampanchayats,
     get_user_details,
     get_task_status,
     get_video_status,
@@ -33,47 +25,48 @@ from .views import (
     update_fellow_profile_section,
     update_fellow_acceptance,
     get_fellow_acceptance,
+    save_fellow_testimonial,
+    get_fellow_details_for_consent,
+    get_universities,
+    get_colleges,
+    get_courses,
 )   
 
 urlpatterns = [
+    path('fellow/profile/<str:mobile_number>/accept/', update_fellow_acceptance, name='update_fellow_acceptance'),
+    path('fellow/profile/<str:mobile_number>/acceptance-status/', get_fellow_acceptance, name='get_fellow_acceptance'),
+    path('fellow/profile/details/<str:mobile_number>/', get_fellow_profile, name='get_fellow_profile'),
+    path('fellow/profile/<str:mobile_number>/<str:section>/', update_fellow_profile_section, name='update_fellow_profile_section'),
+    
     path('', HelloworldView.as_view(), name='hello-world'),
-    path('fellow-signup/', fellow_signup, name='fellow_signup'), 
-    path('fellow-registration/', fellow_register, name='fellow_registration'),
+    path('fellow/signup/', fellow_signup, name='fellow_signup'),
+    path('fellow/login/', fellow_login, name='fellow_login'),
+    path('fellow/register/', fellow_register, name='fellow_register'),
     path('forgot-password/', forgot_password, name='forgot_password'),
-    path('fellow-login/', fellow_login, name='fellow_login'),
-
-
-
-    path('login/', login, name='login'),
-    path('data-consent/update/', update_data_consent, name='update_data_consent'),
-    path('child-protection/update/', update_child_protection_consent, name='update_child_protection'),
-    path('user-status/<str:mobile_number>/', get_user_status, name='get_user_status'),
-    path('castes/', get_castes, name='get_castes'),
-    path('tasks/update/', update_tasks, name='update_tasks'),
+    path('fellow-details/', get_fellow_details, name='get_fellow_details'),
+    path('fellow/data-consent/update/', update_data_consent, name='update_data_consent'),
+    path('fellow/child-protection/update/', update_child_protection_consent, name='update_child_protection'),
+    path('fellow/status/<str:mobile_number>/', get_user_status, name='get_user_status'),
 
     # location api   
     path('states/', get_states, name='get_states'),
     path('districts/', get_districts, name='get_districts'),
     path('mandals/', get_mandals, name='get_mandals'),
-    path('villages/', get_villages, name='get_villages'),
+    path('grampanchayats/', get_grampanchayats, name='get_grampanchayats'),
 
     # task api
     path('user-details/', get_user_details, name='get_user_details'),
-    path('tasks/status/<str:mobile_number>/', get_task_status, name='get_task_status'),
+    path('fellow/tasks/status/<str:mobile_number>/', get_task_status, name='get_task_status'),
     path('tasks/video-status/update/', update_video_status, name='update_video_status'),
     path('tasks/video-status/<str:mobile_number>/', get_video_status, name='get_video_status'),
 
-    path('tasks/submit-task1/', submit_task1, name='submit_task1'),
-    path('tasks/submit-task2/', submit_task2, name='submit_task2'),
+    path('fellow/tasks/submit/task1/', submit_task1, name='submit_task1'),
+    path('fellow/tasks/submit/task2/', submit_task2, name='submit_task2'),
 
-
-    path('upload-profile-photo/', upload_profile_photo, name='upload_profile_photo'), 
-    path('fellow-profile/<str:mobile_number>/accept/', update_fellow_acceptance, name='update_fellow_acceptance'),
-    path('fellow-profile/<str:mobile_number>/acceptance-status/', get_fellow_acceptance, name='get_fellow_acceptance'),
-    path('fellow-profile/<str:mobile_number>/<str:section>/', update_fellow_profile_section, name='update_fellow_profile_section'),
-    path('fellow-profile/<str:mobile_number>/', get_fellow_profile, name='get_fellow_profile'),
-
-    #test apist api
-    path('upload/', UploadPhotoView.as_view(), name='upload-photo'),
-
+    path('fellow/profile/photo/upload/', upload_profile_photo, name='upload_profile_photo'),
+    path('fellow/testimonial/', save_fellow_testimonial, name='save_fellow_testimonial'),
+    path('fellow/details/<str:mobile_number>/', get_fellow_details_for_consent, name='get_fellow_details_for_consent'),
+    path('universities/', get_universities, name='get_universities'),
+    path('colleges/', get_colleges, name='get_colleges'),
+    path('courses/', get_courses, name='get_courses'),
 ]

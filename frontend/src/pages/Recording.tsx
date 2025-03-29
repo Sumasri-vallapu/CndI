@@ -86,6 +86,7 @@ export default function RecordAudioPage() {
           body: formData,
         })
 
+        console.log('response', response)
         const data = await response.json()
         if (!response.ok) throw new Error(data.detail || "Upload failed")
 

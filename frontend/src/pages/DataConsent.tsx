@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle } from "lucide-react";
@@ -7,14 +7,44 @@ import { ENDPOINTS } from "@/utils/api";
 export default function DataProtectionConsent() {
   const navigate = useNavigate();
   const location = useLocation();
-  const mobileNumber = location.state?.mobileNumber; // Fallback for testing
   
+  // Retrieve mobile number from location state or local storage
+  const mobileNumber = location.state?.mobileNumber || localStorage.getItem('mobile_number');
+
   const [isAgreed, setIsAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [fellowDetails, setFellowDetails] = useState({
+    full_name: "",
+    place: "",
+    current_date: ""
+  });
 
-  const fellowName = "John Doe"; // Replace with actual fellow name from state/context
-  const place = "Hyderabad, Telangana"; // Replace with actual location from state/context
-  const currentDate = new Date().toISOString().split("T")[0]; // Auto-fill current date
+  // Fetch fellow details
+  useEffect(() => {
+    const fetchFellowDetails = async () => {
+      if (!mobileNumber) {
+        console.log("No mobile number available");
+        return;
+      }
+      
+      console.log("Fetching details for mobile:", mobileNumber);
+      try {
+        const url = ENDPOINTS.GET_FELLOW_CONSENT_DETAILS(mobileNumber);
+        const response = await fetch(url);
+        
+        if (!response.ok) throw new Error('Failed to fetch fellow details');
+        
+        const result = await response.json();
+        if (result.status === "success") {
+          setFellowDetails(result.data);
+        }
+      } catch (error) {
+        console.error('Error fetching fellow details:', error);
+      }
+    };
+
+    fetchFellowDetails();
+  }, [mobileNumber]);
 
   const handleAgree = async () => {
     if (!isAgreed) {
@@ -108,9 +138,9 @@ export default function DataProtectionConsent() {
 
             {/* ✅ Auto-Filled Fields */}
             <div className="bg-gray-50 p-4 rounded-lg text-sm space-y-2">
-              <p><span className="font-semibold">Full Name:</span> {fellowName}</p>
-              <p><span className="font-semibold">Place:</span> {place}</p>
-              <p><span className="font-semibold">Date:</span> {currentDate}</p>
+              <p><span className="font-semibold">Full Name:</span> {fellowDetails.full_name}</p>
+              <p><span className="font-semibold">Place:</span> {fellowDetails.place}</p>
+              <p><span className="font-semibold">Date:</span> {fellowDetails.current_date}</p>
             </div>
 
             {/* ✅ Acknowledgment Checkbox */}

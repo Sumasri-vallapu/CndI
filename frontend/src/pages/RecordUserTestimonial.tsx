@@ -18,6 +18,32 @@ export default function RecordUserTestimonial() {
   const total = recorders.length
   const progress = (uploaded / total) * 100
 
+  const handleSubmit = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob, 'recording.webm');
+      formData.append('recorder_type', 'unknown');
+      formData.append('mobile_number', '9876543210'); // Replace with actual mobile number
+
+      const response = await fetch(ENDPOINTS.FELLOW_TESTIMONIAL, {
+        method: 'POST',
+        body: formData,
+        // Don't set Content-Type header - browser will set it with boundary
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload testimonial');
+      }
+
+      const data = await response.json();
+      // Handle success - maybe show success message or redirect
+      
+    } catch (error) {
+      console.error('Error uploading testimonial:', error);
+      // Handle error - show error message to user
+    }
+  };
+
   return (
     <div className="max-w-sm mx-auto px-4 py-6 min-h-screen bg-white">
       <div className="flex items-center justify-between mb-4">

@@ -32,21 +32,29 @@ const Register = () => {
   const [state, setState] = useState("");
   const [district, setDistrict] = useState("");
   const [mandal, setMandal] = useState("");
-  const [village, setVillage] = useState("");
-  const [villages, setVillages] = useState<LocationOption[]>([]);
+  const [grampanchayat, setGrampanchayat] = useState("");
+  const [grampanchayats, setGrampanchayats] = useState<LocationOption[]>([]);
 
   // ✅ Location Data
-  const [states, setStates] = useState<LocationOption[]>([]);
-  const [districts, setDistricts] = useState<LocationOption[]>([]);
-  const [mandals, setMandals] = useState<LocationOption[]>([]);
+  const [locations, setLocations] = useState({
+    states: [],
+    districts: [],
+    mandals: [],
+    grampanchayats: []
+  });
 
   // ✅ Fetch Full Name using Mobile Number
   useEffect(() => {
     const fetchUserDetails = async () => {
       if (!mobileNumber) return;
       try {
-        const response = await fetch(`${ENDPOINTS.GET_USER_DETAILS}?mobile_number=${mobileNumber}`);
+        const response = await fetch(ENDPOINTS.GET_FELLOW_DETAILS, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mobile_number: mobileNumber }),
+        });
         const data = await response.json();
+        console.log('data', data)
         if (response.ok) {
           setFullName(data.full_name);
         }
@@ -63,7 +71,7 @@ const Register = () => {
       try {
         const response = await fetch(ENDPOINTS.GET_STATES);
         const data = await response.json();
-        setStates(data);
+        setLocations({ ...locations, states: data });
       } catch (error) {
         console.error("Error fetching states:", error);
       }
@@ -75,9 +83,9 @@ const Register = () => {
     if (!state) return;
     const fetchDistricts = async () => {
       try {
-        const response = await fetch(ENDPOINTS.GET_DISTRICTS(state));
+        const response = await fetch(ENDPOINTS.GET_DISTRICTS + `?state_id=${state}`);
         const data = await response.json();
-        setDistricts(data);
+        setLocations({ ...locations, districts: data });
       } catch (error) {
         console.error("Error fetching districts:", error);
       }
@@ -89,9 +97,9 @@ const Register = () => {
     if (!district) return;
     const fetchMandals = async () => {
       try {
-        const response = await fetch(ENDPOINTS.GET_MANDALS(district));
+        const response = await fetch(ENDPOINTS.GET_MANDALS + `?district_id=${district}`);
         const data = await response.json();
-        setMandals(data);
+        setLocations({ ...locations, mandals: data });
       } catch (error) {
         console.error("Error fetching mandals:", error);
       }
@@ -101,17 +109,39 @@ const Register = () => {
 
   useEffect(() => {
     if (!mandal) return;
-    const fetchVillages = async () => {
+    const fetchGrampanchayats = async () => {
       try {
-        const response = await fetch(ENDPOINTS.GET_VILLAGES(mandal));
+        const response = await fetch(ENDPOINTS.GET_GRAMPANCHAYATS + `?mandal_id=${mandal}`);
         const data = await response.json();
-        setVillages(data);
+        setGrampanchayats(data);
       } catch (error) {
-        console.error("Error fetching villages:", error);
+        console.error("Error fetching grampanchayats:", error);
       }
     };
-    fetchVillages();
+    fetchGrampanchayats();
   }, [mandal]);
+
+  // Add this check at the start of the component
+  useEffect(() => {
+    const checkSignup = async () => {
+      if (!mobileNumber) return;
+      try {
+        const response = await fetch(ENDPOINTS.GET_FELLOW_DETAILS, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ mobile_number: mobileNumber }),
+        });
+        if (!response.ok) {
+          // If not signed up, redirect to signup
+          navigate('/signup', { state: { mobileNumber } });
+        }
+      } catch (error) {
+        console.error("Error checking signup:", error);
+        navigate('/signup', { state: { mobileNumber } });
+      }
+    };
+    checkSignup();
+  }, [mobileNumber, navigate]);
 
   // ✅ Logout Function
   const handleLogout = () => {
@@ -122,13 +152,14 @@ const Register = () => {
 
   // ✅ Handle Registration
   const handleRegister = async () => {
-    if (!mobileNumber || !fullName || !dob || !gender || !casteCategory || !state || !district || !mandal || !village) {
+    if (!mobileNumber || !fullName || !dob || !gender || !casteCategory || 
+        !state || !district || !mandal || !grampanchayat) {
       alert("All fields are required!");
       return;
     }
 
     try {
-      const response = await fetch(ENDPOINTS.REGISTER, {
+      const response = await fetch(ENDPOINTS.FELLOW_REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -140,7 +171,7 @@ const Register = () => {
           state,
           district,
           mandal,
-          village,
+          grampanchayat
         }),
       });
 
@@ -248,10 +279,10 @@ const Register = () => {
         {/* Location Information */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold text-walnut">Location Information</h3>
-          {[{ label: "State", value: state, setter: setState, options: states },
-            { label: "District", value: district, setter: setDistrict, options: districts },
-            { label: "Mandal", value: mandal, setter: setMandal, options: mandals },
-            { label: "Village", value: village, setter: setVillage, options: villages }]
+          {[{ label: "State", value: state, setter: setState, options: locations.states },
+            { label: "District", value: district, setter: setDistrict, options: locations.districts },
+            { label: "Mandal", value: mandal, setter: setMandal, options: locations.mandals },
+            { label: "Grampanchayat", value: grampanchayat, setter: setGrampanchayat, options: grampanchayats }]
             .map(({ label, value, setter, options }) => (
               <div key={label} className="space-y-2">
                 <Label>{label}</Label>
