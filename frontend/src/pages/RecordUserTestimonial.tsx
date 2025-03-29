@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { StudentAvatar } from "@/components/ui/student-avatar"
 import { useNavigate } from "react-router-dom"
+import { ENDPOINTS } from "@/utils/api"
 
 const recorders = [
   { id: "student", type: "Student", count: 0 },

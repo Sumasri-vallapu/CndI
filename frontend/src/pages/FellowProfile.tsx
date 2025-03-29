@@ -102,13 +102,36 @@ const CASTE_OPTIONS = [
 const dropdownOptions = {
   gender: ["MALE", "FEMALE", "OTHER"],
   caste_category: ["OC", "BC", "SC", "ST", "OTHER"],
-  type_of_college: ["Government", "Private"], 
   mode_of_study: ["College Hostel", "Private Hostel", "Day-Scholar", "Distance"],
   type_of_college: ["Government", "Private"],
   study_mode: ["Regular", "Distance", "Online"],
   semester: ["1", "2", "3", "4", "5", "6",  "other"],
   stream: ["Arts", "Science", "Commerce", "Engineering", "Other"],
 };
+
+const TECHNICAL_SKILLS = [
+  "Computer Skills",
+  "MS Office",
+  "Programming",
+  "Data Entry",
+  "Web Design",
+  "Digital Marketing",
+  "Video Editing",
+  "Other"
+];
+
+const ARTISTIC_SKILLS = [
+  "Singing",
+  "Dancing",
+  "Poem/Song Writing",
+  "Prose Writing",
+  "Theatre/Drama",
+  "Drawing/Painting",
+  "Music Instrument",
+  "Photography",
+  "Media Management",
+  "Other"
+];
 
 const ProfileForm = () => {
   const location = useLocation();
@@ -131,6 +154,8 @@ const ProfileForm = () => {
     colleges: [],
     courses: []
   });
+  const [selectedTechnicalSkills, setSelectedTechnicalSkills] = useState<string[]>([]);
+  const [selectedArtisticSkills, setSelectedArtisticSkills] = useState<string[]>([]);
 
   // Get mobile number from both location state and localStorage
   const mobileNumber = location.state?.mobileNumber || localStorage.getItem('mobile_number');
@@ -229,6 +254,13 @@ const ProfileForm = () => {
     };
     fetchStates();
   }, []);
+
+  useEffect(() => {
+    if (profileData) {
+      setSelectedTechnicalSkills(profileData.skills.technical_skills?.split(',') || []);
+      setSelectedArtisticSkills(profileData.skills.artistic_skills?.split(',') || []);
+    }
+  }, [profileData]);
 
   const handleChange = (section: string, key: string, value: string) => {
     if (!profileData) return;
@@ -598,16 +630,16 @@ const ProfileForm = () => {
         const universities = await universitiesResponse.json();
         setEducationData(prev => ({ ...prev, universities }));
 
-        if (profileData?.education_details.university) {
+        if (profileData?.education_details.university_name) {
           const collegesResponse = await fetch(
-            `${ENDPOINTS.GET_COLLEGES}?university=${profileData.education_details.university}`
+            `${ENDPOINTS.GET_COLLEGES}?university=${profileData.education_details.university_name}`
           );
           const colleges = await collegesResponse.json();
           setEducationData(prev => ({ ...prev, colleges }));
 
-          if (profileData?.education_details.college) {
+          if (profileData?.education_details.college_name) { 
             const coursesResponse = await fetch(
-              `${ENDPOINTS.GET_COURSES}?college=${profileData.education_details.college}`
+              `${ENDPOINTS.GET_COURSES}?college=${profileData.education_details.college_name}`
             );
             const courses = await coursesResponse.json();
             setEducationData(prev => ({ ...prev, courses }));
@@ -619,7 +651,25 @@ const ProfileForm = () => {
     };
 
     fetchEducationData();
-  }, [profileData?.education_details.university, profileData?.education_details.college]);
+  }, [profileData?.education_details.university_name, profileData?.education_details.college_name]);
+
+  const handleTechnicalSkillChange = (skill: string) => {
+    setSelectedTechnicalSkills(prev => {
+      if (prev.includes(skill)) {
+        return prev.filter(s => s !== skill);
+      }
+      return [...prev, skill];
+    });
+  };
+
+  const handleArtisticSkillChange = (skill: string) => {
+    setSelectedArtisticSkills(prev => {
+      if (prev.includes(skill)) {
+        return prev.filter(s => s !== skill);
+      }
+      return [...prev, skill];
+    });
+  };
 
   if (loading) {
     return (
@@ -802,6 +852,34 @@ const ProfileForm = () => {
             render: () => renderDropdown("stream", "Stream", dropdownOptions.stream.map(value => ({ value, label: value })))
           },
         ], ["type_of_college", "study_mode", "stream", "semester"])}
+        {renderSection("Skills", [
+          {
+            key: "technical_skills",
+            label: "Technical Skills",
+            render: () => (
+              <div className="flex flex-wrap gap-2">
+                {TECHNICAL_SKILLS.map(skill => (
+                  <label key={skill} className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={selectedTechnicalSkills.includes(skill)}
+                      onChange={() => handleTechnicalSkillChange(skill)}
+                    />
+                    <span>{skill}</span>
+                  </label>
+                ))}
+              </div>
+            )
+          },
+          {
+            key: "artistic_skills",
+            label: "Artistic Skills",
+            type: "checkbox-group",
+            options: ARTISTIC_SKILLS,
+            value: selectedArtisticSkills,
+            onChange: handleArtisticSkillChange
+          }
+        ])}
       </div>
 
       {/* Sidebar Overlay */}

@@ -222,5 +222,22 @@ class FellowProfileSerializer(serializers.ModelSerializer):
             'artistic_skills',
         ]
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        # Convert comma-separated strings to lists
+        if data.get('technical_skills'):
+            data['technical_skills'] = data['technical_skills'].split(',')
+        if data.get('artistic_skills'):
+            data['artistic_skills'] = data['artistic_skills'].split(',')
+        return data
+
+    def to_internal_value(self, data):
+        # Convert lists to comma-separated strings
+        if 'technical_skills' in data and isinstance(data['technical_skills'], list):
+            data['technical_skills'] = ','.join(data['technical_skills'])
+        if 'artistic_skills' in data and isinstance(data['artistic_skills'], list):
+            data['artistic_skills'] = ','.join(data['artistic_skills'])
+        return super().to_internal_value(data)
+
 
 
