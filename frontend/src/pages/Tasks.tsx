@@ -31,11 +31,8 @@ interface TaskStatus {
 const Tasks = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [taskStatus, setTaskStatus] = useState<TaskStatus | null>(null);
-  
-  // Get mobile number from multiple sources
   const mobileNumber = location.state?.mobileNumber || getLoggedInMobile();
-
+  
   const [districts, setDistricts] = useState<LocationItem[]>([]);
   const [mandals, setMandals] = useState<LocationItem[]>([]);
   const [villages, setVillages] = useState<LocationItem[]>([]);
@@ -118,18 +115,25 @@ const Tasks = () => {
 
   // Fetch task status on component mount
   useEffect(() => {
-    if (!mobileNumber) return;
-    fetch(ENDPOINTS.GET_TASK_STATUS(mobileNumber))
-      .then((res) => res.json())
-      .then((data: TaskStatus) => {
+    const fetchTaskStatus = async () => {
+      if (!mobileNumber) return;
+      try {
+        const response = await fetch(ENDPOINTS.GET_TASK_STATUS(mobileNumber));
+        if (!response.ok) throw new Error("Failed to fetch task status");
+        const data: TaskStatus = await response.json();
+        // Update the correct states
         setVideosWatched({
           video1: data.video1_watched,
           video2: data.video2_watched
         });
         setTask1Status(data.task1_status);
         setTask2Status(data.task2_status);
-      })
-      .catch((err) => console.error("Error fetching task status:", err));
+      } catch (error) {
+        console.error("Error fetching task status:", error);
+      }
+    };
+    
+    fetchTaskStatus();
   }, [mobileNumber]);
 
   // Add this function with your other fetch functions

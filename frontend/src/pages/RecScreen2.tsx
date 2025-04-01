@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
-import { ChevronLeft, Mic, Pause, Play, Square, UploadCloud } from "lucide-react"
+import { ChevronLeft, Mic, Play, Square, UploadCloud } from "lucide-react"
 import { STAKEHOLDER_QUESTIONS } from "@/utils/stakeholder_questions"
 import { getLoggedInMobile } from "@/utils/session"
 import { ENDPOINTS } from "@/utils/api"
@@ -15,9 +15,9 @@ import { cn } from "@/lib/utils"
 interface StakeholderQuestion {
   label: string;
   type: string;
+  required?: boolean;
   options?: string[];
   placeholder?: string;
-  required?: boolean;
 }
 
 export default function RecordTestimonialPage() {
@@ -37,7 +37,7 @@ export default function RecordTestimonialPage() {
   const audioChunks = useRef<Blob[]>([])
 
   const mobile_number = getLoggedInMobile()
-  const questions = STAKEHOLDER_QUESTIONS[stakeholder] || []
+  const questions: StakeholderQuestion[] = STAKEHOLDER_QUESTIONS[stakeholder] || []
 
   useEffect(() => {
     if (!mobile_number) {
@@ -114,11 +114,11 @@ export default function RecordTestimonialPage() {
   }
 
   const validateForm = () => {
-    const requiredFields = questions
-      .filter(q => q.required)
+    const requiredQuestions = questions
+      .filter(q => q.required === true)
       .map(q => q.label)
 
-    const missingFields = requiredFields.filter(field => !formData[field])
+    const missingFields = requiredQuestions.filter(field => !formData[field])
     
     if (missingFields.length > 0) {
       alert(`Please fill in the following required fields: ${missingFields.join(", ")}`)
@@ -196,7 +196,7 @@ export default function RecordTestimonialPage() {
           {questions.map((q) => (
             <div key={q.label} className="space-y-2">
               <label className="block text-sm font-medium text-gray-700">
-                {q.label} {q.required && <span className="text-red-500">*</span>}
+                {q.label} {q.required === true && <span className="text-red-500">*</span>}
               </label>
               {q.type === "dropdown" ? (
                 <Select 

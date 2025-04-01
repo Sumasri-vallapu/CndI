@@ -137,7 +137,6 @@ export default function RecordUserTestimonial() {
             uploadCount={rec.count}
             icon={avatarMap[rec.id]}
             id={rec.id}
-            lastRecording={rec.lastRecording}
           />
         ))}
       </div>
@@ -150,13 +149,9 @@ type TestimonialCardProps = {
   uploadCount: number;
   icon: React.ReactNode;
   id: string;
-  lastRecording?: {
-    audio_url: string;
-    created_at: string;
-  };
 }
 
-function TestimonialCard({ type, uploadCount, icon, id, lastRecording }: TestimonialCardProps) {
+function TestimonialCard({ type, uploadCount, icon, id }: TestimonialCardProps) {
   const navigate = useNavigate();
   const status = uploadCount === 0 
     ? "No Audios Uploaded" 

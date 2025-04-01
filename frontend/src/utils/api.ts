@@ -1,7 +1,7 @@
 // API configuration
-const BASE_URL = 'http://localhost:8000/api';
+//const BASE_URL = 'http://localhost:8000/api';
 
-//const BASE_URL = 'https://yuvachetana.com/api';
+const BASE_URL = 'https://yuvachetana.com/api';
 
 
 // API endpoints
@@ -62,4 +62,7 @@ export const ENDPOINTS = {
   GET_COURSES: `${BASE_URL}/courses/`,
 
   SUBMIT_TESTIMONIAL: `${BASE_URL}/submit-testimonial/`,
+
+  GET_USER_DETAILS: (mobile_number: string) => 
+    `${BASE_URL}/fellow/details/${mobile_number}/`,
 } as const; 

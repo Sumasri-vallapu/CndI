@@ -153,9 +153,10 @@ export default function ChildProtectionConsent() {
             {/* ✅ Submit Button */}
             <Button 
               onClick={handleAgree}
+              disabled={isSubmitting}
               className="w-full bg-walnut text-white hover:bg-walnut/90 py-3 rounded-lg text-lg font-medium"
             >
-              I Agree
+              {isSubmitting ? "Submitting..." : "I Agree"}
             </Button>
           </div>
         </div>

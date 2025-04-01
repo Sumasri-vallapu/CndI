@@ -111,25 +111,13 @@ const dropdownOptions = {
 
 const TECHNICAL_SKILLS = [
   "Computer Skills",
-  "MS Office",
   "Programming",
+  "Data Analysis",
+  "MS Office",
   "Data Entry",
   "Web Design",
   "Digital Marketing",
   "Video Editing",
-  "Other"
-];
-
-const ARTISTIC_SKILLS = [
-  "Singing",
-  "Dancing",
-  "Poem/Song Writing",
-  "Prose Writing",
-  "Theatre/Drama",
-  "Drawing/Painting",
-  "Music Instrument",
-  "Photography",
-  "Media Management",
   "Other"
 ];
 
@@ -155,7 +143,6 @@ const ProfileForm = () => {
     courses: []
   });
   const [selectedTechnicalSkills, setSelectedTechnicalSkills] = useState<string[]>([]);
-  const [selectedArtisticSkills, setSelectedArtisticSkills] = useState<string[]>([]);
 
   // Get mobile number from both location state and localStorage
   const mobileNumber = location.state?.mobileNumber || localStorage.getItem('mobile_number');
@@ -258,7 +245,6 @@ const ProfileForm = () => {
   useEffect(() => {
     if (profileData) {
       setSelectedTechnicalSkills(profileData.skills.technical_skills?.split(',') || []);
-      setSelectedArtisticSkills(profileData.skills.artistic_skills?.split(',') || []);
     }
   }, [profileData]);
 
@@ -274,87 +260,19 @@ const ProfileForm = () => {
     });
   };
 
-  const handleSave = async (section: string) => {
-    if (!mobileNumber) {
-      alert("Please login again");
-      return;
-    }
-
+  const handleSave = async (section: string, data: any) => {
     try {
-      const sectionKey = section.toLowerCase().replace(' ', '_');
-      const sectionData = profileData?.[sectionKey as keyof typeof profileData];
-      
-      const response = await fetch(ENDPOINTS.UPDATE_FELLOW_PROFILE(mobileNumber, sectionKey), {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(sectionData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update profile");
-      }
-
-      alert(`${section} updated successfully`);
+      await updateProfileSection(section, data);
+      // Refresh data after update
+      fetchProfileData();
       setIsEditing(null);
     } catch (error) {
-      console.error("Error updating profile:", error);
-      alert(`Error updating ${section}. Please try again.`);
+      alert("Failed to update profile. Please try again.");
     }
-  };
-
-  const getSectionData = (section: string) => {
-    if (profileData) {
-      switch (section) {
-        case 'personal_details':
-          return {
-            gender: profileData.personal_details.gender,
-            caste_category: profileData.personal_details.caste_category,
-            date_of_birth: profileData.personal_details.date_of_birth,
-            state: profileData.personal_details.state_name,
-            district: profileData.personal_details.district_name,
-            mandal: profileData.personal_details.mandal_name,
-            village: profileData.personal_details.grampanchayat_name,
-            whatsapp_number: profileData.personal_details.mobile_number,
-            email: profileData.personal_details.email,
-          };
-        case 'family_details':
-          return {
-            mother_name: profileData.family_details.mother_name,
-            mother_occupation: profileData.family_details.mother_occupation,
-            father_name: profileData.family_details.father_name,
-            father_occupation: profileData.family_details.father_occupation,
-            current_job: profileData.family_details.current_job,
-          };
-        case 'education_details':
-          return {
-            current_job: profileData.family_details.current_job,
-            hobbies: profileData.skills.hobbies,
-            college_name: profileData.education_details.college_name,
-            type_of_college: profileData.education_details.type_of_college,
-            study_mode: profileData.education_details.study_mode,
-            stream: profileData.education_details.stream,
-            course: profileData.education_details.course_name,
-            subjects: profileData.education_details.subjects,
-            semester: profileData.education_details.semester,
-            technical_skills: profileData.skills.technical_skills,
-            artistic_skills: profileData.skills.artistic_skills,
-          };
-        default:
-          return {};
-      }
-    }
-    return {};
   };
 
   const toggleSection = (section: string) => {
     setActiveSection(activeSection === section ? null : section);
-  };
-
-  const formatLabel = (label: string) => {
-    return label.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase()).trim();
   };
 
   const renderDropdown = (key: string, label: string, options: { value: string, label: string }[]) => (
@@ -472,7 +390,7 @@ const ProfileForm = () => {
             {isEditing === title ? "Cancel" : "Edit"}
           </Button>
           {isEditing === title && (
-            <Button onClick={() => handleSave(title)} className="w-full bg-green-500 mt-3">
+            <Button onClick={() => handleSave(title, profileData?.[title.toLowerCase().replace(' ', '_') as keyof typeof profileData])} className="w-full bg-green-500 mt-3">
               Save Changes
             </Button>
           )}
@@ -500,32 +418,19 @@ const ProfileForm = () => {
     navigate('/login');
   };
 
-  const updateProfileSection = async (section: string, updatedData: any) => {
+  const updateProfileSection = async (section: string, data: any) => {
     try {
-      const response = await fetch(ENDPOINTS.UPDATE_FELLOW_PROFILE(mobileNumber!, section), {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(updatedData),
+      const response = await fetch(ENDPOINTS.UPDATE_FELLOW_PROFILE(mobileNumber, section), {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to update profile");
-      }
-
-      // Refresh profile data after update
-      const updatedResponse = await fetch(ENDPOINTS.GET_FELLOW_PROFILE(mobileNumber!));
-      const updatedData = await updatedResponse.json();
-      if (updatedData.status === "success") {
-        setProfileData(updatedData.data);
-      }
       
-      setIsEditing(null);
+      if (!response.ok) throw new Error("Failed to update profile");
+      return await response.json();
     } catch (error) {
       console.error("Error updating profile:", error);
-      alert("Failed to update profile. Please try again.");
+      throw error;
     }
   };
 
@@ -662,13 +567,18 @@ const ProfileForm = () => {
     });
   };
 
-  const handleArtisticSkillChange = (skill: string) => {
-    setSelectedArtisticSkills(prev => {
-      if (prev.includes(skill)) {
-        return prev.filter(s => s !== skill);
+  const fetchProfileData = async () => {
+    if (!mobileNumber) return;
+    try {
+      const response = await fetch(ENDPOINTS.GET_FELLOW_PROFILE(mobileNumber));
+      if (!response.ok) throw new Error("Failed to fetch profile");
+      const data = await response.json();
+      if (data.status === "success") {
+        setProfileData(data.data);
       }
-      return [...prev, skill];
-    });
+    } catch (error) {
+      console.error("Error fetching profile:", error);
+    }
   };
 
   if (loading) {
@@ -837,21 +747,16 @@ const ProfileForm = () => {
             render: () => renderDropdown("mode_of_study", "Mode of Study", dropdownOptions.mode_of_study.map(value => ({ value, label: value })))
           },
           { 
-            key: "type_of_college", 
-            label: "College Type", 
-            render: () => renderDropdown("type_of_college", "College Type", dropdownOptions.type_of_college.map(value => ({ value, label: value })))
+            key: "stream", 
+            label: "Stream", 
+            render: () => renderDropdown("stream", "Stream", dropdownOptions.stream.map(value => ({ value, label: value })))
           },
           { 
             key: "semester", 
             label: "Semester", 
             render: () => renderDropdown("semester", "Semester", dropdownOptions.semester.map(value => ({ value, label: value })))
           },
-          { 
-            key: "stream", 
-            label: "Stream", 
-            render: () => renderDropdown("stream", "Stream", dropdownOptions.stream.map(value => ({ value, label: value })))
-          },
-        ], ["type_of_college", "study_mode", "stream", "semester"])}
+        ])}
         {renderSection("Skills", [
           {
             key: "technical_skills",
@@ -874,10 +779,7 @@ const ProfileForm = () => {
           {
             key: "artistic_skills",
             label: "Artistic Skills",
-            type: "checkbox-group",
-            options: ARTISTIC_SKILLS,
-            value: selectedArtisticSkills,
-            onChange: handleArtisticSkillChange
+            type: "select"
           }
         ])}
       </div>

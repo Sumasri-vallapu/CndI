@@ -10,9 +10,6 @@ import ChildProtectionConsent from '@/pages/ChildProtectionConsent';
 import Test from '@/pages/Test';
 import Main from '@/pages/Main';
 import FellowProfile from '@/pages/FellowProfile';
-import RecordUserTestimonial from '@/pages/RecordUserTestimonial';
-import Recording from '@/pages/Recording';
-import TestimonialRecord from '@/pages/TestimonialRecord';
 import RecScreen1 from '@/pages/RecScreen1';
 import RecScreen2 from '@/pages/RecScreen2';
 export default function App() {
@@ -33,9 +30,6 @@ export default function App() {
               <Route path="/test" element={<Test />} />
               <Route path="/main" element={<Main />} />
               <Route path="/fellow-profile" element={<FellowProfile />} />
-              <Route path="/record-user-testimonial" element={<RecordUserTestimonial />} />
-              <Route path="/record-user-testimonial/record" element={<Recording />} />
-              <Route path="/testimonial-record" element={<TestimonialRecord />} />
               <Route path="/recorder-page" element={<RecScreen1 />} />
               <Route path="/recorder-page/record" element={<RecScreen2 />} />
             </Routes>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, Bell } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { ProfilePhoto } from "@/components/ui/ProfilePhoto";
 import { ENDPOINTS } from "@/utils/api";
 
