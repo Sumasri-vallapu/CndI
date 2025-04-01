@@ -45,6 +45,8 @@ from .serializers import (
 )
 
 from django.db.models import Count
+import base64
+from django.core.files.base import ContentFile
 
 
 
@@ -834,19 +836,71 @@ class SubmitTestimonialView(APIView):
     def post(self, request):
         serializer = TestimonialSubmitSerializer(data=request.data)
         if serializer.is_valid():
-            mobile = serializer.validated_data["mobile_number"]
-            stakeholder = serializer.validated_data["stakeholder_type"]
-            form_data = serializer.validated_data["form_data"]
-            audio_url = serializer.validated_data["audio_url"]
+            try:
+                mobile = serializer.validated_data["mobile_number"]
+                stakeholder = serializer.validated_data["stakeholder_type"]
+                form_data = serializer.validated_data["form_data"]
+                audio_base64 = serializer.validated_data["audio_url"]  # This will be base64 string
 
-            progress, _ = TestimonialProgress.objects.get_or_create(
-                mobile_number=mobile
-            )
+                # Log the received data for debugging
+                logger.info(f"Received testimonial data for mobile: {mobile}, stakeholder: {stakeholder}")
 
-            progress.update_stakeholder(stakeholder, form_data, audio_url)
+                # Convert base64 to file
+                try:
+                    # Remove data URI header if present
+                    if 'base64,' in audio_base64:
+                        audio_base64 = audio_base64.split('base64,')[1]
+                    
+                    audio_data = base64.b64decode(audio_base64)
+                except Exception as e:
+                    logger.error(f"Base64 decoding error: {str(e)}")
+                    return Response({"error": "Invalid audio data"}, status=status.HTTP_400_BAD_REQUEST)
 
-            return Response({"message": "Testimonial saved successfully."}, status=status.HTTP_200_OK)
+                # Generate unique filename
+                file_name = f"testimonials/{uuid.uuid4()}.webm"
 
+                try:
+                    # Upload to S3
+                    s3_client = boto3.client('s3')
+                    s3_bucket_name = "yuvachetana-webapp"
+                    
+                    s3_client.put_object(
+                        Bucket=s3_bucket_name,
+                        Key=file_name,
+                        Body=audio_data,
+                        ContentType='audio/webm'
+                    )
+
+                    # Generate S3 URL
+                    audio_url = f"https://{s3_bucket_name}.s3.amazonaws.com/{file_name}"
+                    logger.info(f"Successfully uploaded audio to S3: {audio_url}")
+
+                except Exception as e:
+                    logger.error(f"S3 upload error: {str(e)}")
+                    return Response({"error": "Failed to upload audio"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+                # Save to database
+                try:
+                    progress, _ = TestimonialProgress.objects.get_or_create(
+                        mobile_number=mobile
+                    )
+                    progress.update_stakeholder(stakeholder, form_data, audio_url)
+                    logger.info(f"Successfully saved testimonial record to database")
+
+                    return Response({
+                        "message": "Testimonial saved successfully",
+                        "audio_url": audio_url
+                    }, status=status.HTTP_200_OK)
+
+                except Exception as e:
+                    logger.error(f"Database error: {str(e)}")
+                    return Response({"error": "Failed to save testimonial"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            except Exception as e:
+                logger.error(f"Unexpected error in SubmitTestimonialView: {str(e)}")
+                return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        logger.error(f"Validation errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RecorderSummaryView(APIView):

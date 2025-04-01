@@ -28,7 +28,7 @@ export default function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/register" element={<Register />} />
               <Route path="/tasks" element={<Tasks />} />
-              <Route path="/child-protection-consent" element={<ChildProtectionConsent />} />
+              <Route path="/child-protection" element={<ChildProtectionConsent />} />
               <Route path="/data-protection-consent" element={<DataConsent />} />
               <Route path="/test" element={<Test />} />
               <Route path="/main" element={<Main />} />

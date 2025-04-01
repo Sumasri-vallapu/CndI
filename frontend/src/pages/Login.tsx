@@ -5,6 +5,7 @@ import { useNavigate, useLocation, Link } from "react-router-dom";
 import ImageCarousel from "@/components/ui/ImageCarousel"; 
 import { validateMobileNumber, getMobileErrorMessage } from "@/utils/validation";
 import { ENDPOINTS } from "@/utils/api";  
+import { setLoggedInMobile } from "@/utils/session";
 
 const Login = () => { 
   const navigate = useNavigate();   
@@ -48,7 +49,8 @@ const Login = () => {
       const data = await response.json();
       if (!response.ok) throw new Error(data.detail || "Login failed");
 
-      localStorage.setItem("token", data.token); 
+      localStorage.setItem("token", data.token);
+      setLoggedInMobile(mobileNumber);
 
       const userStatus = data.user_status;   
 
@@ -61,9 +63,8 @@ const Login = () => {
       } else if (userStatus === "PENDING_DATA_CONSENT") {
         navigate("/data-consent", { state: { mobileNumber } });
       } else if (userStatus === "PENDING_CHILD_PROTECTION_CONSENT") {
-        navigate("/child-protection-consent", { state: { mobileNumber } });
+        navigate("/child-protection", { state: { mobileNumber } });
       } else if (userStatus === "ACCESS_GRANTED") {
-        localStorage.setItem('mobile_number', mobileNumber);
         navigate("/main", { 
           state: { mobileNumber },
           replace: true  // Use replace to prevent going back to login

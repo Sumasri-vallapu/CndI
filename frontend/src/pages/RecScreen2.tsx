@@ -9,6 +9,16 @@ import { ENDPOINTS } from "@/utils/api"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Card } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
+
+interface StakeholderQuestion {
+  label: string;
+  type: string;
+  options?: string[];
+  placeholder?: string;
+  required?: boolean;
+}
 
 export default function RecordTestimonialPage() {
   const navigate = useNavigate()
@@ -21,6 +31,7 @@ export default function RecordTestimonialPage() {
   const [isRecording, setIsRecording] = useState(false)
   const [isPaused, setIsPaused] = useState(false)
   const [recorded, setRecorded] = useState(false)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunks = useRef<Blob[]>([])
@@ -102,94 +113,155 @@ export default function RecordTestimonialPage() {
     setIsPaused(false)
   }
 
+  const validateForm = () => {
+    const requiredFields = questions
+      .filter(q => q.required)
+      .map(q => q.label)
+
+    const missingFields = requiredFields.filter(field => !formData[field])
+    
+    if (missingFields.length > 0) {
+      alert(`Please fill in the following required fields: ${missingFields.join(", ")}`)
+      return false
+    }
+
+    if (!recorded) {
+      alert("Please record your testimonial before submitting")
+      return false
+    }
+
+    return true
+  }
+
   const uploadRecording = async () => {
-    const audioBase64 = sessionStorage.getItem("latestRecording")
-    if (!audioBase64) return
-
-    const audioBlob = new Blob(audioChunks.current, { type: "audio/webm" })
-    const payload = new FormData()
-
-    payload.append("audio", audioBlob)
-    payload.append("mobile_number", mobile_number)
-    payload.append("stakeholder_type", stakeholder)
-    payload.append("form_data", JSON.stringify(formData))
-
+    if (!validateForm()) return
+    
+    setIsSubmitting(true)
     try {
-      const res = await fetch(ENDPOINTS.SAVE_USER_TESTIMONIAL_RECORDING, {
+      const audioBase64 = sessionStorage.getItem("latestRecording")
+      if (!audioBase64 || !mobile_number) return
+
+      const testimonialPayload = {
+        mobile_number,
+        stakeholder_type: stakeholder,
+        form_data: formData,
+        audio_url: audioBase64  // Send the base64 audio data
+      }
+
+      console.log('Submitting testimonial...')
+      const testimonialRes = await fetch(ENDPOINTS.SUBMIT_TESTIMONIAL, {
         method: "POST",
-        body: payload,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(testimonialPayload)
       })
 
-      if (!res.ok) throw new Error("Upload failed")
-      alert("Audio uploaded successfully!")
-      navigate("/record-user-testimonial")
+      if (!testimonialRes.ok) {
+        const errorData = await testimonialRes.json()
+        console.error('Server response:', errorData)
+        throw new Error(errorData.error || "Testimonial submission failed")
+      }
+      
+      alert("Testimonial submitted successfully!")
+      navigate("/recorder-page")
     } catch (err) {
-      console.error(err)
-      alert("Something went wrong. Try again.")
+      console.error("Error submitting testimonial:", err)
+      alert(err instanceof Error ? err.message : "Failed to submit testimonial. Please try again.")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <div className="max-w-md mx-auto px-4 py-6 space-y-8">
+    <div className="max-w-md mx-auto px-4 py-6 min-h-screen bg-[#F4F1E3]">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <button onClick={() => navigate(-1)} aria-label="Back">
-          <ChevronLeft className="h-6 w-6 text-[#7A3D1A]" />
+      <div className="flex items-center justify-between mb-6">
+        <button 
+          onClick={() => navigate(-1)} 
+          className="p-2 hover:bg-white/50 rounded-lg transition-colors"
+        >
+          <ChevronLeft className="h-6 w-6 text-walnut" />
         </button>
-        <h1 className="text-lg font-bold text-[#7A3D1A] capitalize">
-          {stakeholder.replace(/-/g, " ")} Testimonial
+        <h1 className="text-xl font-bold text-walnut capitalize">
+          {stakeholder.replace(/_/g, " ")} Testimonial
         </h1>
-        <div className="w-6" />
+        <div className="w-10" />
       </div>
 
       {/* Form Section */}
-      <div className="space-y-4">
-        {questions.map((q) => (
-          <div key={q.label}>
-            <label className="block mb-1 font-medium text-gray-700">{q.label}</label>
-            {q.type === "dropdown" ? (
-              <Select onValueChange={(val) => handleChange(q.label, val)}>
-                <SelectTrigger>
-                  <SelectValue placeholder={`Select ${q.label}`} />
-                </SelectTrigger>
-                <SelectContent>
-                  {q.options.map((opt) => (
-                    <SelectItem key={opt} value={opt}>{opt}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            ) : (
-              <Input
-                type="text"
-                placeholder={q.label}
-                value={formData[q.label] || ""}
-                onChange={(e) => handleChange(q.label, e.target.value)}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      <Card className="p-6 mb-6 bg-white shadow-md rounded-xl">
+        <h2 className="text-lg font-semibold text-walnut mb-4">Details</h2>
+        <div className="space-y-4">
+          {questions.map((q) => (
+            <div key={q.label} className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                {q.label} {q.required && <span className="text-red-500">*</span>}
+              </label>
+              {q.type === "dropdown" ? (
+                <Select 
+                  onValueChange={(val) => handleChange(q.label, val)}
+                  value={formData[q.label]}
+                >
+                  <SelectTrigger className={cn(
+                    "w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm",
+                    "focus:outline-none focus:ring-2 focus:ring-walnut focus:border-transparent",
+                    "disabled:opacity-50 disabled:cursor-not-allowed"
+                  )}>
+                    <SelectValue placeholder={`Select ${q.label.toLowerCase()}`} />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border border-gray-200 rounded-lg shadow-lg">
+                    {q.options?.map((opt) => (
+                      <SelectItem 
+                        key={opt} 
+                        value={opt}
+                        className={cn(
+                          "py-2 px-3 text-sm cursor-pointer",
+                          "hover:bg-walnut hover:text-white",
+                          "focus:bg-walnut focus:text-white"
+                        )}
+                      >
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ) : (
+                <Input
+                  type="text"
+                  placeholder={q.placeholder || q.label}
+                  value={formData[q.label] || ""}
+                  onChange={(e) => handleChange(q.label, e.target.value)}
+                  className="w-full"
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      </Card>
 
       {/* Recording Section */}
-      <div className="bg-gray-50 border p-4 rounded-xl space-y-4">
-        <div className="text-center text-sm text-gray-500">Audio Recorder</div>
-
-        <div className="text-center text-2xl font-semibold">
-          <span className="text-red-500">● </span>
-          {String(Math.floor(time / 60)).padStart(2, "0")}:
-          {String(Math.floor(time % 60)).padStart(2, "0")}:
-          {String(Math.floor((time % 1) * 10))}
+      <Card className="bg-white p-6 rounded-xl space-y-6">
+        <div className="text-center">
+          <h2 className="text-lg font-semibold text-walnut">Record Audio</h2>
+          <p className="text-sm text-gray-500 mt-1">Share your experience</p>
         </div>
 
-        <div className="flex justify-center">
+        <div className="text-center text-3xl font-semibold font-mono">
+          <span className={`${isRecording ? "text-red-500" : "text-gray-400"}`}>●</span>
+          {String(Math.floor(time / 60)).padStart(2, "0")}:
+          {String(Math.floor(time % 60)).padStart(2, "0")}
+        </div>
+
+        <div className="flex justify-center gap-4">
           <button
             onClick={() => {
               if (!isRecording) startRecording()
               else if (isPaused) toggleRecording()
               else stopRecording()
             }}
-            className={`w-20 h-20 rounded-full flex items-center justify-center shadow-md text-white transition ${
-              isRecording ? "bg-red-600" : "bg-green-600"
+            className={`w-16 h-16 rounded-full flex items-center justify-center shadow-lg text-white transition-all transform hover:scale-105 ${
+              isRecording ? "bg-red-500 hover:bg-red-600" : "bg-walnut hover:bg-walnut/90"
             }`}
           >
             {isRecording ? (
@@ -201,21 +273,33 @@ export default function RecordTestimonialPage() {
         </div>
 
         {typeof window !== "undefined" && sessionStorage.getItem("latestRecording") && (
-          <audio
-            controls
-            src={sessionStorage.getItem("latestRecording") ?? undefined}
-            className="w-full mt-4"
-          />
+          <div className="bg-gray-50 p-4 rounded-lg">
+            <audio
+              controls
+              src={sessionStorage.getItem("latestRecording") ?? undefined}
+              className="w-full"
+            />
+          </div>
         )}
 
         <Button
           onClick={uploadRecording}
-          disabled={!recorded}
-          className="w-full bg-blue-600 text-white disabled:opacity-50"
+          disabled={!recorded || Object.keys(formData).length === 0 || isSubmitting}
+          className="w-full bg-walnut hover:bg-walnut/90 text-white disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <UploadCloud className="w-4 h-4 mr-2" /> Upload Testimonial
+          {isSubmitting ? (
+            <>
+              <span className="animate-spin mr-2">⏳</span>
+              Submitting...
+            </>
+          ) : (
+            <>
+              <UploadCloud className="w-4 h-4 mr-2" /> 
+              Submit Testimonial
+            </>
+          )}
         </Button>
-      </div>
+      </Card>
     </div>
   )
 }

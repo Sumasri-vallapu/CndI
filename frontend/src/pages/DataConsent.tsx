@@ -3,78 +3,63 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle } from "lucide-react";
 import { ENDPOINTS } from "@/utils/api";
+import { getLoggedInMobile } from "@/utils/session";
+import type { FellowDetails, FellowDetailsResponse } from "@/types/fellow";
 
 export default function DataProtectionConsent() {
   const navigate = useNavigate();
   const location = useLocation();
   
-  // Retrieve mobile number from location state or local storage
-  const mobileNumber = location.state?.mobileNumber || localStorage.getItem('mobile_number');
-
   const [isAgreed, setIsAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [fellowDetails, setFellowDetails] = useState({
-    full_name: "",
-    place: "",
-    current_date: ""
-  });
+  const [fellowDetails, setFellowDetails] = useState<FellowDetails | null>(null);
+  
+  const mobileNumber = location.state?.mobileNumber || getLoggedInMobile();
 
-  // Fetch fellow details
   useEffect(() => {
     const fetchFellowDetails = async () => {
       if (!mobileNumber) {
-        console.log("No mobile number available");
+        navigate("/login");
         return;
       }
-      
-      console.log("Fetching details for mobile:", mobileNumber);
+
       try {
-        const url = ENDPOINTS.GET_FELLOW_CONSENT_DETAILS(mobileNumber);
-        const response = await fetch(url);
+        const response = await fetch(ENDPOINTS.GET_FELLOW_CONSENT_DETAILS(mobileNumber));
+        if (!response.ok) throw new Error("Failed to fetch fellow details");
         
-        if (!response.ok) throw new Error('Failed to fetch fellow details');
-        
-        const result = await response.json();
+        const result: FellowDetailsResponse = await response.json();
         if (result.status === "success") {
           setFellowDetails(result.data);
         }
       } catch (error) {
-        console.error('Error fetching fellow details:', error);
+        console.error("Error fetching fellow details:", error);
       }
     };
 
     fetchFellowDetails();
-  }, [mobileNumber]);
+  }, [mobileNumber, navigate]);
 
   const handleAgree = async () => {
-    if (!isAgreed) {
+    if (!mobileNumber || !isAgreed) {
       alert("Please check the acknowledgment box to proceed");
-      navigate("/main", { state: { mobileNumber } });
       return;
     }
-    
+
     setIsSubmitting(true);
     
     try {
       const response = await fetch(ENDPOINTS.UPDATE_DATA_CONSENT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          mobile_number: mobileNumber
-        })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mobile_number: mobileNumber }),
       });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update data protection consent');
-      }
-      
-      // Navigate to main page on success
-      navigate('/main', { state: { mobileNumber } });
+
+      if (!response.ok) throw new Error("Failed to update consent");
+
+      navigate("/main", { state: { mobileNumber } });
     } catch (error) {
-      console.error('Error submitting data protection consent:', error);
-      alert('Failed to submit consent. Please try again.');
+      console.error("Error updating consent:", error);
+      alert("Failed to submit consent. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -139,9 +124,9 @@ export default function DataProtectionConsent() {
 
             {/* ✅ Auto-Filled Fields */}
             <div className="bg-gray-50 p-4 rounded-lg text-sm space-y-2">
-              <p><span className="font-semibold">Full Name:</span> {fellowDetails.full_name}</p>
-              <p><span className="font-semibold">Place:</span> {fellowDetails.place}</p>
-              <p><span className="font-semibold">Date:</span> {fellowDetails.current_date}</p>
+              <p><span className="font-semibold">Full Name:</span> {fellowDetails?.full_name}</p>
+              <p><span className="font-semibold">Place:</span> {fellowDetails?.place}</p>
+              <p><span className="font-semibold">Date:</span> {fellowDetails?.current_date}</p>
             </div>
 
             {/* ✅ Acknowledgment Checkbox */}

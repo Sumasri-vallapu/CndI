@@ -6,6 +6,7 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { ENDPOINTS } from "@/utils/api";
 import Dropzone from "react-dropzone";
 import { PlayCircle, ArrowLeft, ImageUp } from "lucide-react";
+import { getLoggedInMobile } from "@/utils/session";
 
 // ✅ Define TypeScript Interfaces
 interface LocationItem {
@@ -30,7 +31,10 @@ interface TaskStatus {
 const Tasks = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const mobileNumber = location.state?.mobileNumber;
+  const [taskStatus, setTaskStatus] = useState<TaskStatus | null>(null);
+  
+  // Get mobile number from multiple sources
+  const mobileNumber = location.state?.mobileNumber || getLoggedInMobile();
 
   const [districts, setDistricts] = useState<LocationItem[]>([]);
   const [mandals, setMandals] = useState<LocationItem[]>([]);
@@ -59,6 +63,13 @@ const Tasks = () => {
   // Add these state variables after your existing state declarations
   const [isAccepted, setIsAccepted] = useState(false);
   const [acceptanceDate, setAcceptanceDate] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!mobileNumber) {
+      navigate("/login");
+      return;
+    }
+  }, [mobileNumber, navigate]);
 
   // ✅ Fetch Districts
   useEffect(() => {
@@ -528,7 +539,15 @@ const Tasks = () => {
                     <div className="pt-2 border-t border-gray-200">
                       <p className="text-gray-700 my-4">We would love to know more about our new Bose Fellow.</p>
                       <button 
-                        onClick={() => navigate("/child-protection-consent")} 
+                        onClick={() => {
+                          if (!mobileNumber) {
+                            navigate("/login");
+                            return;
+                          }
+                          navigate("/child-protection", { 
+                            state: { mobileNumber } 
+                          });
+                        }} 
                         className="px-6 py-3 bg-walnut text-white rounded-lg hover:bg-walnut/90 transition-colors"
                       >
                         Complete Your Profile

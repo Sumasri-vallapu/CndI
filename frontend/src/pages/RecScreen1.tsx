@@ -171,7 +171,7 @@ function TestimonialCard({ type, uploadCount, icon, id, lastRecording }: Testimo
         </div>
         <div
           className="flex flex-col items-center cursor-pointer"
-          onClick={() => navigate(`/testimonial-form?id=${id}`)}
+          onClick={() => navigate(`/recorder-page/record?id=${id}`)}
         >
           <Mic className="h-6 w-6 text-[#7A3D1A]" />
           <span className="text-xs text-[#7A3D1A]">Record</span>
