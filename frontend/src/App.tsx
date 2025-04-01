@@ -14,6 +14,7 @@ import RecordUserTestimonial from '@/pages/RecordUserTestimonial';
 import Recording from '@/pages/Recording';
 import TestimonialRecord from '@/pages/TestimonialRecord';
 import RecScreen1 from '@/pages/RecScreen1';
+import RecScreen2 from '@/pages/RecScreen2';
 export default function App() {
   return (
     <BrowserRouter>
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="/record-user-testimonial/record" element={<Recording />} />
               <Route path="/testimonial-record" element={<TestimonialRecord />} />
               <Route path="/recorder-page" element={<RecScreen1 />} />
+              <Route path="/recorder-page/record" element={<RecScreen2 />} />
             </Routes>
           </main>
         </div>

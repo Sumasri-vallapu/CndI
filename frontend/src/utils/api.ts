@@ -60,4 +60,6 @@ export const ENDPOINTS = {
   GET_UNIVERSITIES: `${BASE_URL}/universities/`,
   GET_COLLEGES: `${BASE_URL}/colleges/`,
   GET_COURSES: `${BASE_URL}/courses/`,
+
+  SUBMIT_TESTIMONIAL: `${BASE_URL}/submit-testimonial/`,
 } as const; 

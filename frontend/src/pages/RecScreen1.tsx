@@ -10,63 +10,100 @@ import { useNavigate } from "react-router-dom"
 import { ENDPOINTS } from "@/utils/api"
 import { getLoggedInMobile } from "@/utils/session"
 
-// Placeholder avatar components (can be updated per stakeholder type)
+// Define types for the API response
+interface RecorderSummaryResponse {
+  mobile_number: string;
+  counts: {
+    [key: string]: number;
+  };
+  latest_records: {
+    [key: string]: {
+      stakeholder_type: string;
+      audio_url: string;
+      created_at: string;
+      mobile_number: string;
+    };
+  };
+}
+
+type Recorder = {
+  id: string;
+  type: string;
+  count: number;
+  lastRecording?: {
+    audio_url: string;
+    created_at: string;
+  };
+}
+
+// Stakeholder label mapping
+const stakeholderLabelMap: Record<string, string> = {
+  fellow: "Fellow",
+  fellow_parent: "Fellow Parent",
+  child: "Child",
+  childs_parent: "Child's Parent",
+  supporter: "Supporter"
+};
+
+// Avatar components mapping
 const avatarMap: Record<string, React.ReactNode> = {
-  fellow: <StudentAvatar />, // Replace with <FellowAvatar /> if available
+  fellow: <StudentAvatar />,
   fellow_parent: <StudentAvatar />,
   child: <StudentAvatar />,
   childs_parent: <StudentAvatar />,
   supporter: <StudentAvatar />
-}
-
-type Recorder = {
-  id: string
-  type: string
-  count: number
-}
+};
 
 export default function RecordUserTestimonial() {
-  const [recorders, setRecorders] = useState<Recorder[]>([])
+  const [recorders, setRecorders] = useState<Recorder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-
     const fetchData = async () => {
-      const mobile_number = getLoggedInMobile()
+      const mobile_number = getLoggedInMobile();
 
       if (!mobile_number) {
-        alert("Please log in again.")
-        return
+        setError("Please log in again.");
+        setLoading(false);
+        return;
       }
+
       try {
-        const res = await fetch(`${ENDPOINTS.GET_RECORDER_SUMMARY}?mobile=${mobile_number}`)
-        const data = await res.json()
+        const res = await fetch(`${ENDPOINTS.GET_RECORDER_SUMMARY}?mobile=${mobile_number}`);
+        if (!res.ok) throw new Error('Failed to fetch recorder summary');
+        
+        const data: RecorderSummaryResponse = await res.json();
 
-        const stakeholderLabelMap: Record<string, string> = {
-          fellow: "Fellow",
-          fellow_parent: "Fellow Parent",
-          child: "Child",
-          childs_parent: "Child's Parent",
-          supporter: "Supporter"
-        }
-
+        // Create recorders array with all stakeholder types
         const recorders: Recorder[] = Object.entries(stakeholderLabelMap).map(([key, label]) => ({
           id: key,
           type: label,
-          count: data[key] || 0
-        }))
+          count: data.counts[key] || 0,
+          lastRecording: data.latest_records[key] ? {
+            audio_url: data.latest_records[key].audio_url,
+            created_at: data.latest_records[key].created_at
+          } : undefined
+        }));
 
-        setRecorders(recorders)
+        setRecorders(recorders);
+        setLoading(false);
       } catch (err) {
-        console.error("Error fetching recorder summary:", err)
+        console.error("Error fetching recorder summary:", err);
+        setError("Failed to load recorder summary");
+        setLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
-  const uploaded = recorders.reduce((acc, r) => acc + (r.count > 0 ? 1 : 0), 0)
-  const total = recorders.length
-  const progress = (uploaded / total) * 100
+  const uploaded = recorders.reduce((acc, r) => acc + (r.count > 0 ? 1 : 0), 0);
+  const total = recorders.length;
+  const progress = (uploaded / total) * 100;
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div className="text-red-500">{error}</div>;
 
   return (
     <div className="max-w-sm mx-auto px-4 py-6 min-h-screen bg-white">
@@ -98,26 +135,32 @@ export default function RecordUserTestimonial() {
             key={rec.id}
             type={rec.type}
             uploadCount={rec.count}
-            icon={avatarMap[rec.id] || <StudentAvatar />} // fallback icon
+            icon={avatarMap[rec.id]}
             id={rec.id}
+            lastRecording={rec.lastRecording}
           />
         ))}
       </div>
     </div>
-  )
+  );
 }
 
 type TestimonialCardProps = {
-  type: string
-  uploadCount: number
-  icon: React.ReactNode
-  id: string
+  type: string;
+  uploadCount: number;
+  icon: React.ReactNode;
+  id: string;
+  lastRecording?: {
+    audio_url: string;
+    created_at: string;
+  };
 }
 
-function TestimonialCard({ type, uploadCount, icon, id }: TestimonialCardProps) {
-  const navigate = useNavigate()
-  const status =
-    uploadCount === 0 ? "No Audios Uploaded" : `${uploadCount} Audios Uploaded`
+function TestimonialCard({ type, uploadCount, icon, id, lastRecording }: TestimonialCardProps) {
+  const navigate = useNavigate();
+  const status = uploadCount === 0 
+    ? "No Audios Uploaded" 
+    : `${uploadCount} Audio${uploadCount > 1 ? 's' : ''} Uploaded`;
 
   return (
     <Card className="rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
@@ -140,5 +183,5 @@ function TestimonialCard({ type, uploadCount, icon, id }: TestimonialCardProps) 
         <span className="text-xl">›</span>
       </div>
     </Card>
-  )
+  );
 }

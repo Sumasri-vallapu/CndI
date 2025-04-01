@@ -12,7 +12,8 @@ from .models import (
     GramPanchayat,
     University,
     College,
-    Course
+    Course,
+    TestimonialRecord
 )
 
 class FellowSignUpSerializer(serializers.ModelSerializer):
@@ -249,4 +250,7 @@ class TestimonialSubmitSerializer(serializers.Serializer):
     form_data = serializers.DictField()
     audio_url = serializers.URLField()
 
-
+class TestimonialRecordSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestimonialRecord
+        fields = ['stakeholder_type', 'audio_url', 'created_at', 'mobile_number']

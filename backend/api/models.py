@@ -330,7 +330,7 @@ class TestimonialProgress(models.Model):
         TestimonialRecord.objects.create(
             mobile_number=self.mobile_number,
             stakeholder_type=stakeholder_type,
-            audio_url=audio_url
+            audio_url=audio_url)
 
 
 

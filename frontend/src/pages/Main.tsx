@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, Bell } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ProfilePhoto } from "@/components/ui/ProfilePhoto";
 import { ENDPOINTS } from "@/utils/api";
 
@@ -10,6 +10,7 @@ const MainScreen = () => {
   const [activeSidebar, setActiveSidebar] = useState<string | null>(null);
   const [fullName, setFullName] = useState("");
   const mobileNumber = localStorage.getItem('mobile_number');
+  const navigate = useNavigate();
 
   const toggleSection = (section: string) => {
     setActiveSection(activeSection === section ? null : section);
@@ -105,7 +106,10 @@ const MainScreen = () => {
             subItems: ["My Profile", "Children", "Learning Center (LC)"]
           },
           { title: "Assessments", subItems: ["Baseline", "Endline"] },
-          { title: "Reflections", subItems: ["Monthly Reflections", "Quarterly Feedbacks", "Annual Testimonials"] },
+          { 
+            title: "Reflections", 
+            subItems: ["Monthly Reflections", "Quarterly Feedbacks", "Annual Testimonials"] 
+          },
         ].map((section) => (
           <div key={section.title} className="w-full p-3 bg-white shadow-md rounded-lg mb-3">
             <h3
@@ -118,13 +122,20 @@ const MainScreen = () => {
             {activeSidebar === section.title && (
               <div className="mt-2">
                 {section.subItems.map((item) => (
-                  <Link 
+                  <div 
                     key={item} 
-                    to={item === "My Profile" ? "/fellow-profile" : "#"} 
-                    className="block text-blue-700 hover:text-blue-900 py-2 px-3 text-sm border-b border-gray-100 last:border-b-0"
+                    onClick={() => {
+                      if (item === "My Profile") {
+                        navigate("/fellow-profile");
+                      } else if (item === "Annual Testimonials") {
+                        navigate("/recorder-page");
+                      }
+                      setIsSidebarOpen(false); // Close sidebar after navigation
+                    }}
+                    className="block text-blue-700 hover:text-blue-900 py-2 px-3 text-sm border-b border-gray-100 last:border-b-0 cursor-pointer"
                   >
                     {item}
-                  </Link>
+                  </div>
                 ))}
               </div>
             )}

@@ -849,20 +849,43 @@ class SubmitTestimonialView(APIView):
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class RecorderSummaryView(APIView):
     def get(self, request):
         mobile = request.GET.get("mobile")
         if not mobile:
             return Response({"error": "mobile is required"}, status=400)
 
-        counts = (
-            TestimonialRecord.objects
-            .filter(mobile_number=mobile)
-            .values("stakeholder_type")
-            .annotate(count=Count("id"))
-        )
+        try:
+            # Get counts for each stakeholder type
+            counts = (
+                TestimonialRecord.objects
+                .filter(mobile_number=mobile)
+                .values("stakeholder_type")
+                .annotate(count=Count("id"))
+            )
 
-        return Response({rec["stakeholder_type"]: rec["count"] for rec in counts})
+            # Get latest record for each stakeholder type
+            latest_records = {}
+            for stakeholder in dict(TestimonialRecord.STAKEHOLDER_CHOICES).keys():
+                latest = (
+                    TestimonialRecord.objects
+                    .filter(mobile_number=mobile, stakeholder_type=stakeholder)
+                    .order_by('-created_at')
+                    .first()
+                )
+                if latest:
+                    latest_records[stakeholder] = {
+                        'stakeholder_type': latest.stakeholder_type,
+                        'audio_url': latest.audio_url,
+                        'created_at': latest.created_at.isoformat(),
+                        'mobile_number': latest.mobile_number
+                    }
 
+            return Response({
+                'mobile_number': mobile,
+                'counts': {rec["stakeholder_type"]: rec["count"] for rec in counts},
+                'latest_records': latest_records
+            })
 
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
