@@ -12,7 +12,8 @@ import Main from '@/pages/Main';
 import FellowProfile from '@/pages/FellowProfile';
 import RecordUserTestimonial from '@/pages/RecordUserTestimonial';
 import Recording from '@/pages/Recording';
-
+import TestimonialRecord from '@/pages/TestimonialRecord';
+import RecScreen1 from '@/pages/RecScreen1';
 export default function App() {
   return (
     <BrowserRouter>
@@ -33,6 +34,8 @@ export default function App() {
               <Route path="/fellow-profile" element={<FellowProfile />} />
               <Route path="/record-user-testimonial" element={<RecordUserTestimonial />} />
               <Route path="/record-user-testimonial/record" element={<Recording />} />
+              <Route path="/testimonial-record" element={<TestimonialRecord />} />
+              <Route path="/recorder-page" element={<RecScreen1 />} />
             </Routes>
           </main>
         </div>

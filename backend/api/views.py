@@ -24,6 +24,8 @@ from .models import (
     University,
     College,
     Course,
+    TestimonialProgress,
+    TestimonialRecord
 )
 from .serializers import (
     FellowSignUpSerializer,
@@ -39,7 +41,13 @@ from .serializers import (
     UniversitySerializer,
     CollegeSerializer,
     CourseSerializer,
+    TestimonialSubmitSerializer
 )
+
+from django.db.models import Count
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -817,5 +825,44 @@ def get_courses(request):
     serializer = CourseSerializer(courses, many=True)
     return Response(serializer.data)
 
+
+
+
+    
+
+class SubmitTestimonialView(APIView):
+    def post(self, request):
+        serializer = TestimonialSubmitSerializer(data=request.data)
+        if serializer.is_valid():
+            mobile = serializer.validated_data["mobile_number"]
+            stakeholder = serializer.validated_data["stakeholder_type"]
+            form_data = serializer.validated_data["form_data"]
+            audio_url = serializer.validated_data["audio_url"]
+
+            progress, _ = TestimonialProgress.objects.get_or_create(
+                mobile_number=mobile
+            )
+
+            progress.update_stakeholder(stakeholder, form_data, audio_url)
+
+            return Response({"message": "Testimonial saved successfully."}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class RecorderSummaryView(APIView):
+    def get(self, request):
+        mobile = request.GET.get("mobile")
+        if not mobile:
+            return Response({"error": "mobile is required"}, status=400)
+
+        counts = (
+            TestimonialRecord.objects
+            .filter(mobile_number=mobile)
+            .values("stakeholder_type")
+            .annotate(count=Count("id"))
+        )
+
+        return Response({rec["stakeholder_type"]: rec["count"] for rec in counts})
 
 

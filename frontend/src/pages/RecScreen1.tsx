@@ -1,59 +1,72 @@
+// RecordUserTestimonial.tsx
 "use client"
 
+import { useEffect, useState } from "react"
 import { Mic } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { StudentAvatar } from "@/components/ui/student-avatar"
 import { useNavigate } from "react-router-dom"
 import { ENDPOINTS } from "@/utils/api"
+import { getLoggedInMobile } from "@/utils/session"
 
-const recorders = [
-  { id: "student", type: "Student", count: 0 },
-  { id: "parent", type: "Student's Parent", count: 2 },
-  { id: "fellow", type: "Fellow Parent", count: 0 },
-  { id: "supporter", type: "Supporter", count: 2 },
-]
+// Placeholder avatar components (can be updated per stakeholder type)
+const avatarMap: Record<string, React.ReactNode> = {
+  fellow: <StudentAvatar />, // Replace with <FellowAvatar /> if available
+  fellow_parent: <StudentAvatar />,
+  child: <StudentAvatar />,
+  childs_parent: <StudentAvatar />,
+  supporter: <StudentAvatar />
+}
+
+type Recorder = {
+  id: string
+  type: string
+  count: number
+}
 
 export default function RecordUserTestimonial() {
+  const [recorders, setRecorders] = useState<Recorder[]>([])
+
+  useEffect(() => {
+
+    const fetchData = async () => {
+      const mobile_number = getLoggedInMobile()
+
+      if (!mobile_number) {
+        alert("Please log in again.")
+        return
+      }
+      try {
+        const res = await fetch(`${ENDPOINTS.GET_RECORDER_SUMMARY}?mobile=${mobile_number}`)
+        const data = await res.json()
+
+        const stakeholderLabelMap: Record<string, string> = {
+          fellow: "Fellow",
+          fellow_parent: "Fellow Parent",
+          child: "Child",
+          childs_parent: "Child's Parent",
+          supporter: "Supporter"
+        }
+
+        const recorders: Recorder[] = Object.entries(stakeholderLabelMap).map(([key, label]) => ({
+          id: key,
+          type: label,
+          count: data[key] || 0
+        }))
+
+        setRecorders(recorders)
+      } catch (err) {
+        console.error("Error fetching recorder summary:", err)
+      }
+    }
+
+    fetchData()
+  }, [])
+
   const uploaded = recorders.reduce((acc, r) => acc + (r.count > 0 ? 1 : 0), 0)
   const total = recorders.length
   const progress = (uploaded / total) * 100
-
-  const handleSubmit = async (audioBlob: Blob) => {
-    try {
-      // Convert Blob to base64
-      const base64Audio = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64String = reader.result as string;
-          resolve(base64String);
-        };
-        reader.readAsDataURL(audioBlob);
-      });
-
-      const formData = new FormData();
-      formData.append('audio', base64Audio);
-      formData.append('recorder_type', 'unknown');
-      formData.append('mobile_number', '9876543210'); // Replace with actual mobile number
-
-      const response = await fetch(ENDPOINTS.FELLOW_TESTIMONIAL, {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload testimonial');
-      }
-
-      const data = await response.json();
-      console.log('Upload successful:', data);
-      // Handle success - maybe show success message or redirect
-      
-    } catch (error) {
-      console.error('Error uploading testimonial:', error);
-      // Handle error - show error message to user
-    }
-  };
 
   return (
     <div className="max-w-sm mx-auto px-4 py-6 min-h-screen bg-white">
@@ -69,7 +82,7 @@ export default function RecordUserTestimonial() {
           </svg>
         </button>
         <h1 className="text-lg font-bold text-[#7A3D1A]">Record Testimonial</h1>
-        <div className="w-8" /> {/* for balance */}
+        <div className="w-8" />
       </div>
 
       <div className="mb-6">
@@ -85,7 +98,8 @@ export default function RecordUserTestimonial() {
             key={rec.id}
             type={rec.type}
             uploadCount={rec.count}
-            icon={<StudentAvatar />}
+            icon={avatarMap[rec.id] || <StudentAvatar />} // fallback icon
+            id={rec.id}
           />
         ))}
       </div>
@@ -97,9 +111,10 @@ type TestimonialCardProps = {
   type: string
   uploadCount: number
   icon: React.ReactNode
+  id: string
 }
 
-function TestimonialCard({ type, uploadCount, icon }: TestimonialCardProps) {
+function TestimonialCard({ type, uploadCount, icon, id }: TestimonialCardProps) {
   const navigate = useNavigate()
   const status =
     uploadCount === 0 ? "No Audios Uploaded" : `${uploadCount} Audios Uploaded`
@@ -111,7 +126,10 @@ function TestimonialCard({ type, uploadCount, icon }: TestimonialCardProps) {
           {icon}
           <span className="font-medium text-gray-800">{type}</span>
         </div>
-        <div className="flex flex-col items-center" onClick={() => navigate("/record-user-testimonial/record")}>
+        <div
+          className="flex flex-col items-center cursor-pointer"
+          onClick={() => navigate(`/testimonial-form?id=${id}`)}
+        >
           <Mic className="h-6 w-6 text-[#7A3D1A]" />
           <span className="text-xs text-[#7A3D1A]">Record</span>
         </div>

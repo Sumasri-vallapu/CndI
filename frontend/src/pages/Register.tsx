@@ -8,6 +8,7 @@ import { ENDPOINTS } from "@/utils/api";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { ArrowLeft } from "lucide-react"; // Remove ArrowRight 
+import { clearLoggedInMobile } from "@/utils/session";
 
 interface LocationOption {
   id: string;
@@ -145,8 +146,7 @@ const Register = () => {
 
   // ✅ Logout Function
   const handleLogout = () => {
-    localStorage.removeItem("user_token");
-    sessionStorage.clear();
+    clearLoggedInMobile();
     navigate("/login");
   };
 

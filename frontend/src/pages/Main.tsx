@@ -23,7 +23,7 @@ const MainScreen = () => {
     const fetchUserDetails = async () => {
       if (!mobileNumber) return;
       try {
-        const response = await fetch(`${ENDPOINTS.GET_USER_DETAILS}?mobile_number=${mobileNumber}`);
+        const response = await fetch(`${ENDPOINTS.GET_FELLOW_DETAILS}?mobile_number=${mobileNumber}`);
         const data = await response.json();
         setFullName(data.full_name);
       } catch (error) {

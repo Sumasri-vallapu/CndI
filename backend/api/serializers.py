@@ -241,3 +241,12 @@ class FellowProfileSerializer(serializers.ModelSerializer):
 
 
 
+class TestimonialSubmitSerializer(serializers.Serializer):
+    mobile_number = serializers.CharField()
+    stakeholder_type = serializers.ChoiceField(choices=[
+        "fellow", "fellow_parent", "child", "childs_parent", "supporter"
+    ])
+    form_data = serializers.DictField()
+    audio_url = serializers.URLField()
+
+

@@ -294,3 +294,60 @@ class FellowTestimonial(models.Model):
     
     def __str__(self):
         return f"Testimonial by {self.fellow.full_name} - {self.recorder_type}" 
+
+
+
+class TestimonialProgress(models.Model):
+    mobile_number = models.CharField(max_length=20, unique=True)
+
+    # Each field stores a list of distinct stakeholder testimonials
+    fellow = models.JSONField(default=list)
+    fellow_parent = models.JSONField(default=list)
+    child = models.JSONField(default=list)
+    childs_parent = models.JSONField(default=list)
+    supporter = models.JSONField(default=list)
+
+    # Summary of all uploaded audio URLs
+    testimonial_urls = models.JSONField(default=dict)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def update_stakeholder(self, stakeholder_type, form_data, audio_url):
+        allowed = ["fellow", "fellow_parent", "child", "childs_parent", "supporter"]
+        if stakeholder_type not in allowed:
+            raise ValueError(f"{stakeholder_type} is not a valid stakeholder type")
+
+        form_data["audio_url"] = audio_url
+
+        stakeholder_list = getattr(self, stakeholder_type)
+        stakeholder_list.append(form_data)
+        setattr(self, stakeholder_type, stakeholder_list)
+
+        self.testimonial_urls.setdefault(stakeholder_type, []).append(audio_url)
+        self.save()
+
+        TestimonialRecord.objects.create(
+            mobile_number=self.mobile_number,
+            stakeholder_type=stakeholder_type,
+            audio_url=audio_url
+
+
+
+class TestimonialRecord(models.Model):
+    STAKEHOLDER_CHOICES = [
+        ("fellow", "Fellow"),
+        ("fellow_parent", "Fellow Parent"),
+        ("child", "Child"),
+        ("childs_parent", "Child's Parent"),
+        ("supporter", "Supporter")
+    ]
+
+    mobile_number = models.CharField(max_length=20)
+    stakeholder_type = models.CharField(max_length=20, choices=STAKEHOLDER_CHOICES)
+    audio_url = models.URLField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.mobile_number} - {self.stakeholder_type}"
+

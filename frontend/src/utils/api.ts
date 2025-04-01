@@ -33,6 +33,9 @@ export const ENDPOINTS = {
   GET_USER_STATUS: `${BASE_URL}/fellow/status/`,
 
   GET_FELLOW_DETAILS: `${BASE_URL}/fellow-details/`,
+
+  // Recorder endpoints
+  GET_RECORDER_SUMMARY: `${BASE_URL}/recorder-summary/`,
   
   // task api
   GET_VIDEO_STATUS: (mobile_number: string) => 

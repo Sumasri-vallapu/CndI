@@ -49,6 +49,7 @@ export default function DataProtectionConsent() {
   const handleAgree = async () => {
     if (!isAgreed) {
       alert("Please check the acknowledgment box to proceed");
+      navigate("/main", { state: { mobileNumber } });
       return;
     }
     

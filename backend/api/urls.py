@@ -30,6 +30,8 @@ from .views import (
     get_universities,
     get_colleges,
     get_courses,
+    SubmitTestimonialView,
+    RecorderSummaryView
 )   
 
 urlpatterns = [
@@ -64,9 +66,12 @@ urlpatterns = [
     path('fellow/tasks/submit/task2/', submit_task2, name='submit_task2'),
 
     path('fellow/profile/photo/upload/', upload_profile_photo, name='upload_profile_photo'),
-    path('fellow/testimonial/', save_fellow_testimonial, name='save_fellow_testimonial'),
+    path('fellow/testimonial/upload/', save_fellow_testimonial, name='save_fellow_testimonial'),
     path('fellow/details/<str:mobile_number>/', get_fellow_details_for_consent, name='get_fellow_details_for_consent'),
     path('universities/', get_universities, name='get_universities'),
     path('colleges/', get_colleges, name='get_colleges'),
-    path('courses/', get_courses, name='get_courses'),
+    path('courses/', get_courses, name='get_courses'),  
+    path("submit-testimonial/", SubmitTestimonialView.as_view(), name="submit-testimonial"),
+    path("recorder-summary/", RecorderSummaryView.as_view(), name="recorder-summary")
+
 ]
