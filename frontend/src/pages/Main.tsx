@@ -127,11 +127,14 @@ const MainScreen = () => {
                     onClick={() => {
                       if (item === "My Profile") {
                         navigate("/fellow-profile");
+                      } else if (item === "Children") {
+                        navigate("/children-profile");
                       } else if (item === "Annual Testimonials") {
                         navigate("/recorder-page");
                       }
                       setIsSidebarOpen(false); // Close sidebar after navigation
                     }}
+
                     className="block text-blue-700 hover:text-blue-900 py-2 px-3 text-sm border-b border-gray-100 last:border-b-0 cursor-pointer"
                   >
                     {item}
