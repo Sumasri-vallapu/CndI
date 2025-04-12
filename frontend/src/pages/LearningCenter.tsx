@@ -120,7 +120,7 @@ const LearningCenter = () => {
     }
   };
 
-  const handleSave = async (section: string) => {
+  const handleSave = async () => {
     const mobile = localStorage.getItem("mobile_number");
     if (!mobile) return;
 
@@ -178,20 +178,18 @@ const LearningCenter = () => {
 
   const renderField = ({
     section,
-    key,
     label,
     value,
     placeholder,
     readOnly = false,
   }: {
     section: string;
-    key: string;
     label: string;
     value: string;
     placeholder?: string;
     readOnly?: boolean;
   }) => (
-    <div className="space-y-2" key={key}>
+    <div className="space-y-2" key={label}>
       <Label>{label}</Label>
       {readOnly ? (
         <p className="bg-gray-100 p-3 rounded text-gray-700">
@@ -200,7 +198,7 @@ const LearningCenter = () => {
       ) : isEditing === section ? (
         <Input
           value={value}
-          onChange={(e) => handleInputChange(section, key, e.target.value)}
+          onChange={(e) => handleInputChange(section, label, e.target.value)}
           placeholder={placeholder || `Enter ${label}`}
           className="signup-input"
         />
@@ -214,7 +212,6 @@ const LearningCenter = () => {
 
   const renderSelect = (
     section: string,
-    key: string,
     label: string,
     value: string,
     options: LocationOption[],
@@ -266,12 +263,12 @@ const LearningCenter = () => {
         </div>
 
         {/* Full name */}
-        {renderField({ section: "info", key: "fullName", label: "Full Name", value: centerData.fullName, readOnly: true })}
+        {renderField({ section: "info", label: "Full Name", value: centerData.fullName, readOnly: true })}
 
         {/* TeamLead/DistrictLead/Status/Photo Container */}
         <div className="w-full p-6 bg-white shadow-lg border border-gray-200 rounded-lg space-y-4">
-          {renderField({ section: "top", key: "teamLeadName", label: "Team Lead Name", value: centerData.teamLeadName })}
-          {renderField({ section: "top", key: "districtLeadName", label: "District Lead Name", value: centerData.districtLeadName })}
+          {renderField({ section: "top", label: "Team Lead Name", value: centerData.teamLeadName })}
+          {renderField({ section: "top", label: "District Lead Name", value: centerData.districtLeadName })}
 
           {/* Status */}
           <div className="space-y-2">
@@ -314,7 +311,7 @@ const LearningCenter = () => {
           {/* Buttons */}
           {isEditing === "top" ? (
             <>
-              <Button onClick={() => handleSave("top")} className="w-full bg-green-600 text-white">Save Changes</Button>
+              <Button onClick={handleSave} className="w-full bg-green-600 text-white">Save Changes</Button>
               <Button onClick={() => setIsEditing(null)} className="w-full">Cancel</Button>
             </>
           ) : (
@@ -330,16 +327,16 @@ const LearningCenter = () => {
           </h3>
           {activeSection === "address" && (
             <div className="mt-3 space-y-4">
-              {renderSelect("address", "state", "State", centerData.address.state, locationData.states, handleStateChange)}
-              {renderSelect("address", "district", "District", centerData.address.district, locationData.districts, handleDistrictChange)}
-              {renderSelect("address", "mandal", "Mandal", centerData.address.mandal, locationData.mandals, handleMandalChange)}
-              {renderSelect("address", "village", "Village", centerData.address.village, locationData.villages, (v) => handleInputChange("address", "village", v))}
-              {renderField({ section: "address", key: "pincode", label: "Pincode", value: centerData.address.pincode })}
-              {renderField({ section: "address", key: "fullAddress", label: "Full Address", value: centerData.address.fullAddress })}
+              {renderSelect("address", "State", centerData.address.state, locationData.states, handleStateChange)}
+              {renderSelect("address", "District", centerData.address.district, locationData.districts, handleDistrictChange)}
+              {renderSelect("address", "Mandal", centerData.address.mandal, locationData.mandals, handleMandalChange)}
+              {renderSelect("address", "Village", centerData.address.village, locationData.villages, (v) => handleInputChange("address", "village", v))}
+              {renderField({ section: "address", label: "Pincode", value: centerData.address.pincode })}
+              {renderField({ section: "address", label: "Full Address", value: centerData.address.fullAddress })}
 
               {isEditing === "address" ? (
                 <>
-                  <Button onClick={() => handleSave("address")} className="w-full bg-green-600 text-white">Save Changes</Button>
+                  <Button onClick={handleSave} className="w-full bg-green-600 text-white">Save Changes</Button>
                   <Button onClick={() => setIsEditing(null)} className="w-full">Cancel</Button>
                 </>
               ) : (
