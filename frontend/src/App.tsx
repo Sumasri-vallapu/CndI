@@ -12,6 +12,7 @@ import Main from '@/pages/Main';
 import FellowProfile from '@/pages/FellowProfile';
 import RecScreen1 from '@/pages/RecScreen1';
 import RecScreen2 from '@/pages/RecScreen2';
+import LearningCenter from '@/pages/LearningCenter';
 export default function App() {
   return (
     <BrowserRouter>
@@ -32,6 +33,7 @@ export default function App() {
               <Route path="/fellow-profile" element={<FellowProfile />} />
               <Route path="/recorder-page" element={<RecScreen1 />} />
               <Route path="/recorder-page/record" element={<RecScreen2 />} />
+              <Route path="/learning-center" element={<LearningCenter />} />
             </Routes>
           </main>
         </div>
