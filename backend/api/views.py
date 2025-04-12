@@ -874,7 +874,7 @@ def save_learning_center(request):
         print("❌ Exception while saving:", str(e))
         return Response({"error": str(e)}, status=500)
 
-#Fetxh LearningCenter Details
+#Fetch LearningCenter Details
     
 @api_view(['GET'])
 def get_learning_center(request, mobile_number):
