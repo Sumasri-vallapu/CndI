@@ -127,7 +127,9 @@ const MainScreen = () => {
                     onClick={() => {
                       if (item === "My Profile") {
                         navigate("/fellow-profile");
-                      } else if (item === "Annual Testimonials") {
+                      } else if (item === "Learning Center (LC)") {
+                        navigate("/learning-center");
+                      }else if (item === "Annual Testimonials") {
                         navigate("/recorder-page");
                       }
                       setIsSidebarOpen(false); // Close sidebar after navigation

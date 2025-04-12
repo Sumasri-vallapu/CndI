@@ -351,3 +351,15 @@ class TestimonialRecord(models.Model):
     def __str__(self):
         return f"{self.mobile_number} - {self.stakeholder_type}"
 
+class LearningCenter(models.Model):
+    mobile_number = models.CharField(max_length=20, unique=True)
+    full_name = models.CharField(max_length=255)
+    team_lead_name = models.CharField(max_length=255)
+    district_lead_name = models.CharField(max_length=255)
+    status = models.CharField(max_length=20)
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
+    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True)
+    mandal = models.ForeignKey(Mandal, on_delete=models.SET_NULL, null=True)
+    village = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True)
+    pincode = models.CharField(max_length=10)
+    full_address = models.TextField()

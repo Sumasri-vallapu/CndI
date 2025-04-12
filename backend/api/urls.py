@@ -31,7 +31,9 @@ from .views import (
     get_colleges,
     get_courses,
     SubmitTestimonialView,
-    RecorderSummaryView
+    RecorderSummaryView,
+    save_learning_center,
+    get_learning_center
 )   
 
 urlpatterns = [
@@ -72,6 +74,9 @@ urlpatterns = [
     path('colleges/', get_colleges, name='get_colleges'),
     path('courses/', get_courses, name='get_courses'),  
     path("submit-testimonial/", SubmitTestimonialView.as_view(), name="submit-testimonial"),
-    path("recorder-summary/", RecorderSummaryView.as_view(), name="recorder-summary")
+    path("recorder-summary/", RecorderSummaryView.as_view(), name="recorder-summary"),
+    #Learning Center API
+    path('learning-center/save/', save_learning_center, name='save_learning_center'),
+    path('learning-center/<str:mobile_number>/', get_learning_center, name='get_learning_center'),
 
 ]
