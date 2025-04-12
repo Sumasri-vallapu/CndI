@@ -2,10 +2,17 @@ import { useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem
+} from "@/components/ui/select";
+import { useNavigate, useLocation } from "react-router-dom";
 import { StepIndicator } from "@/components/ui/StepIndicator";
 import { ENDPOINTS } from "@/utils/api";
+import { validateMobileNumber, getMobileErrorMessage } from "@/utils/validation";
 
 interface LocationOption {
   id: string;
@@ -14,10 +21,13 @@ interface LocationOption {
 
 export default function ChildPersonalDetails() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const childId = location.state?.childId || localStorage.getItem("child_id");
 
   const [gender, setGender] = useState("");
   const [caste, setCaste] = useState("");
-  const [mobileNumber, setMobileNumber] = useState("");
+  const [parentMobileNumber, setMobileNumber] = useState("");
+  const [mobileError, setMobileError] = useState("");
   const [dob, setDob] = useState("");
   const [fullName, setFullName] = useState("");
 
@@ -31,7 +41,26 @@ export default function ChildPersonalDetails() {
   const [selectedMandal, setSelectedMandal] = useState("");
   const [selectedVillage, setSelectedVillage] = useState("");
 
-  const isMobileValid = /^([6-9]\d{9})$/.test(mobileNumber);
+  useEffect(() => {
+    if (!childId) return;
+    fetch(`${ENDPOINTS.GET_CHILD_PROFILE_BY_ID(childId)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "success") {
+          const d = data.data;
+          setFullName(d.full_name || "");
+          setGender(d.gender || "");
+          setCaste(d.caste_category || "");
+          setDob(d.date_of_birth || "");
+          setMobileNumber(d.parent_mobile_number || "");
+          setSelectedState(d.state?.toString() || "");
+          setSelectedDistrict(d.district?.toString() || "");
+          setSelectedMandal(d.mandal?.toString() || "");
+          setSelectedVillage(d.village?.toString() || "");
+        }
+      })
+      .catch(err => console.error("Failed to fetch child data", err));
+  }, [childId]);
 
   useEffect(() => {
     fetch(ENDPOINTS.GET_STATES)
@@ -46,10 +75,6 @@ export default function ChildPersonalDetails() {
         .then((res) => res.json())
         .then((data) => setDistricts(data))
         .catch((err) => console.error("Failed to fetch districts", err));
-    } else {
-      setDistricts([]);
-      setMandals([]);
-      setVillages([]);
     }
   }, [selectedState]);
 
@@ -59,9 +84,6 @@ export default function ChildPersonalDetails() {
         .then((res) => res.json())
         .then((data) => setMandals(data))
         .catch((err) => console.error("Failed to fetch mandals", err));
-    } else {
-      setMandals([]);
-      setVillages([]);
     }
   }, [selectedDistrict]);
 
@@ -71,36 +93,81 @@ export default function ChildPersonalDetails() {
         .then((res) => res.json())
         .then((data) => setVillages(data))
         .catch((err) => console.error("Failed to fetch grampanchayats", err));
-    } else {
-      setVillages([]);
     }
   }, [selectedMandal]);
+
+  // ✅ Re-fetch dropdowns if state/district/mandal already selected
+  useEffect(() => {
+    if (selectedState && districts.length === 0) {
+      fetch(`${ENDPOINTS.GET_DISTRICTS}?state_id=${selectedState}`)
+        .then(res => res.json())
+        .then(data => setDistricts(data));
+    }
+    if (selectedDistrict && mandals.length === 0) {
+      fetch(`${ENDPOINTS.GET_MANDALS}?district_id=${selectedDistrict}`)
+        .then(res => res.json())
+        .then(data => setMandals(data));
+    }
+    if (selectedMandal && villages.length === 0) {
+      fetch(`${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal_id=${selectedMandal}`)
+        .then(res => res.json())
+        .then(data => setVillages(data));
+    }
+  }, [selectedState, selectedDistrict, selectedMandal]);
+
+  const handleMobileChange = (value: string) => {
+    setMobileNumber(value);
+    setMobileError(getMobileErrorMessage(value));
+  };
+
+  const handleSaveAndNext = async () => {
+    const payload = {
+      parent_mobile_number: parentMobileNumber,
+      full_name: fullName,
+      gender,
+      caste_category: caste,
+      date_of_birth: dob,
+      state: selectedState,
+      district: selectedDistrict,
+      mandal: selectedMandal,
+      village: selectedVillage,
+      mobile_number: localStorage.getItem("mobile_number"),
+    };
+
+    try {
+      const res = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const result = await res.json();
+      if (res.ok && result.status === "success") {
+        const newChildId = result.data.id;
+        localStorage.setItem("child_id", newChildId.toString());
+        navigate("/child-educational-details", { state: { childId: newChildId } });
+      } else {
+        alert("Failed to save child details");
+      }
+    } catch (err) {
+      console.error("Save error:", err);
+      alert("Something went wrong");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F4F1E3] flex flex-col items-center px-4 py-6">
       <div className="w-full flex items-center justify-between max-w-3xl mb-4">
-        <button
-          onClick={() => navigate("/children-profile")}
-          className="text-walnut hover:text-earth flex items-center gap-2 text-base font-medium"
-        >
+        <button onClick={() => navigate("/children-profile")} className="text-walnut hover:text-earth flex items-center gap-2 text-base font-medium">
           <ArrowLeft size={20} />
           <span>Back</span>
         </button>
-        <button
-          onClick={() => {
-            localStorage.removeItem("mobile_number");
-            navigate("/login");
-          }}
-          className="bg-walnut text-white px-4 py-2 rounded-lg text-sm"
-        >
+        <button onClick={() => { localStorage.removeItem("mobile_number"); navigate("/login"); }} className="bg-walnut text-white px-4 py-2 rounded-lg text-sm">
           Logout
         </button>
       </div>
 
-      <StepIndicator
-        currentStep={1}
-        steps={["Personal Details", "Learning Details", "Parent or Guardian Details", "Educational Details"]}
-      />
+      <StepIndicator currentStep={1} steps={["Personal Details", "Educational Details", "Parent or Guardian Details", "Learning Details"]} />
 
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6 mt-6">
         <div className="w-full flex justify-center mb-2">
@@ -111,26 +178,15 @@ export default function ChildPersonalDetails() {
 
         <div className="space-y-2">
           <Label htmlFor="full_name">Full Name</Label>
-          <Input
-            id="full_name"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-            type="text"
-            placeholder="Child name"
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-walnut"
-          />
+          <Input id="full_name" value={fullName} onChange={(e) => setFullName(e.target.value)} type="text" placeholder="Child name" className="signup-input" />
         </div>
 
         <div className="space-y-2">
           <Label>Gender</Label>
           <Select value={gender} onValueChange={setGender}>
-            <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 text-left focus:outline-none focus:border-walnut">
-              <SelectValue placeholder="Select Gender" />
-            </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              <SelectItem value="MALE">Male</SelectItem>
-              <SelectItem value="FEMALE">Female</SelectItem>
-              <SelectItem value="OTHER">Other</SelectItem>
+            <SelectTrigger className="signup-input w-full"><SelectValue placeholder="Select Gender" /></SelectTrigger>
+            <SelectContent className="w-full bg-white text-black border border-gray-300 shadow-md z-50">
+              {["MALE", "FEMALE", "OTHER"].map(g => <SelectItem key={g} value={g}>{g}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
@@ -138,31 +194,16 @@ export default function ChildPersonalDetails() {
         <div className="space-y-2">
           <Label>Caste Category</Label>
           <Select value={caste} onValueChange={setCaste}>
-            <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 text-left focus:outline-none focus:border-walnut">
-              <SelectValue placeholder="Select Caste" />
-            </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              <SelectItem value="ST">ST</SelectItem>
-              <SelectItem value="SC">SC</SelectItem>
-              <SelectItem value="BC">BC</SelectItem>
-              <SelectItem value="OBC">OBC</SelectItem>
-              <SelectItem value="OC">OC</SelectItem>
-              <SelectItem value="MUSLIM">Muslim</SelectItem>
-              <SelectItem value="CHRISTIAN">Christian</SelectItem>
-              <SelectItem value="OTHER">Other</SelectItem>
+            <SelectTrigger className="signup-input w-full"><SelectValue placeholder="Select Caste" /></SelectTrigger>
+            <SelectContent className="w-full bg-white text-black border border-gray-300 shadow-md z-50">
+              {["ST", "SC", "BC", "OBC", "OC", "MUSLIM", "CHRISTIAN", "OTHER"].map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
           <Label htmlFor="dob">Date of Birth</Label>
-          <Input
-            id="dob"
-            type="date"
-            value={dob}
-            onChange={(e) => setDob(e.target.value)}
-            className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-0 focus-visible:ring-0 focus:border-walnut"
-          />
+          <Input id="dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="signup-input" />
         </div>
 
         <div className="space-y-2">
@@ -170,78 +211,38 @@ export default function ChildPersonalDetails() {
           <Input
             id="mobile_number"
             type="text"
-            placeholder="Enter Mobile Number"
-            value={mobileNumber}
-            onChange={(e) => setMobileNumber(e.target.value)}
-            className={`signup-input ${!isMobileValid && mobileNumber ? "border-red-500" : ""}`}
+            value={parentMobileNumber}
+            onChange={(e) => handleMobileChange(e.target.value)}
+            className={`signup-input ${!validateMobileNumber(parentMobileNumber) && parentMobileNumber ? "border-red-500" : ""}`}
           />
-          {!isMobileValid && mobileNumber && (
-            <p className="text-red-500 text-sm">Enter valid 10-digit number</p>
+          {!validateMobileNumber(parentMobileNumber) && parentMobileNumber && (
+            <p className="text-red-500 text-sm">{mobileError}</p>
           )}
         </div>
 
-        <div className="space-y-2">
-          <Label>State</Label>
-          <Select value={selectedState} onValueChange={setSelectedState}>
-            <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 text-left focus:outline-none focus:border-walnut">
-              <SelectValue placeholder="Select State" />
-            </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              {states.map((state) => (
-                <SelectItem key={state.id} value={state.id}>{state.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>District</Label>
-          <Select value={selectedDistrict} onValueChange={setSelectedDistrict}>
-            <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 text-left focus:outline-none focus:border-walnut">
-              <SelectValue placeholder="Select District" />
-            </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              {districts.map((d) => (
-                <SelectItem key={d.id} value={d.id}>{d.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Mandal</Label>
-          <Select value={selectedMandal} onValueChange={setSelectedMandal}>
-            <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 text-left focus:outline-none focus:border-walnut">
-              <SelectValue placeholder="Select Mandal" />
-            </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              {mandals.map((m) => (
-                <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label>Village</Label>
-          <Select value={selectedVillage} onValueChange={setSelectedVillage}>
-            <SelectTrigger className="w-full border border-gray-300 rounded-md px-4 py-2 text-left focus:outline-none focus:border-walnut">
-              <SelectValue placeholder="Select Village" />
-            </SelectTrigger>
-            <SelectContent className="bg-white text-black">
-              {villages.map((v) => (
-                <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {[{ label: "State", val: selectedState, set: setSelectedState, opts: states },
+          { label: "District", val: selectedDistrict, set: setSelectedDistrict, opts: districts },
+          { label: "Mandal", val: selectedMandal, set: setSelectedMandal, opts: mandals },
+          { label: "Village", val: selectedVillage, set: setSelectedVillage, opts: villages }
+        ].map(({ label, val, set, opts }) => (
+          <div className="space-y-2" key={label}>
+            <Label>{label}</Label>
+            <Select value={val} onValueChange={set}>
+              <SelectTrigger className="signup-input w-full">
+                <SelectValue placeholder={`Select ${label}`} />
+              </SelectTrigger>
+              <SelectContent className="w-full bg-white text-black border border-gray-300 shadow-md z-50">
+                {opts.map((opt) => (
+                  <SelectItem key={opt.id} value={opt.id}>{opt.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
 
         <div className="w-full flex justify-end pt-4">
-          <button
-            onClick={() => navigate("/child-learning-details")}
-            className="bg-walnut text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-earth"
-          >
-            Next
+          <button onClick={handleSaveAndNext} className="bg-walnut text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-earth">
+            Save & Continue
           </button>
         </div>
       </div>

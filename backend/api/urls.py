@@ -31,7 +31,10 @@ from .views import (
     get_colleges,
     get_courses,
     SubmitTestimonialView,
-    RecorderSummaryView
+    RecorderSummaryView,
+    save_child_profile,
+    get_child_profiles,
+    get_child_profile_by_id
 )   
 
 urlpatterns = [
@@ -72,6 +75,12 @@ urlpatterns = [
     path('colleges/', get_colleges, name='get_colleges'),
     path('courses/', get_courses, name='get_courses'),  
     path("submit-testimonial/", SubmitTestimonialView.as_view(), name="submit-testimonial"),
-    path("recorder-summary/", RecorderSummaryView.as_view(), name="recorder-summary")
+    path("recorder-summary/", RecorderSummaryView.as_view(), name="recorder-summary"),
+    path("children/profile/save/", save_child_profile, name="save_child_profile"),  # ✅ keep only one
+    path("children/profile/list/<str:mobile_number>/", get_child_profiles, name="get_child_profiles"),
+    path("children/profile/id/<int:child_id>/", get_child_profile_by_id, name="get_child_profile_by_id")
+
+
+
 
 ]

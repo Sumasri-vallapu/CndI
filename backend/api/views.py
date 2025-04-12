@@ -25,7 +25,8 @@ from .models import (
     College,
     Course,
     TestimonialProgress,
-    TestimonialRecord
+    TestimonialRecord,
+    ChildrenProfile,
 )
 from .serializers import (
     FellowSignUpSerializer,
@@ -41,7 +42,8 @@ from .serializers import (
     UniversitySerializer,
     CollegeSerializer,
     CourseSerializer,
-    TestimonialSubmitSerializer
+    TestimonialSubmitSerializer,
+    ChildrenProfileSerializer
 )
 
 from django.db.models import Count
@@ -943,3 +945,80 @@ class RecorderSummaryView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+
+@api_view(['POST'])
+def save_child_profile(request):
+    print("📩 [POST] save_child_profile called")
+    
+    mobile_number = request.data.get('mobile_number')
+    if not mobile_number:
+        print("❌ No mobile number provided in request")
+        return Response({"error": "Logged-in fellow mobile number is required"}, status=400)
+
+    try:
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+        print(f"✅ Fellow found: {fellow.full_name} ({mobile_number})")
+    except FellowSignUp.DoesNotExist:
+        print(f"❌ Fellow not found with mobile number: {mobile_number}")
+        return Response({"error": "Fellow not found with this mobile number"}, status=404)
+
+    child_id = request.data.get('id')
+    instance = None
+    if child_id:
+        instance = ChildrenProfile.objects.filter(id=child_id, fellow=fellow).first()
+        print(f"✏️ Updating existing child ID: {child_id}" if instance else f"⚠️ No child found with ID {child_id} for this fellow")
+
+    print("📦 Payload received:", dict(request.data))
+
+    serializer = ChildrenProfileSerializer(instance, data=request.data, partial=True)
+    if serializer.is_valid():
+        child = serializer.save(fellow=fellow)
+        print(f"✅ Child profile saved with ID: {child.id}")
+        return Response({
+            "status": "success",
+            "message": "Child profile saved successfully",
+            "child_id": child.id,
+            "data": ChildrenProfileSerializer(child).data
+        }, status=200)
+
+    print("❌ Serializer errors:", serializer.errors)
+    return Response({"status": "error", "errors": serializer.errors}, status=400)
+
+
+@api_view(['GET'])
+def get_child_profiles(request, mobile_number):
+    print(f"📩 [GET] get_child_profiles for mobile: {mobile_number}")
+    try:
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+        print(f"✅ Fellow found: {fellow.full_name}")
+    except FellowSignUp.DoesNotExist:
+        print(f"❌ Fellow not found with mobile: {mobile_number}")
+        return Response({"error": "Fellow not found"}, status=404)
+
+    children = ChildrenProfile.objects.filter(fellow=fellow)
+    print(f"📦 Found {children.count()} children for fellow {fellow.full_name}")
+    serializer = ChildrenProfileSerializer(children, many=True)
+    return Response({
+        "status": "success",
+        "count": len(serializer.data),
+        "data": serializer.data
+    }, status=200)
+
+
+@api_view(['GET'])
+def get_child_profile_by_id(request, child_id):
+    print(f"📩 [GET] get_child_profile_by_id called with child_id: {child_id}")
+    try:
+        child = ChildrenProfile.objects.get(id=child_id)
+        print(f"✅ Child found: {child.full_name} (ID: {child.id})")
+    except ChildrenProfile.DoesNotExist:
+        print(f"❌ Child not found with ID: {child_id}")
+        return Response({"error": "Child profile not found"}, status=404)
+
+    serializer = ChildrenProfileSerializer(child)
+    return Response({
+        "status": "success",
+        "data": serializer.data
+    }, status=200)
+

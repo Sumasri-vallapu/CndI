@@ -8,7 +8,6 @@ export default function ChildrenProfile() {
   const actions = [
     { label: "Add Child Profile", onClick: () => navigate("/child-personal-details") },
     { label: "View Child Profile", onClick: () => navigate("/view-child") },
-    { label: "Delete Child Profile", onClick: () => navigate("/delete-child") },
   ];
 
   const handleLogout = () => {
