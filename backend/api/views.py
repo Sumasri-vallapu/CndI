@@ -912,6 +912,40 @@ def upload_lc_photo(request):
     except Exception as e:
         return Response({"error": str(e)}, status=500)
 
+@api_view(['POST'])
+def delete_lc_photo(request):
+    mobile_number = request.data.get('mobile_number')
+    if not mobile_number:
+        return Response({"error": "mobile_number is required"}, status=400)
+
+    try:
+        lc = LearningCenter.objects.get(mobile_number=mobile_number)
+        photo_url = lc.lc_photo_url
+
+        if not photo_url:
+            return Response({"message": "No photo to delete"}, status=400)
+
+        # Extract the S3 key from URL
+        s3_key = photo_url.split(".com/")[-1]
+
+        # Delete from S3
+        s3_client.delete_object(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Key=s3_key
+        )
+
+        # Remove URL from DB
+        lc.lc_photo_url = None
+        lc.save()
+
+        return Response({"status": "success", "message": "Photo deleted"})
+
+    except LearningCenter.DoesNotExist:
+        return Response({"error": "Learning Center not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+
 #Fetch LearningCenter Details
     
 @api_view(['GET'])

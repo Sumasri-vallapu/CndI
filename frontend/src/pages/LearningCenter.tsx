@@ -126,31 +126,7 @@ const LearningCenter = () => {
     }
   };
 
-  /*const handleSave = async (section: string) => {
-    const mobile = localStorage.getItem("mobile_number");
-    if (!mobile) return;
-
-    const payload = {
-      mobile_number: mobile,
-      center_data: centerData,
-    };
-
-    try {
-      const res = await fetch(ENDPOINTS.SAVE_LEARNING_CENTER, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-      if (data.status === "success") alert("✅ Saved successfully");
-      else alert("❌ Save failed: " + (data.message || data.error || "Unknown error"));
-    } catch (err) {
-      alert("❌ Error saving data");
-    }
-
-    setIsEditing(null);
-  };*/
+  //Save Learning Center Data
   const handleSave = async (section: string) => {
     const mobile = localStorage.getItem("mobile_number");
     if (!mobile) return;
@@ -395,15 +371,32 @@ const LearningCenter = () => {
               variant="ghost"
               size="icon"
               className="text-red-600"
-              onClick={() => {
-                setPhotoUrl(null); // Optionally: trigger backend delete too
-                alert("🗑️ File deleted locally — backend deletion optional");
+              onClick={async () => {
+                try {
+                  const res = await fetch(ENDPOINTS.DELETE_LC_PHOTO, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                      mobile_number: localStorage.getItem("mobile_number"),
+                    }),
+                  });
+                  const result = await res.json();
+                  if (result.status === "success") {
+                    setPhotoUrl(null);
+                    alert("🗑️ Photo deleted successfully");
+                  } else {
+                    alert("❌ Deletion failed: " + (result.message || result.error));
+                 }
+                } catch (err) {
+                  alert("❌ Error deleting photo");
+                }
               }}
             >
-            🗑
+              🗑
             </Button>
           </div>
         )}
+
       </>
     ) : (
       <p className="bg-gray-100 p-3 rounded text-gray-700">

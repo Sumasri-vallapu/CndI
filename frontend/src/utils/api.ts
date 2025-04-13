@@ -14,14 +14,15 @@ export const ENDPOINTS = {
   FELLOW_TESTIMONIAL: `${BASE_URL}/fellow/testimonial/`,
   UPLOAD_PROFILE_PHOTO: `${BASE_URL}/fellow/profile/photo/upload/`,
   SAVE_USER_TESTIMONIAL_RECORDING: `${BASE_URL}/fellow/testimonial/upload/`,
-  UPLOAD_LC_PHOTO: `${BASE_URL}/learning-center/photo/upload/`,
+ 
 
   //Learning Center endpoints
   CREATE_LEARNING_CENTER: `${BASE_URL}/learning-center/create/`,
   GET_LEARNING_CENTER: (mobile_number: string) => 
     `${BASE_URL}/learning-center/${mobile_number}/`,
   SAVE_LEARNING_CENTER: `${BASE_URL}/learning-center/save/`,
-  
+  UPLOAD_LC_PHOTO: `${BASE_URL}/learning-center/photo/upload/`,
+  DELETE_LC_PHOTO: `${BASE_URL}/learning-center/photo/delete/`,
   // Location endpoints
   GET_STATES: `${BASE_URL}/states/`,
   GET_DISTRICTS: `${BASE_URL}/districts/`,
