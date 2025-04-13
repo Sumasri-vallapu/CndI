@@ -33,7 +33,8 @@ from .views import (
     SubmitTestimonialView,
     RecorderSummaryView,
     save_learning_center,
-    get_learning_center
+    get_learning_center,
+    upload_lc_photo,
 )   
 
 urlpatterns = [
@@ -78,5 +79,7 @@ urlpatterns = [
     #Learning Center API
     path('learning-center/save/', save_learning_center, name='save_learning_center'),
     path('learning-center/<str:mobile_number>/', get_learning_center, name='get_learning_center'),
+    path('learning-center/photo/upload/', upload_lc_photo, name='upload_lc_photo'),
+    
 
 ]

@@ -873,6 +873,44 @@ def save_learning_center(request):
     except Exception as e:
         print("❌ Exception while saving:", str(e))
         return Response({"error": str(e)}, status=500)
+#Learning Center Photo Upload
+@api_view(['POST'])
+@parser_classes([MultiPartParser])
+def upload_lc_photo(request):
+    mobile_number = request.data.get('mobile_number')
+    photo = request.FILES.get('photo')
+
+    if not mobile_number or not photo:
+        return Response({"error": "Both mobile number and photo are required"}, status=400)
+
+    try:
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
+
+        ext = photo.name.split('.')[-1]
+        filename = f"lc_photos/{user.unique_number}.{ext}"
+
+        s3_client.upload_fileobj(
+            photo,
+            settings.AWS_STORAGE_BUCKET_NAME,  # from .env or settings.py
+            filename,
+            ExtraArgs={'ContentType': photo.content_type}
+        )
+
+        photo_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{filename}"
+
+        lc, _ = LearningCenter.objects.get_or_create(mobile_number=mobile_number)
+        lc.lc_photo_url = photo_url
+        lc.save()
+
+        return Response({
+            "status": "success",
+            "photo_url": photo_url
+        })
+
+    except FellowSignUp.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
 
 #Fetch LearningCenter Details
     
@@ -885,6 +923,7 @@ def get_learning_center(request, mobile_number):
             "teamLeadName": lc.team_lead_name,
             "districtLeadName": lc.district_lead_name,
             "status": lc.status,
+            "lc_photo_url": lc.lc_photo_url,
             "address": {
                 "state": str(lc.state_id),
                 "district": str(lc.district_id),

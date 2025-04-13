@@ -14,6 +14,7 @@ export const ENDPOINTS = {
   FELLOW_TESTIMONIAL: `${BASE_URL}/fellow/testimonial/`,
   UPLOAD_PROFILE_PHOTO: `${BASE_URL}/fellow/profile/photo/upload/`,
   SAVE_USER_TESTIMONIAL_RECORDING: `${BASE_URL}/fellow/testimonial/upload/`,
+  UPLOAD_LC_PHOTO: `${BASE_URL}/learning-center/photo/upload/`,
 
   //Learning Center endpoints
   CREATE_LEARNING_CENTER: `${BASE_URL}/learning-center/create/`,

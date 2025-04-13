@@ -350,7 +350,7 @@ class TestimonialRecord(models.Model):
 
     def __str__(self):
         return f"{self.mobile_number} - {self.stakeholder_type}"
-
+#Learning Center Model
 class LearningCenter(models.Model):
     mobile_number = models.CharField(max_length=20, unique=True)
     full_name = models.CharField(max_length=255)
@@ -363,3 +363,7 @@ class LearningCenter(models.Model):
     village = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True)
     pincode = models.CharField(max_length=10)
     full_address = models.TextField()
+    lc_photo_url = models.URLField(max_length=500, blank=True, null=True)
+
+
+    
