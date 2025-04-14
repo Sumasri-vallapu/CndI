@@ -19,6 +19,7 @@ import ChildLearningDetails from '@/pages/ChildLearningDetails';
 import ChildParentDetails from '@/pages/ChildParentDetails';
 import ChildEduDetails from '@/pages/ChildEduDetails';
 import ViewChildProfile from '@/pages/ViewChildProfile';
+import ChildProfile from '@/pages/ChildProfile';
 
 export default function App() {
   return (
@@ -47,6 +48,7 @@ export default function App() {
               <Route path="/child-parent-details" element={<ChildParentDetails />} />
               <Route path="/child-educational-details" element={<ChildEduDetails />} />
               <Route path="/view-child-profile" element={<ViewChildProfile />} />
+              <Route path="/child-profile" element={<ChildProfile />} />
             </Routes>
           </main>
         </div>
