@@ -66,17 +66,10 @@ export const ENDPOINTS = {
   GET_USER_DETAILS: (mobile_number: string) => 
     `${BASE_URL}/fellow/details/${mobile_number}/`,
 
-    // Children Profile
-    
-    // Get all children profiles added by fellow
-GET_CHILDREN_FOR_FELLOW: (mobile_number: string) =>
-  `${BASE_URL}/children/profile/list/${mobile_number}/`,
+  GET_CHILD_PROFILE: (child_id: string) => `${BASE_URL}/children/profile/?child_id=${child_id}`,
+  SAVE_CHILD_PROFILE: `${BASE_URL}/children/profile/save/`,
+  GET_CHILDREN_LIST: (mobile: string) => `${BASE_URL}/children/profile/list/${mobile}/`,
+  UPLOAD_CHILD_PHOTO: `${BASE_URL}/children/photo/upload/`,
 
-// Get single child profile by ID
-GET_CHILD_PROFILE_BY_ID: (childId: number) =>
-  `${BASE_URL}/children/profile/id/${childId}/`,
-
-// Save child profile
-SAVE_CHILD_PROFILE: `${BASE_URL}/children/profile/save/`,
   
 } as const; 

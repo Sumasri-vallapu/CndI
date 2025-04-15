@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Pencil } from "lucide-react";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ENDPOINTS } from "@/utils/api";
 
@@ -9,86 +7,100 @@ interface ChildProfile {
   id: number;
   full_name: string;
   gender: string;
-  caste_category: string;
-  school_name: string;
   child_class: string;
-  speaking_level: string;
+  status: string;
 }
 
-export default function ViewChildProfile() {
+const ViewChildren = () => {
   const navigate = useNavigate();
   const [children, setChildren] = useState<ChildProfile[]>([]);
-  const fellowMobile = localStorage.getItem("mobile_number") || "";
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fellow_mobile_number = localStorage.getItem("mobile_number") || "";
 
   useEffect(() => {
-    if (!fellowMobile) return;
+    let ignore = false;
 
-    fetch(ENDPOINTS.GET_CHILDREN_FOR_FELLOW(fellowMobile))
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.status === "success" && Array.isArray(data.data)) {
+    const fetchChildren = async () => {
+      try {
+        const res = await fetch(ENDPOINTS.GET_CHILDREN_LIST(fellow_mobile_number || ""));
+        const data = await res.json();
+        if (!ignore && data.status === "success") {
           setChildren(data.data);
-        } else {
-          setChildren([]);
         }
-      })
-      .catch((err) => {
-        console.error("Failed to fetch children profiles", err);
-        setChildren([]);
-      });
-  }, [fellowMobile]);
+      } catch {
+        if (!ignore) setError("Something went wrong");
+      } finally {
+        if (!ignore) setLoading(false);
+      }
+    };
 
-  const handleEdit = (childId: number) => {
-    navigate("/child-personal-details", { state: { childId } });
-  };
+    if (fellow_mobile_number) fetchChildren();
 
-  const handleLogout = () => {
-    localStorage.removeItem("mobile_number");
-    navigate("/login");
-  };
+    return () => {
+      ignore = true;
+    };
+  }, [fellow_mobile_number]);
+
+
+  if (loading) return <div className="p-4">Loading children...</div>;
+  if (error) return <div className="p-4 text-red-500">{error}</div>;
 
   return (
-    <div className="min-h-screen bg-[#F4F1E3] flex flex-col items-center px-4 py-6">
-      {/* Top Nav */}
-      <div className="w-full flex items-center justify-between max-w-3xl mb-4">
-        <button
-          onClick={() => navigate("/children-profile")}
-          className="text-walnut hover:text-earth flex items-center gap-2 text-base font-medium"
-        >
-          <ArrowLeft size={20} />
-          <span>Back</span>
-        </button>
-        <button onClick={handleLogout} className="bg-walnut text-white px-4 py-2 rounded-lg text-sm">
-          Logout
-        </button>
-      </div>
-
+    <div className="min-h-screen bg-[#F4F1E3] px-4 py-6 flex flex-col items-center">
+      {/* Top Container: width & spacing same as AddChildProfile */}
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6 mt-6">
-        <h2 className="text-2xl font-bold text-center text-walnut mb-6">Saved Child Profiles</h2>
+        <h2 className="text-2xl font-bold text-walnut text-center">Children Profiles</h2>
 
         {children.length === 0 ? (
-          <p className="text-center text-sm text-gray-500">No child profile found. Please add one.</p>
+          <p className="text-center text-gray-600">No children added yet.</p>
         ) : (
           <div className="space-y-4">
             {children.map((child) => (
-              <Card key={child.id} className="p-4 flex justify-between items-center">
-                <div>
-                  <p className="text-lg font-semibold text-walnut">{child.full_name}</p>
-                  <p className="text-sm text-gray-700">
-                    Gender: {child.gender} | Class: {child.child_class} | School: {child.school_name}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Caste: {child.caste_category} | Speaking Level: {child.speaking_level}
-                  </p>
+              <div
+                key={child.id}
+                className="border border-gray-300 rounded-md p-4 shadow-sm space-y-2"
+              >
+                {/* Full Name at top */}
+                <div className="text-lg font-bold text-walnut">{child.full_name}</div>
+
+                {/* All details in one line each */}
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Gender:</span> {child.gender}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Class:</span> {child.child_class}
+                </p>
+                <p className="text-sm text-gray-700">
+                  <span className="font-semibold">Status:</span> {child.status}
+                </p>
+
+                {/* Buttons one below the other */}
+                <div className="flex flex-col gap-2 pt-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => navigate(`/children/edit/${child.id}`)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    className="bg-walnut text-white hover:bg-earth"
+                    onClick={() => navigate(`/children/view/${child.id}`)}
+                  >
+                    View
+                  </Button>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => handleEdit(child.id)}>
-                  <Pencil size={20} />
-                </Button>
-              </Card>
+              </div>
+
             ))}
           </div>
         )}
       </div>
     </div>
   );
-}
+
+
+};
+
+export default ViewChildren;

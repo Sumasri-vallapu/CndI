@@ -256,10 +256,11 @@ class TestimonialRecordSerializer(serializers.ModelSerializer):
 
 
 class ChildrenProfileSerializer(serializers.ModelSerializer):
+    # Read-only display fields from related ForeignKey models
     state_name = serializers.CharField(source='state.state_name', read_only=True)
     district_name = serializers.CharField(source='district.district_name', read_only=True)
     mandal_name = serializers.CharField(source='mandal.mandal_name', read_only=True)
-    village_name = serializers.CharField(source='village.gram_panchayat_name', read_only=True)
+    grampanchayat_name = serializers.CharField(source='grampanchayat.gram_panchayat_name', read_only=True)
 
     class Meta:
         model = ChildrenProfile
@@ -270,12 +271,12 @@ class ChildrenProfileSerializer(serializers.ModelSerializer):
             'caste_category',
             'date_of_birth',
             'parent_mobile_number',
-            'state', 'district', 'mandal', 'village',
-            'state_name', 'district_name', 'mandal_name', 'village_name',
+            'state', 'district', 'mandal', 'grampanchayat',
+            'state_name', 'district_name', 'mandal_name', 'grampanchayat_name',
             'school_name',
             'type_of_school',
             'child_class',
-            'admission_status',
+            'status',
             'mother_name',
             'mother_occupation',
             'father_name',
@@ -288,10 +289,9 @@ class ChildrenProfileSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = [
             'id', 'created_at', 'updated_at',
-            'state_name', 'district_name', 'mandal_name', 'village_name',
+            'state_name', 'district_name', 'mandal_name', 'grampanchayat_name',
         ]
 
     def update(self, instance, validated_data):
-        validated_data.pop("fellow", None)  # Prevent fellow override
+        validated_data.pop("fellow", None)  # Prevent overriding fellow
         return super().update(instance, validated_data)
-

@@ -372,13 +372,12 @@ class ChildrenProfile(models.Model):
     state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
     district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True)
     mandal = models.ForeignKey(Mandal, on_delete=models.SET_NULL, null=True)
-    village = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True)
+    grampanchayat = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True)
 
     # Education
     school_name = models.CharField(max_length=200, blank=True)
     type_of_school = models.CharField(max_length=50, blank=True)
     child_class = models.CharField(max_length=10, blank=True)
-    admission_status = models.CharField(max_length=20, blank=True)
 
     # Parent Info
     mother_name = models.CharField(max_length=100, blank=True)
@@ -389,6 +388,7 @@ class ChildrenProfile(models.Model):
     # Learning
     speaking_level = models.CharField(max_length=20, blank=True)
     reading_level = models.CharField(max_length=20, blank=True)
+    status = models.CharField(max_length=20, blank=True)
     child_photo_s3_url = models.URLField(max_length=500, blank=True, null=True)
 
     # Meta

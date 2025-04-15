@@ -946,21 +946,21 @@ class RecorderSummaryView(APIView):
         except Exception as e:
             return Response({"error": str(e)}, status=500)
 
-
 @api_view(['POST'])
 def save_child_profile(request):
     print("📩 [POST] save_child_profile called")
     
-    mobile_number = request.data.get('mobile_number')
-    if not mobile_number:
-        print("❌ No mobile number provided in request")
-        return Response({"error": "Logged-in fellow mobile number is required"}, status=400)
+    # ✅ Renamed for clarity
+    fellow_mobile_number = request.data.get('fellow_mobile_number')
+    if not fellow_mobile_number:
+        print("❌ No fellow mobile number provided in request")
+        return Response({"error": "Fellow mobile number is required"}, status=400)
 
     try:
-        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
-        print(f"✅ Fellow found: {fellow.full_name} ({mobile_number})")
+        fellow = FellowSignUp.objects.get(mobile_number=fellow_mobile_number)
+        print(f"✅ Fellow found: {fellow.full_name} ({fellow_mobile_number})")
     except FellowSignUp.DoesNotExist:
-        print(f"❌ Fellow not found with mobile number: {mobile_number}")
+        print(f"❌ Fellow not found with mobile number: {fellow_mobile_number}")
         return Response({"error": "Fellow not found with this mobile number"}, status=404)
 
     child_id = request.data.get('id')
@@ -1021,4 +1021,43 @@ def get_child_profile_by_id(request, child_id):
         "status": "success",
         "data": serializer.data
     }, status=200)
+
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser])
+def upload_child_photo(request):
+    print("📩 [POST] upload_child_photo called")
+
+    child_id = request.data.get("child_id")
+    photo = request.FILES.get("photo")
+
+    if not child_id or not photo:
+        return Response({"error": "child_id and photo are required"}, status=400)
+
+    try:
+        child = ChildrenProfile.objects.get(id=child_id)
+    except ChildrenProfile.DoesNotExist:
+        return Response({"error": "Child not found"}, status=404)
+
+    # Upload to S3
+    s3 = boto3.client("s3")
+    ext = photo.name.split(".")[-1]
+    key = f"children/photos/{uuid.uuid4()}.{ext}"
+
+    try:
+        s3.upload_fileobj(
+            photo,
+            os.getenv("AWS_STORAGE_BUCKET_NAME"),
+            key,
+            ExtraArgs={"ContentType": photo.content_type, "ACL": "public-read"},
+        )
+        s3_url = f"https://{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.amazonaws.com/{key}"
+        child.child_photo_s3_url = s3_url
+        child.save()
+        print(f"✅ Uploaded to S3: {s3_url}")
+        return Response({"status": "success", "photo_url": s3_url}, status=200)
+
+    except Exception as e:
+        print(f"❌ S3 upload failed: {e}")
+        return Response({"error": "Upload failed", "details": str(e)}, status=500)
 
