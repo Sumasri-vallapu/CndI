@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Camera, User } from "lucide-react";
 
 interface UploadProfilePhotoProps {
@@ -13,18 +13,30 @@ export default function UploadProfilePhoto({
   setPhotoBlob,
 }: UploadProfilePhotoProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setPhotoPreview(file);
+    try {
+      setUploading(true);
+      setPhotoPreview(file);
+
+      // ✅ Simulate quick success message
+      setTimeout(() => {
+        alert("✅ Profile photo added successfully (will be uploaded on final save)");
+      }, 300);
+
+    } finally {
+      setUploading(false);
+    }
   };
 
   const setPhotoPreview = (file: Blob) => {
     const objectUrl = URL.createObjectURL(file);
-    setPreviewUrl(objectUrl); // ✅ Show preview
-    setPhotoBlob(file);       // ✅ Pass blob to parent
+    setPreviewUrl(objectUrl);
+    setPhotoBlob(file);
   };
 
   return (
@@ -40,8 +52,14 @@ export default function UploadProfilePhoto({
       )}
 
       <button
-        onClick={() => fileInputRef.current?.click()}
-        className="absolute bottom-0 right-0 bg-walnut text-white rounded-full p-2"
+        onClick={() => !uploading && fileInputRef.current?.click()}
+        className={`absolute bottom-0 right-0 rounded-full p-2 ${
+          uploading
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-walnut text-white hover:bg-walnut/90 transition-colors"
+        }`}
+        disabled={uploading}
+        title={uploading ? "Uploading..." : "Upload"}
       >
         <Camera className="h-5 w-5" />
       </button>

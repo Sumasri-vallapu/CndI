@@ -16,6 +16,7 @@ import UploadProfilePhoto from "@/components/ui/UploadProfilePhoto";
 
 
 
+
 interface LocationOption {
     id: string;
     name: string;
@@ -340,7 +341,13 @@ const AddChildProfile = () => {
             fellow_mobile_number: localStorage.getItem("mobile_number"),
         };
 
+        if (!photoBlob) {
+            alert("Please upload a profile photo before submitting.");
+            return;
+        }
+
         try {
+            // STEP 1: Save profile
             const res = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -352,14 +359,28 @@ const AddChildProfile = () => {
 
             console.log("✅ Saved child:", result);
             const newChildId = result.child_id;
-            setChildId(newChildId); // Update state
+            setChildId(newChildId);
 
-            // ✅ Upload photo if selected
-            if (photoBlob && newChildId) {
-                const uploadedUrl = await uploadPhotoToS3(photoBlob, newChildId);
-                if (uploadedUrl) {
-                    console.log("✅ Photo uploaded to:", uploadedUrl);
-                }
+            // STEP 2: Upload photo to S3
+            const uploadedUrl = await uploadPhotoToS3(photoBlob, newChildId);
+            if (uploadedUrl) {
+                console.log("✅ Photo uploaded to:", uploadedUrl);
+
+                // STEP 3: Save photo URL to backend
+                const photoRes = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        id: newChildId,
+                        fellow_mobile_number: localStorage.getItem("mobile_number"),
+                        child_photo_s3_url: uploadedUrl,
+                    }),
+                });
+
+                const photoSaveResult = await photoRes.json();
+                if (!photoRes.ok) throw new Error("Failed to save photo URL");
+
+                console.log("✅ Photo URL saved to DB:", photoSaveResult);
             }
 
             alert("Child profile saved successfully!");
@@ -369,7 +390,6 @@ const AddChildProfile = () => {
             alert("Failed to save child profile.");
         }
     };
-
 
 
 
@@ -440,6 +460,7 @@ const AddChildProfile = () => {
                 <Input
                     type={type}
                     value={profileData[key] ?? ""}
+                    placeholder={`Enter ${label}`}
                     onChange={(e) => handleChange(key, e.target.value)}
                     className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walnut/40 focus:border-walnut/40"
                 />
