@@ -16,7 +16,6 @@ import UploadProfilePhoto from "@/components/ui/UploadProfilePhoto";
 
 
 
-
 interface LocationOption {
     id: string;
     name: string;
@@ -318,6 +317,13 @@ const AddChildProfile = () => {
 
 
     const handleFinalSubmit = async () => {
+        // 1. Validate photo
+        if (!photoBlob) {
+            alert("Please upload a profile photo before submitting.");
+            return;
+        }
+
+        // 2. Prepare initial payload
         const payload: any = {
             full_name: profileData.full_name,
             gender: profileData.gender,
@@ -341,13 +347,8 @@ const AddChildProfile = () => {
             fellow_mobile_number: localStorage.getItem("mobile_number"),
         };
 
-        if (!photoBlob) {
-            alert("Please upload a profile photo before submitting.");
-            return;
-        }
-
         try {
-            // STEP 1: Save profile
+            // 3. Submit child profile first
             const res = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -357,30 +358,33 @@ const AddChildProfile = () => {
             const result = await res.json();
             if (!res.ok) throw new Error(result?.errors || "Save failed");
 
-            console.log("✅ Saved child:", result);
             const newChildId = result.child_id;
             setChildId(newChildId);
 
-            // STEP 2: Upload photo to S3
+            // 4. Upload photo to S3
             const uploadedUrl = await uploadPhotoToS3(photoBlob, newChildId);
-            if (uploadedUrl) {
-                console.log("✅ Photo uploaded to:", uploadedUrl);
+            if (!uploadedUrl) throw new Error("Photo upload failed");
 
-                // STEP 3: Save photo URL to backend
-                const photoRes = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        id: newChildId,
-                        fellow_mobile_number: localStorage.getItem("mobile_number"),
-                        child_photo_s3_url: uploadedUrl,
-                    }),
-                });
+            console.log("✅ Photo uploaded to:", uploadedUrl);
 
-                const photoSaveResult = await photoRes.json();
-                if (!photoRes.ok) throw new Error("Failed to save photo URL");
+            // 5. Update child profile with photo URL
+            const photoUpdatePayload = {
+                id: newChildId,
+                fellow_mobile_number: localStorage.getItem("mobile_number"),
+                child_photo_s3_url: uploadedUrl,
+            };
 
-                console.log("✅ Photo URL saved to DB:", photoSaveResult);
+            const updateRes = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
+                method: "POST", // ✅ same POST used for updating
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(photoUpdatePayload),
+            });
+
+            const updateResult = await updateRes.json();
+            if (!updateRes.ok) {
+                console.warn("⚠️ Failed to update photo URL:", updateResult.errors);
+            } else {
+                console.log("✅ Photo URL updated in backend");
             }
 
             alert("Child profile saved successfully!");
@@ -390,7 +394,6 @@ const AddChildProfile = () => {
             alert("Failed to save child profile.");
         }
     };
-
 
 
     useEffect(() => {

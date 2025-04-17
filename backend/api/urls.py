@@ -78,7 +78,7 @@ urlpatterns = [
     path("submit-testimonial/", SubmitTestimonialView.as_view(), name="submit-testimonial"),
     path("recorder-summary/", RecorderSummaryView.as_view(), name="recorder-summary"),
     path("children/profile/save/", save_child_profile, name="save_child_profile"),
-    path("children/profile/", get_child_profile_by_id, name="get_child_profile_by_id"),
+    path("children/profile/<int:child_id>/", get_child_profile_by_id, name="get_child_profile_by_id"),
     path("children/profile/list/<str:mobile_number>/", get_child_profiles, name="get_child_profiles"),
     path("children/photo/upload/", upload_child_photo, name="upload_child_photo"),
 ]

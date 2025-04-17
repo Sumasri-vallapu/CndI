@@ -1039,25 +1039,33 @@ def upload_child_photo(request):
     except ChildrenProfile.DoesNotExist:
         return Response({"error": "Child not found"}, status=404)
 
-    # Upload to S3
-    s3 = boto3.client("s3")
+    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
     ext = photo.name.split(".")[-1]
     key = f"children/photos/{uuid.uuid4()}.{ext}"
 
     try:
+        s3 = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
+        )
+
         s3.upload_fileobj(
             photo,
-            os.getenv("AWS_STORAGE_BUCKET_NAME"),
+            bucket_name,
             key,
-            ExtraArgs={"ContentType": photo.content_type, "ACL": "public-read"},
+            ExtraArgs={  # ✅ No ACL here
+                "ContentType": photo.content_type
+            }
         )
-        s3_url = f"https://{os.getenv('AWS_STORAGE_BUCKET_NAME')}.s3.amazonaws.com/{key}"
+
+        s3_url = f"https://{bucket_name}.s3.amazonaws.com/{key}"
         child.child_photo_s3_url = s3_url
         child.save()
+
         print(f"✅ Uploaded to S3: {s3_url}")
         return Response({"status": "success", "photo_url": s3_url}, status=200)
 
     except Exception as e:
         print(f"❌ S3 upload failed: {e}")
         return Response({"error": "Upload failed", "details": str(e)}, status=500)
-
