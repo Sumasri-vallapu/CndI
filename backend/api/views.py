@@ -5,6 +5,7 @@ import logging
 import os
 from django.conf import settings
 from django.utils import timezone
+from api.models import DistrictLead, TeamLead
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
@@ -873,6 +874,22 @@ def save_learning_center(request):
     except Exception as e:
         print("❌ Exception while saving:", str(e))
         return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def get_district_leads_by_district(request, district_id):
+    leads = DistrictLead.objects.filter(district_id=district_id)
+    data = [{"id": lead.id, "name": lead.name} for lead in leads]
+    return Response(data)
+
+
+@api_view(['GET'])
+def get_team_leads_by_dl(request):
+    dl_id = request.GET.get('dl_id')
+    leads = TeamLead.objects.filter(district_lead_id=dl_id)
+    data = [{"id": lead.id, "name": lead.name} for lead in leads]
+    return Response(data)
+
+
 #Learning Center Photo Upload
 @api_view(['POST'])
 @parser_classes([MultiPartParser])
