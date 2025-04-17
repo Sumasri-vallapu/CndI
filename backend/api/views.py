@@ -865,7 +865,9 @@ def save_learning_center(request):
                 "mandal_id": data['address']['mandal'],
                 "village_id": data['address']['village'],
                 "pincode": data['address']['pincode'],
-                "full_address": data['address']['fullAddress'],
+                "colony_name": data['address']['colonyName'],
+                "door_number": data['address']['doorNumber'],
+                "landmark": data['address']['landmark'],
             }
         )
 
@@ -981,7 +983,10 @@ def get_learning_center(request, mobile_number):
                 "mandal": str(lc.mandal_id),
                 "village": str(lc.village_id),
                 "pincode": lc.pincode,
-                "fullAddress": lc.full_address,
+                #"fullAddress": lc.full_address,
+                "colonyName": lc.colony_name,
+                "doorNumber": lc.door_number,
+                "landmark": lc.landmark,
             }
         })
     except LearningCenter.DoesNotExist:

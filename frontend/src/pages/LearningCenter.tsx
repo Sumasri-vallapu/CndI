@@ -37,7 +37,6 @@ const LearningCenter = () => {
       mandal: "",
       village: "",
       pincode: "",
-      fullAddress: "",
       colonyName: "",
       doorNumber: "",
       landmark: "",
@@ -108,7 +107,12 @@ const LearningCenter = () => {
         setCenterData((prev) => ({
           ...prev,
           ...convertedData,
+          address: {
+            ...prev.address,
+            ...convertedData.address,
+          },
         }));
+
 
         if (data.lc_photo_url) {
           setPhotoUrl(data.lc_photo_url);  // <- This updates the UI with uploaded photo
@@ -192,6 +196,10 @@ const LearningCenter = () => {
       if (value === "None") return null;
       return value;
     });
+
+    if ("fullAddress" in cleanCenterData.address) {
+      delete cleanCenterData.address.fullAddress;
+    }
 
 
     const payload = {
@@ -413,7 +421,6 @@ const LearningCenter = () => {
               {renderSelect("address", "Mandal", centerData.address.mandal, locationData.mandals, handleMandalChange)}
               {renderSelect("address", "Village", centerData.address.village, locationData.villages, (v) => handleInputChange("address", "village", v))}
               {renderField({ section: "address", fieldKey: "pincode", label: "Pincode", value: centerData.address.pincode })}
-              {renderField({ section: "address", fieldKey: "fullAddress", label: "Full Address", value: centerData.address.fullAddress })}
               {renderField({ section: "address", fieldKey: "colonyName", label: "Colony Name", value: centerData.address.colonyName })}
               {renderField({ section: "address", fieldKey: "doorNumber", label: "Door No / H.No / Street No", value: centerData.address.doorNumber })}
               {renderField({ section: "address", fieldKey: "landmark", label: "Landmark", value: centerData.address.landmark })}

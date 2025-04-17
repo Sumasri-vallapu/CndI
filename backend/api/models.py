@@ -381,7 +381,10 @@ class LearningCenter(models.Model):
     mandal = models.ForeignKey(Mandal, on_delete=models.SET_NULL, null=True,blank=True)
     village = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True,blank=True)
     pincode = models.CharField(max_length=10)
-    full_address = models.TextField()
+    #full_address = models.TextField()
+    colony_name = models.CharField(max_length=100, blank=True, null=True)
+    door_number = models.CharField(max_length=100, blank=True, null=True)
+    landmark = models.CharField(max_length=200, blank=True, null=True)
     lc_photo_url = models.URLField(max_length=500, blank=True, null=True)
 
 
