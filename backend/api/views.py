@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
+
 from .models import (
     FellowSignUp,
     FellowRegistration,
@@ -27,6 +28,7 @@ from .models import (
     Course,
     TestimonialProgress,
     TestimonialRecord,
+    ChildrenProfile,
     LearningCenter
 )
 from .serializers import (
@@ -43,7 +45,8 @@ from .serializers import (
     UniversitySerializer,
     CollegeSerializer,
     CourseSerializer,
-    TestimonialSubmitSerializer
+    TestimonialSubmitSerializer,
+    ChildrenProfileSerializer
 )
 
 from django.db.models import Count
@@ -1103,3 +1106,148 @@ class RecorderSummaryView(APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def save_child_profile(request):
+    print("📩 [POST] save_child_profile called")
+    
+    # ✅ Renamed for clarity
+    fellow_mobile_number = request.data.get('fellow_mobile_number')
+    if not fellow_mobile_number:
+        print("❌ No fellow mobile number provided in request")
+        return Response({"error": "Fellow mobile number is required"}, status=400)
+
+    try:
+        fellow = FellowSignUp.objects.get(mobile_number=fellow_mobile_number)
+        print(f"✅ Fellow found: {fellow.full_name} ({fellow_mobile_number})")
+    except FellowSignUp.DoesNotExist:
+        print(f"❌ Fellow not found with mobile number: {fellow_mobile_number}")
+        return Response({"error": "Fellow not found with this mobile number"}, status=404)
+
+    child_id = request.data.get('id')
+    instance = None
+    if child_id:
+        instance = ChildrenProfile.objects.filter(id=child_id, fellow=fellow).first()
+        print(f"✏️ Updating existing child ID: {child_id}" if instance else f"⚠️ No child found with ID {child_id} for this fellow")
+
+    print("📦 Payload received:", dict(request.data))
+
+    serializer = ChildrenProfileSerializer(instance, data=request.data, partial=True)
+    if serializer.is_valid():
+        child = serializer.save(fellow=fellow)
+        print(f"✅ Child profile saved with ID: {child.id}")
+        return Response({
+            "status": "success",
+            "message": "Child profile saved successfully",
+            "child_id": child.id,
+            "data": ChildrenProfileSerializer(child).data
+        }, status=200)
+
+    print("❌ Serializer errors:", serializer.errors)
+    return Response({"status": "error", "errors": serializer.errors}, status=400)
+
+
+@api_view(['GET'])
+def get_child_profiles(request, mobile_number):
+    print(f"📩 [GET] get_child_profiles for mobile: {mobile_number}")
+    try:
+        fellow = FellowSignUp.objects.get(mobile_number=mobile_number)
+        print(f"✅ Fellow found: {fellow.full_name}")
+    except FellowSignUp.DoesNotExist:
+        print(f"❌ Fellow not found with mobile: {mobile_number}")
+        return Response({"error": "Fellow not found"}, status=404)
+
+    children = ChildrenProfile.objects.filter(fellow=fellow)
+    print(f"📦 Found {children.count()} children for fellow {fellow.full_name}")
+    serializer = ChildrenProfileSerializer(children, many=True)
+    return Response({
+        "status": "success",
+        "count": len(serializer.data),
+        "data": serializer.data
+    }, status=200)
+
+
+@api_view(['GET'])
+def get_child_profile_by_id(request, child_id):
+    print(f"📩 [GET] get_child_profile_by_id called with child_id: {child_id}")
+    try:
+        child = ChildrenProfile.objects.get(id=child_id)
+        print(f"✅ Child found: {child.full_name} (ID: {child.id})")
+    except ChildrenProfile.DoesNotExist:
+        print(f"❌ Child not found with ID: {child_id}")
+        return Response({"error": "Child profile not found"}, status=404)
+
+    serializer = ChildrenProfileSerializer(child)
+    return Response({
+        "status": "success",
+        "data": serializer.data
+    }, status=200)
+
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser])
+def upload_child_photo(request):
+    print("📩 [POST] upload_child_photo called")
+
+    child_id = request.data.get("child_id")
+    photo = request.FILES.get("photo")
+
+    if not child_id or not photo:
+        return Response({"error": "child_id and photo are required"}, status=400)
+
+    try:
+        child = ChildrenProfile.objects.get(id=child_id)
+    except ChildrenProfile.DoesNotExist:
+        return Response({"error": "Child not found"}, status=404)
+
+    bucket_name = settings.AWS_STORAGE_BUCKET_NAME
+    ext = photo.name.split(".")[-1]
+    key = f"children/photos/{uuid.uuid4()}.{ext}"
+
+    try:
+        s3 = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY
+        )
+
+        s3.upload_fileobj(
+            photo,
+            bucket_name,
+            key,
+            ExtraArgs={  # ✅ No ACL here
+                "ContentType": photo.content_type
+            }
+        )
+
+        s3_url = f"https://{bucket_name}.s3.amazonaws.com/{key}"
+        child.child_photo_s3_url = s3_url
+        child.save()
+
+        print(f"✅ Uploaded to S3: {s3_url}")
+        return Response({"status": "success", "photo_url": s3_url}, status=200)
+
+    except Exception as e:
+        print(f"❌ S3 upload failed: {e}")
+        return Response({"error": "Upload failed", "details": str(e)}, status=500)
+
+
+@api_view(['DELETE'])
+def delete_child_profile(request, child_id):
+    print(f"📩 [DELETE] delete_child_profile called with child_id={child_id}")
+
+    try:
+        child = ChildrenProfile.objects.get(id=child_id)
+        full_name = child.full_name
+        child.delete()
+        print(f"✅ Deleted child profile: {full_name} (ID: {child_id})")
+        return Response({"status": "success", "message": f"Child '{full_name}' deleted successfully."})
+    
+    except ChildrenProfile.DoesNotExist:
+        print(f"❌ Child not found with ID: {child_id}")
+        return Response({"status": "error", "message": "Child not found"}, status=404)
+    
+    except Exception as e:
+        print(f"❌ Unexpected error during deletion: {e}")
+        return Response({"status": "error", "message": "Something went wrong"}, status=500)
+

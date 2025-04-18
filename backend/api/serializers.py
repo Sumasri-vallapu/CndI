@@ -13,7 +13,8 @@ from .models import (
     University,
     College,
     Course,
-    TestimonialRecord
+    TestimonialRecord,
+    ChildrenProfile
 )
 
 class FellowSignUpSerializer(serializers.ModelSerializer):
@@ -252,3 +253,45 @@ class TestimonialRecordSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestimonialRecord
         fields = ['stakeholder_type', 'audio_url', 'created_at', 'mobile_number']
+
+
+class ChildrenProfileSerializer(serializers.ModelSerializer):
+    # Read-only display fields from related ForeignKey models
+    state_name = serializers.CharField(source='state.state_name', read_only=True)
+    district_name = serializers.CharField(source='district.district_name', read_only=True)
+    mandal_name = serializers.CharField(source='mandal.mandal_name', read_only=True)
+    grampanchayat_name = serializers.CharField(source='grampanchayat.gram_panchayat_name', read_only=True)
+
+    class Meta:
+        model = ChildrenProfile
+        fields = [
+            'id',
+            'full_name',
+            'gender',
+            'caste_category',
+            'date_of_birth',
+            'parent_mobile_number',
+            'state', 'district', 'mandal', 'grampanchayat',
+            'state_name', 'district_name', 'mandal_name', 'grampanchayat_name',
+            'school_name',
+            'type_of_school',
+            'child_class',
+            'status',
+            'mother_name',
+            'mother_occupation',
+            'father_name',
+            'father_occupation',
+            'reading_level',
+            'speaking_level',
+            'child_photo_s3_url',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'id', 'created_at', 'updated_at',
+            'state_name', 'district_name', 'mandal_name', 'grampanchayat_name',
+        ]
+
+    def update(self, instance, validated_data):
+        validated_data.pop("fellow", None)  # Prevent overriding fellow
+        return super().update(instance, validated_data)

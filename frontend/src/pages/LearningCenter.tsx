@@ -187,6 +187,7 @@ const LearningCenter = () => {
     }
   };
 
+
   //Save Learning Center Data
   const handleSave = async (section: string) => {
     const mobile = localStorage.getItem("mobile_number");
@@ -566,7 +567,7 @@ const LearningCenter = () => {
 
           {isEditing === "top" ? (
             <>
-              <Button onClick={() => handleSave("top")} className="w-full bg-green-600 text-white">Save Changes</Button>
+              <Button onClick={handleSave} className="w-full bg-green-600 text-white">Save Changes</Button>
               <Button onClick={() => setIsEditing(null)} className="w-full">Cancel</Button>
             </>
           ) : (

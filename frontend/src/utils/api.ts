@@ -1,7 +1,7 @@
 // API configuration
 const BASE_URL = 'http://localhost:8000/api';
 
-//const BASE_URL = 'https://yuvachetana.com/api';
+// const BASE_URL = 'https://yuvachetana.com/api';
 
 
 // API endpoints
@@ -78,4 +78,12 @@ export const ENDPOINTS = {
 
   GET_USER_DETAILS: (mobile_number: string) =>
     `${BASE_URL}/fellow/details/${mobile_number}/`,
+
+  GET_CHILD_PROFILE: (id: string) => `${BASE_URL}/children/profile/${id}/`,
+  SAVE_CHILD_PROFILE: `${BASE_URL}/children/profile/save/`,
+  GET_CHILDREN_LIST: (mobile: string) => `${BASE_URL}/children/profile/list/${mobile}/`,
+  UPLOAD_CHILD_PHOTO: `${BASE_URL}/children/photo/upload/`,
+  DELETE_CHILD_PROFILE: (id: string) => `${BASE_URL}/children/profile/delete/${id}/`,
+
+  
 } as const; 
