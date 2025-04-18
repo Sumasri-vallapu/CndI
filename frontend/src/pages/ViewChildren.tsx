@@ -67,8 +67,6 @@ const ViewChildren = () => {
 
   return (
     <div className="min-h-screen bg-[#F4F1E3] px-4 py-6 flex flex-col items-center">
-
-      {/* 🔙 Top Navigation */}
       <div className="w-full max-w-3xl flex justify-between py-4 no-print print:hidden">
         <button
           onClick={() => navigate("/children-profile")}
@@ -86,7 +84,6 @@ const ViewChildren = () => {
       </div>
 
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-4">
-
         <div className="flex flex-col items-center justify-center space-y-2">
           <img
             src="/Images/organization_logo.png"
@@ -94,7 +91,6 @@ const ViewChildren = () => {
             className="h-22 w-auto object-contain mb-2"
             loading="eager"
           />
-
           <h2 className="text-xl font-bold text-walnut">Children Profiles</h2>
         </div>
 
@@ -108,13 +104,11 @@ const ViewChildren = () => {
         <p className="text-sm text-gray-600">Showing {filtered.length} students</p>
 
         <div className="space-y-4">
-
           {paginatedData.map((child) => (
             <div
               key={child.id}
               className="bg-gray-100 p-4 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
             >
-              {/* Left side: Profile info */}
               <div className="flex items-center gap-4">
                 <img
                   src={child.child_photo_s3_url || "https://via.placeholder.com/100?text=No+Photo"}
@@ -129,19 +123,16 @@ const ViewChildren = () => {
                 </div>
               </div>
 
-              {/* Right side: View Button */}
               <div className="sm:self-end">
                 <Button
                   className="bg-walnut text-white w-full sm:w-auto mt-2 sm:mt-0"
-                  onClick={() => window.location.href = `/children/view/${child.id}`}
+                  onClick={() => navigate(`/children/view/${child.id}`)}
                 >
                   View Profile
                 </Button>
               </div>
             </div>
           ))}
-
-
         </div>
 
         <div className="flex justify-center mt-4 gap-2">
@@ -151,7 +142,7 @@ const ViewChildren = () => {
               className={`px-3 py-1 rounded ${page === i + 1
                 ? "bg-walnut text-white"
                 : "bg-gray-200 text-gray-700"
-                }`}
+              }`}
               onClick={() => setPage(i + 1)}
             >
               {i + 1}
