@@ -35,7 +35,8 @@ from .views import (
     save_child_profile,
     get_child_profiles,
     get_child_profile_by_id,
-    upload_child_photo
+    upload_child_photo,
+    delete_child_profile,
 )   
 
 urlpatterns = [
@@ -81,4 +82,5 @@ urlpatterns = [
     path("children/profile/<int:child_id>/", get_child_profile_by_id, name="get_child_profile_by_id"),
     path("children/profile/list/<str:mobile_number>/", get_child_profiles, name="get_child_profiles"),
     path("children/photo/upload/", upload_child_photo, name="upload_child_photo"),
+    path("children/profile/delete/<int:child_id>/", delete_child_profile, name="delete_child_profile"),
 ]

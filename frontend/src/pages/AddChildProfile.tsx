@@ -60,9 +60,9 @@ const CASTE_OPTIONS = [
     { value: "BC", label: "BC" },
     { value: "OBC", label: "OBC" },
     { value: "OC", label: "OC" },
-    { value: "MUSLIM", label: "Muslim" },
-    { value: "CHRISTIAN", label: "Christian" },
-    { value: "OTHER", label: "Other" }
+    { value: "Muslim", label: "MUSLIM" },
+    { value: "Christian", label: "CHRISTIAN" },
+    { value: "Other", label: "OTHER" }
 ];
 
 const SCHOOL_TYPE_OPTIONS = [
@@ -89,21 +89,43 @@ const MOTHER_OCCUPATION_OPTIONS = [
     { value: "Tailor", label: "Tailor" },
     { value: "Agricultural Labour", label: "Agricultural Labour" },
     { value: "Construction Labour", label: "Construction Labour" },
-    { value: "Other", label: "Other" }
+    { value: "Daily Wage Worker", label: "Daily Wage Worker" },
+    { value: "School Teacher", label: "School Teacher" },
+    { value: "Anganwadi Teacher", label: "Anganwadi Teacher" },
+    { value: "DWCRA Member", label: "DWCRA Member" },
+    { value: "Factory Worker", label: "Factory Worker" },
+    { value: "Expired", label: "Expired" },
+    { value: "Other", label: "Other" },
 ];
 
 const FATHER_OCCUPATION_OPTIONS = [
-    { value: "Home Maker", label: "Home Maker" },
     { value: "Tailor", label: "Tailor" },
     { value: "Agricultural Labour", label: "Agricultural Labour" },
     { value: "Construction Labour", label: "Construction Labour" },
-    { value: "Other", label: "Other" }
+    { value: "Daily Wage Worker", label: "Daily Wage Worker" },
+    { value: "School Teacher", label: "School Teacher" },
+    { value: "Factory Worker", label: "Factory Worker" },
+    { value: "Expired", label: "Expired" },
+    { value: "Plumber", label: "Plumber" },
+    { value: "Electrician", label: "Electrician" },
+    { value: "Driver", label: "Driver" },
+    { value: "Business", label: "Business" },
+    { value: "Other", label: "Other" },
+
 ];
 
-const LEVEL_OPTIONS = [
-    { value: "BEGINNER", label: "Beginner" },
+const SPEAKING_LEVEL_OPTIONS = [
+    { value: "BASIC", label: "Basic" },
     { value: "INTERMEDIATE", label: "Intermediate" },
-    { value: "ADVANCED", label: "Advanced" },
+    { value: "PROFICIENT", label: "Proficient" },
+];
+
+const READING_LEVEL_OPTIONS = [
+    { value: "EMERGENT", label: "Emergent" },
+    { value: "LETTERS", label: "Letters" },
+    { value: "WORDS", label: "Words" },
+    { value: "PARAGRAPHS", label: "Paragraphs" },
+    { value: "STORY", label: "Story" },
 ];
 
 const STATUS_OPTIONS = [
@@ -121,7 +143,6 @@ const AddChildProfile = () => {
 
     const [activeSection, setActiveSection] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState<string | null>(null);
-    const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const [customMotherOccupation, setCustomMotherOccupation] = useState("");
@@ -135,7 +156,6 @@ const AddChildProfile = () => {
     });
 
     // 🔜 Child photo upload
-    const [childId, setChildId] = useState<string | null>(null);
     const [photoBlob, setPhotoBlob] = useState<Blob | null>(null);
     const [photoPreviewUrl, setPhotoPreviewUrl] = useState<string | null>(null);
 
@@ -223,18 +243,6 @@ const AddChildProfile = () => {
             return;
         }
 
-        console.log("✅ Saving personal details:", {
-            full_name: profileData.full_name,
-            gender: profileData.gender,
-            caste_category: profileData.caste_category,
-            date_of_birth: profileData.date_of_birth,
-            parent_mobile_number: profileData.parent_mobile_number,
-            state: profileData.state,
-            district: profileData.district,
-            mandal: profileData.mandal,
-            grampanchayat: profileData.grampanchayat,
-        });
-
         setErrors({});
         setIsEditing(null);
         alert("Personal details saved successfully.");
@@ -256,12 +264,6 @@ const AddChildProfile = () => {
             setErrors(validationErrors);
             return;
         }
-
-        console.log("✅ Saving educational details:", {
-            school_name: profileData.school_name,
-            school_type: profileData.type_of_school,
-            child_class: profileData.child_class,
-        });
 
         setErrors({});
         setIsEditing(null);
@@ -285,13 +287,6 @@ const AddChildProfile = () => {
             return;
         }
 
-        console.log("✅ Saving parent details:", {
-            mother_name: profileData.mother_name,
-            father_name: profileData.father_name,
-            mother_occupation: profileData.mother_occupation,
-            father_occupation: profileData.father_occupation,
-        });
-
         setErrors({});
         setIsEditing(null);
         alert("Parent details saved.");
@@ -312,12 +307,6 @@ const AddChildProfile = () => {
             setErrors(validationErrors);
             return;
         }
-
-        console.log("✅ Saving learning details:", {
-            speaking_level: profileData.speaking_level,
-            reading_level: profileData.reading_level,
-            status: profileData.status,
-        });
 
         setErrors({});
         setIsEditing(null);
@@ -380,14 +369,11 @@ const AddChildProfile = () => {
             if (!res.ok) throw new Error(result?.errors || "Save failed");
 
             const newChildId = isEditMode ? id : result.child_id;
-            setChildId(newChildId);
 
             // 4. Upload photo if available
             if (photoBlob) {
                 const uploadedUrl = await uploadPhotoToS3(photoBlob, newChildId);
                 if (!uploadedUrl) throw new Error("Photo upload failed");
-
-                console.log("✅ Photo uploaded to:", uploadedUrl);
 
                 // 5. Update child profile with photo URL
                 const photoUpdatePayload = {
@@ -402,12 +388,10 @@ const AddChildProfile = () => {
                     body: JSON.stringify(photoUpdatePayload),
                 });
 
-                const updateResult = await updateRes.json();
                 if (!updateRes.ok) {
-                    console.warn("⚠️ Failed to update photo URL:", updateResult.errors);
-                } else {
-                    console.log("✅ Photo URL updated");
+                    alert("Failed to update child photo.");
                 }
+
             }
 
             if (isEditMode) {
@@ -483,21 +467,18 @@ const AddChildProfile = () => {
     // 🔜  Fetch location data if the child is in edit mode
     useEffect(() => {
         if (isEditMode && profileData.state) {
-            fetchDistricts(profileData.state);
+            fetchDistricts(profileData.state).then(() => {
+                if (profileData.district) {
+                    fetchMandals(profileData.district).then(() => {
+                        if (profileData.mandal) {
+                            fetchGrampanchayats(profileData.mandal);
+                        }
+                    });
+                }
+            });
         }
-    }, [isEditMode, profileData.state]);
+    }, [isEditMode, profileData.state, profileData.district, profileData.mandal]);
 
-    useEffect(() => {
-        if (isEditMode && profileData.district) {
-            fetchMandals(profileData.district);
-        }
-    }, [isEditMode, profileData.district]);
-
-    useEffect(() => {
-        if (isEditMode && profileData.mandal) {
-            fetchGrampanchayats(profileData.mandal);
-        }
-    }, [isEditMode, profileData.mandal]);
 
 
     // 🔜  Fetch child profile data if we're in edit mode
@@ -511,7 +492,6 @@ const AddChildProfile = () => {
                     if (data.status === "success") {
                         setProfileData(data.data);
                         setPhotoPreviewUrl(data.data.child_photo_s3_url || null);
-                        setChildId(id!);
                     } else {
                         console.error("❌ Failed to fetch child for edit mode");
                     }
@@ -633,7 +613,7 @@ const AddChildProfile = () => {
             {/* Top bar with Back and Logout */}
             <div className="w-full flex items-center justify-between max-w-3xl py-4">
                 <button
-                    onClick={() => navigate("/children-profile")}
+                    onClick={() => navigate("/view-children")}
                     className="text-walnut hover:text-earth flex items-center gap-2"
                 >
                     <ArrowLeft size={20} />
@@ -930,8 +910,8 @@ const AddChildProfile = () => {
 
                     {activeSection === "learning" && (
                         <div className="space-y-4">
-                            {renderDropdown("speaking_level", "Speaking Level", LEVEL_OPTIONS)}
-                            {renderDropdown("reading_level", "Reading Level", LEVEL_OPTIONS)}
+                            {renderDropdown("speaking_level", "Speaking Level", SPEAKING_LEVEL_OPTIONS)}
+                            {renderDropdown("reading_level", "Reading Level", READING_LEVEL_OPTIONS)}
                             {renderDropdown("status", "Status", STATUS_OPTIONS)}
 
                             <Button

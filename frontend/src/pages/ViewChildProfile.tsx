@@ -131,9 +131,6 @@ const ViewChildProfile = () => {
       alert("Failed to delete child profile.");
     }
   };
-  
-
-
 
   return (
     <div className="min-h-screen bg-[#F4F1E3] px-4 py-6 flex flex-col items-center">

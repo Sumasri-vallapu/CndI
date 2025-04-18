@@ -122,7 +122,7 @@ const ViewChildren = () => {
                   className="w-14 h-14 rounded-full object-cover"
                 />
                 <div>
-                  <div className="text-base font-semibold text-gray-900">{child.full_name}</div>
+                  <div className="text-base font-semibold text-gray-900">{toProperCase(child.full_name)}</div>
                   <div className="text-sm text-gray-600">
                     Class: {child.child_class || "—"} | Speaking: {child.speaking_level || "—"} | Reading: {child.reading_level || "—"} | Status: {child.status || "—"}
                   </div>

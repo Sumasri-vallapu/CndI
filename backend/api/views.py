@@ -1069,3 +1069,24 @@ def upload_child_photo(request):
     except Exception as e:
         print(f"❌ S3 upload failed: {e}")
         return Response({"error": "Upload failed", "details": str(e)}, status=500)
+
+
+@api_view(['DELETE'])
+def delete_child_profile(request, child_id):
+    print(f"📩 [DELETE] delete_child_profile called with child_id={child_id}")
+
+    try:
+        child = ChildrenProfile.objects.get(id=child_id)
+        full_name = child.full_name
+        child.delete()
+        print(f"✅ Deleted child profile: {full_name} (ID: {child_id})")
+        return Response({"status": "success", "message": f"Child '{full_name}' deleted successfully."})
+    
+    except ChildrenProfile.DoesNotExist:
+        print(f"❌ Child not found with ID: {child_id}")
+        return Response({"status": "error", "message": "Child not found"}, status=404)
+    
+    except Exception as e:
+        print(f"❌ Unexpected error during deletion: {e}")
+        return Response({"status": "error", "message": "Something went wrong"}, status=500)
+
