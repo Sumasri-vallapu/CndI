@@ -37,6 +37,9 @@ from .views import (
     get_child_profile_by_id,
     upload_child_photo,
     delete_child_profile,
+
+    save_learning_center,
+    get_learning_center
 )   
 
 urlpatterns = [
@@ -83,4 +86,7 @@ urlpatterns = [
     path("children/profile/list/<str:mobile_number>/", get_child_profiles, name="get_child_profiles"),
     path("children/photo/upload/", upload_child_photo, name="upload_child_photo"),
     path("children/profile/delete/<int:child_id>/", delete_child_profile, name="delete_child_profile"),
+    #Learning Center API
+    path('learning-center/save/', save_learning_center, name='save_learning_center'),
+    path('learning-center/<str:mobile_number>/', get_learning_center, name='get_learning_center'),
 ]

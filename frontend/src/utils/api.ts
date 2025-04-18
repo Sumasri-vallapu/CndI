@@ -14,6 +14,12 @@ export const ENDPOINTS = {
   FELLOW_TESTIMONIAL: `${BASE_URL}/fellow/testimonial/`,
   UPLOAD_PROFILE_PHOTO: `${BASE_URL}/fellow/profile/photo/upload/`,
   SAVE_USER_TESTIMONIAL_RECORDING: `${BASE_URL}/fellow/testimonial/upload/`,
+
+  //Learning Center endpoints
+  CREATE_LEARNING_CENTER: `${BASE_URL}/learning-center/create/`,
+  GET_LEARNING_CENTER: (mobile_number: string) => 
+    `${BASE_URL}/learning-center/${mobile_number}/`,
+  SAVE_LEARNING_CENTER: `${BASE_URL}/learning-center/save/`,
   
   // Location endpoints
   GET_STATES: `${BASE_URL}/states/`,

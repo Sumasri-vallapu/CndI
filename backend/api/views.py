@@ -28,6 +28,7 @@ from .models import (
     TestimonialProgress,
     TestimonialRecord,
     ChildrenProfile,
+    LearningCenter
 )
 from .serializers import (
     FellowSignUpSerializer,
@@ -830,10 +831,74 @@ def get_courses(request):
     serializer = CourseSerializer(courses, many=True)
     return Response(serializer.data)
 
+#Learning Center API
 
+@api_view(['POST'])
+def save_learning_center(request):
+    print("🟡 Incoming Request:", request.data)
 
+    mobile_number = request.data.get('mobile_number')
+    data = request.data.get('center_data')
 
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except Exception as e:
+            print("❌ JSON parse error:", str(e))
+            return Response({"error": f"Invalid JSON: {str(e)}"}, status=400)
+
+    if not mobile_number or not data:
+        print("❌ Missing mobile_number or center_data")
+        return Response({"error": "Missing required fields"}, status=400)
+
+    try:
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
+        print("✅ User found:", user.full_name)
+
+        lc, created = LearningCenter.objects.update_or_create(
+            mobile_number=mobile_number,
+            defaults={
+                "full_name": data['fullName'],
+                "team_lead_name": data['teamLeadName'],
+                "district_lead_name": data['districtLeadName'],
+                "status": data['status'],
+                "state_id": data['address']['state'],
+                "district_id": data['address']['district'],
+                "mandal_id": data['address']['mandal'],
+                "village_id": data['address']['village'],
+                "pincode": data['address']['pincode'],
+                "full_address": data['address']['fullAddress'],
+            }
+        )
+
+        return Response({"status": "success", "message": "Learning center data saved"})
+
+    except Exception as e:
+        print("❌ Exception while saving:", str(e))
+        return Response({"error": str(e)}, status=500)
+
+#Fetch LearningCenter Details
     
+@api_view(['GET'])
+def get_learning_center(request, mobile_number):
+    try:
+        lc = LearningCenter.objects.get(mobile_number=mobile_number)
+        return Response({
+            "fullName": lc.full_name,
+            "teamLeadName": lc.team_lead_name,
+            "districtLeadName": lc.district_lead_name,
+            "status": lc.status,
+            "address": {
+                "state": str(lc.state_id),
+                "district": str(lc.district_id),
+                "mandal": str(lc.mandal_id),
+                "village": str(lc.village_id),
+                "pincode": lc.pincode,
+                "fullAddress": lc.full_address,
+            }
+        })
+    except LearningCenter.DoesNotExist:
+        return Response({"message": "No data found"}, status=404)
 
 class SubmitTestimonialView(APIView):
     def post(self, request):

@@ -16,7 +16,7 @@ import ChildrenProfile from '@/pages/ChildrenProfile';
 import AddChildProfile from '@/pages/AddChildProfile';
 import ViewChildren from '@/pages/ViewChildren';
 import ViewChildProfile from '@/pages/ViewChildProfile';
-
+import LearningCenter from '@/pages/LearningCenter';
 export default function App() {
   return (
     <BrowserRouter>
@@ -42,6 +42,7 @@ export default function App() {
               <Route path="/children/edit/:id" element={<AddChildProfile />} /> {/* ✅ Add this line */}
               <Route path="/view-children" element={<ViewChildren />} />
               <Route path="/children/view/:id" element={<ViewChildProfile />} />
+              <Route path="/learning-center" element={<LearningCenter />} />
             </Routes>
           </main>
         </div>
