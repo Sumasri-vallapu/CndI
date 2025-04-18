@@ -12,9 +12,28 @@ class State(models.Model):
 class District(models.Model):
     state = models.ForeignKey(State, on_delete=models.CASCADE)
     district_name = models.CharField(max_length=100)
+    
 
     def __str__(self):
         return self.district_name
+
+class DistrictLead(models.Model):
+    dl_id = models.CharField(max_length=20, null=True, blank=True)
+    name = models.CharField(max_length=100)
+    district = models.ForeignKey('District', on_delete=models.CASCADE, related_name="district_leads", null=True, blank=True)
+
+    def __str__(self):
+        return self.name
+
+
+
+class TeamLead(models.Model):
+    name = models.CharField(max_length=100)  # TL Name
+    district_lead = models.ForeignKey(DistrictLead, on_delete=models.CASCADE, related_name="team_leads")
+
+    def __str__(self):
+        return self.name
+
 
 
 class Mandal(models.Model):
@@ -351,6 +370,9 @@ class TestimonialRecord(models.Model):
     def __str__(self):
         return f"{self.mobile_number} - {self.stakeholder_type}"
 
+#Learning Center Model
+
+
 class ChildrenProfile(models.Model):
     # Link to the fellow who added this child
     fellow = models.ForeignKey(FellowSignUp, on_delete=models.CASCADE, related_name="children")
@@ -403,9 +425,16 @@ class LearningCenter(models.Model):
     team_lead_name = models.CharField(max_length=255)
     district_lead_name = models.CharField(max_length=255)
     status = models.CharField(max_length=20)
-    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
-    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True)
-    mandal = models.ForeignKey(Mandal, on_delete=models.SET_NULL, null=True)
-    village = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True)
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True,blank=True)
+    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True,blank=True)
+    mandal = models.ForeignKey(Mandal, on_delete=models.SET_NULL, null=True,blank=True)
+    village = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True,blank=True)
     pincode = models.CharField(max_length=10)
-    full_address = models.TextField()
+    #full_address = models.TextField()
+    colony_name = models.CharField(max_length=100, blank=True, null=True)
+    door_number = models.CharField(max_length=100, blank=True, null=True)
+    landmark = models.CharField(max_length=200, blank=True, null=True)
+    lc_photo_url = models.URLField(max_length=500, blank=True, null=True)
+
+
+    

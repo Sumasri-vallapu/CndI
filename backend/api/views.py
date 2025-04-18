@@ -5,6 +5,7 @@ import logging
 import os
 from django.conf import settings
 from django.utils import timezone
+from api.models import DistrictLead, TeamLead
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
@@ -867,7 +868,9 @@ def save_learning_center(request):
                 "mandal_id": data['address']['mandal'],
                 "village_id": data['address']['village'],
                 "pincode": data['address']['pincode'],
-                "full_address": data['address']['fullAddress'],
+                "colony_name": data['address']['colonyName'],
+                "door_number": data['address']['doorNumber'],
+                "landmark": data['address']['landmark'],
             }
         )
 
@@ -876,6 +879,94 @@ def save_learning_center(request):
     except Exception as e:
         print("❌ Exception while saving:", str(e))
         return Response({"error": str(e)}, status=500)
+
+@api_view(['GET'])
+def get_district_leads_by_district(request, district_id):
+    leads = DistrictLead.objects.filter(district_id=district_id)
+    data = [{"id": lead.id, "name": lead.name} for lead in leads]
+    return Response(data)
+
+
+@api_view(['GET'])
+def get_team_leads_by_dl(request):
+    dl_id = request.GET.get('dl_id')
+    leads = TeamLead.objects.filter(district_lead_id=dl_id)
+    data = [{"id": lead.id, "name": lead.name} for lead in leads]
+    return Response(data)
+
+
+#Learning Center Photo Upload
+@api_view(['POST'])
+@parser_classes([MultiPartParser])
+def upload_lc_photo(request):
+    mobile_number = request.data.get('mobile_number')
+    photo = request.FILES.get('photo')
+
+    if not mobile_number or not photo:
+        return Response({"error": "Both mobile number and photo are required"}, status=400)
+
+    try:
+        user = FellowSignUp.objects.get(mobile_number=mobile_number)
+
+        ext = photo.name.split('.')[-1]
+        filename = f"lc_photos/{user.unique_number}.{ext}"
+
+        s3_client.upload_fileobj(
+            photo,
+            settings.AWS_STORAGE_BUCKET_NAME,  # from .env or settings.py
+            filename,
+            ExtraArgs={'ContentType': photo.content_type}
+        )
+
+        photo_url = f"https://{settings.AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{filename}"
+
+        lc, _ = LearningCenter.objects.get_or_create(mobile_number=mobile_number)
+        lc.lc_photo_url = photo_url
+        lc.save()
+
+        return Response({
+            "status": "success",
+            "photo_url": photo_url
+        })
+
+    except FellowSignUp.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
+@api_view(['POST'])
+def delete_lc_photo(request):
+    mobile_number = request.data.get('mobile_number')
+    if not mobile_number:
+        return Response({"error": "mobile_number is required"}, status=400)
+
+    try:
+        lc = LearningCenter.objects.get(mobile_number=mobile_number)
+        photo_url = lc.lc_photo_url
+
+        if not photo_url:
+            return Response({"message": "No photo to delete"}, status=400)
+
+        # Extract the S3 key from URL
+        s3_key = photo_url.split(".com/")[-1]
+
+        # Delete from S3
+        s3_client.delete_object(
+            Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+            Key=s3_key
+        )
+
+        # Remove URL from DB
+        lc.lc_photo_url = None
+        lc.save()
+
+        return Response({"status": "success", "message": "Photo deleted"})
+
+    except LearningCenter.DoesNotExist:
+        return Response({"error": "Learning Center not found"}, status=404)
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
 
 #Fetch LearningCenter Details
     
@@ -888,13 +979,17 @@ def get_learning_center(request, mobile_number):
             "teamLeadName": lc.team_lead_name,
             "districtLeadName": lc.district_lead_name,
             "status": lc.status,
+            "lc_photo_url": lc.lc_photo_url,
             "address": {
                 "state": str(lc.state_id),
                 "district": str(lc.district_id),
                 "mandal": str(lc.mandal_id),
                 "village": str(lc.village_id),
                 "pincode": lc.pincode,
-                "fullAddress": lc.full_address,
+                #"fullAddress": lc.full_address,
+                "colonyName": lc.colony_name,
+                "doorNumber": lc.door_number,
+                "landmark": lc.landmark,
             }
         })
     except LearningCenter.DoesNotExist:

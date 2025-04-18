@@ -39,7 +39,11 @@ from .views import (
     delete_child_profile,
 
     save_learning_center,
-    get_learning_center
+    get_learning_center,
+    upload_lc_photo,
+    delete_lc_photo,
+    get_district_leads_by_district,
+    get_team_leads_by_dl,
 )   
 
 urlpatterns = [
@@ -89,4 +93,10 @@ urlpatterns = [
     #Learning Center API
     path('learning-center/save/', save_learning_center, name='save_learning_center'),
     path('learning-center/<str:mobile_number>/', get_learning_center, name='get_learning_center'),
+    path('learning-center/photo/upload/', upload_lc_photo, name='upload_lc_photo'),
+    path('learning-center/photo/delete/', delete_lc_photo, name='delete_lc_photo'),
+    path('district-leads/<str:district_id>/', get_district_leads_by_district, name='get_district_leads_by_district'),
+    path('team-leads/', get_team_leads_by_dl, name='get_team_leads_by_dl'),
+    
+
 ]
