@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
-import SignUp from '@/pages/SignUp'; 
+import SignUp from '@/pages/SignUp';
 import ForgotPassword from '@/pages/ForgotPassword';
 import Register from '@/pages/Register';
 import Tasks from '@/pages/Tasks';
@@ -12,6 +12,10 @@ import Main from '@/pages/Main';
 import FellowProfile from '@/pages/FellowProfile';
 import RecScreen1 from '@/pages/RecScreen1';
 import RecScreen2 from '@/pages/RecScreen2';
+import ChildrenProfile from '@/pages/ChildrenProfile';
+import AddChildProfile from '@/pages/AddChildProfile';
+import ViewChildren from '@/pages/ViewChildren';
+import ViewChildProfile from '@/pages/ViewChildProfile';
 import LearningCenter from '@/pages/LearningCenter';
 export default function App() {
   return (
@@ -33,6 +37,11 @@ export default function App() {
               <Route path="/fellow-profile" element={<FellowProfile />} />
               <Route path="/recorder-page" element={<RecScreen1 />} />
               <Route path="/recorder-page/record" element={<RecScreen2 />} />
+              <Route path="/children-profile" element={<ChildrenProfile />} />
+              <Route path="/add-child-profile" element={<AddChildProfile />} />
+              <Route path="/children/edit/:id" element={<AddChildProfile />} /> {/* ✅ Add this line */}
+              <Route path="/view-children" element={<ViewChildren />} />
+              <Route path="/children/view/:id" element={<ViewChildProfile />} />
               <Route path="/learning-center" element={<LearningCenter />} />
             </Routes>
           </main>

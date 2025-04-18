@@ -32,6 +32,12 @@ from .views import (
     get_courses,
     SubmitTestimonialView,
     RecorderSummaryView,
+    save_child_profile,
+    get_child_profiles,
+    get_child_profile_by_id,
+    upload_child_photo,
+    delete_child_profile,
+
     save_learning_center,
     get_learning_center
 )   
@@ -75,8 +81,12 @@ urlpatterns = [
     path('courses/', get_courses, name='get_courses'),  
     path("submit-testimonial/", SubmitTestimonialView.as_view(), name="submit-testimonial"),
     path("recorder-summary/", RecorderSummaryView.as_view(), name="recorder-summary"),
+    path("children/profile/save/", save_child_profile, name="save_child_profile"),
+    path("children/profile/<int:child_id>/", get_child_profile_by_id, name="get_child_profile_by_id"),
+    path("children/profile/list/<str:mobile_number>/", get_child_profiles, name="get_child_profiles"),
+    path("children/photo/upload/", upload_child_photo, name="upload_child_photo"),
+    path("children/profile/delete/<int:child_id>/", delete_child_profile, name="delete_child_profile"),
     #Learning Center API
     path('learning-center/save/', save_learning_center, name='save_learning_center'),
     path('learning-center/<str:mobile_number>/', get_learning_center, name='get_learning_center'),
-
 ]

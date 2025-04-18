@@ -351,6 +351,52 @@ class TestimonialRecord(models.Model):
     def __str__(self):
         return f"{self.mobile_number} - {self.stakeholder_type}"
 
+class ChildrenProfile(models.Model):
+    # Link to the fellow who added this child
+    fellow = models.ForeignKey(FellowSignUp, on_delete=models.CASCADE, related_name="children")
+
+    # Identity
+    full_name = models.CharField(max_length=100)
+    parent_mobile_number = models.CharField(max_length=10)  # parent's number
+    date_of_birth = models.DateField()
+    gender = models.CharField(max_length=10, choices=[
+        ('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')
+    ])
+    caste_category = models.CharField(max_length=20, choices=[
+        ('ST', 'ST'), ('SC', 'SC'), ('BC', 'BC'), ('OBC', 'OBC'),
+        ('OC', 'OC'), ('MUSLIM', 'Muslim'), ('CHRISTIAN', 'Christian'), ('OTHER', 'Other'),
+    ])
+
+    # Location
+    state = models.ForeignKey(State, on_delete=models.SET_NULL, null=True)
+    district = models.ForeignKey(District, on_delete=models.SET_NULL, null=True)
+    mandal = models.ForeignKey(Mandal, on_delete=models.SET_NULL, null=True)
+    grampanchayat = models.ForeignKey(GramPanchayat, on_delete=models.SET_NULL, null=True)
+
+    # Education
+    school_name = models.CharField(max_length=200, blank=True)
+    type_of_school = models.CharField(max_length=50, blank=True)
+    child_class = models.CharField(max_length=50, blank=True)
+
+    # Parent Info
+    mother_name = models.CharField(max_length=100, blank=True)
+    mother_occupation = models.CharField(max_length=100, blank=True)
+    father_name = models.CharField(max_length=100, blank=True)
+    father_occupation = models.CharField(max_length=100, blank=True)
+
+    # Learning
+    speaking_level = models.CharField(max_length=50, blank=True)
+    reading_level = models.CharField(max_length=50, blank=True)
+    status = models.CharField(max_length=50, blank=True)
+    child_photo_s3_url = models.URLField(max_length=500, blank=True, null=True)
+
+    # Meta
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.full_name
+
 class LearningCenter(models.Model):
     mobile_number = models.CharField(max_length=20, unique=True)
     full_name = models.CharField(max_length=255)
