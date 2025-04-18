@@ -70,6 +70,7 @@ export const ENDPOINTS = {
   SAVE_CHILD_PROFILE: `${BASE_URL}/children/profile/save/`,
   GET_CHILDREN_LIST: (mobile: string) => `${BASE_URL}/children/profile/list/${mobile}/`,
   UPLOAD_CHILD_PHOTO: `${BASE_URL}/children/photo/upload/`,
+  DELETE_CHILD_PROFILE: (id: string) => `${BASE_URL}/children/profile/delete/${id}/`,
 
   
 } as const; 

@@ -107,6 +107,34 @@ const ViewChildProfile = () => {
     </div>
   );
 
+
+  const handleDelete = async (childId: number | undefined) => {
+    if (!childId) {
+      alert("Invalid child ID");
+      return;
+    }
+  
+    const confirmed = window.confirm("Are you sure you want to delete this profile?");
+    if (!confirmed) return;
+  
+    try {
+      const res = await fetch(ENDPOINTS.DELETE_CHILD_PROFILE(childId.toString()), {
+        method: "DELETE",
+      });
+  
+      if (!res.ok) throw new Error("Failed to delete profile");
+  
+      alert("Profile deleted successfully.");
+      navigate("/view-children");
+    } catch (error) {
+      console.error("❌ Delete error:", error);
+      alert("Failed to delete child profile.");
+    }
+  };
+  
+
+
+
   return (
     <div className="min-h-screen bg-[#F4F1E3] px-4 py-6 flex flex-col items-center">
       {/* 🔙 Top Navigation */}
@@ -181,6 +209,27 @@ const ViewChildProfile = () => {
           </button>
         </div>
       </div>
+
+      {/* 🗑️ Delete Button - Outside the white card */}
+      <div className="mt-4 flex justify-center no-print print:hidden">
+        <button
+          onClick={() => handleDelete(child?.id)}
+          className="flex items-center gap-2 text-red-600 border border-red-600 px-4 py-2 rounded-md hover:bg-red-50"
+        >
+          <span>Delete Profile</span>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+
     </div>
   );
 };

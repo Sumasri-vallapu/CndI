@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ENDPOINTS } from "@/utils/api";
+import { ArrowLeft } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface ChildProfile {
   id: number;
@@ -18,8 +20,9 @@ const ViewChildren = () => {
   const [filtered, setFiltered] = useState<ChildProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(1);
-  const pageSize = 10;
+  const pageSize = 5;
 
+  const navigate = useNavigate();
   const toProperCase = (str: string) =>
     str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substring(1).toLowerCase());
 
@@ -64,18 +67,36 @@ const ViewChildren = () => {
 
   return (
     <div className="min-h-screen bg-[#F4F1E3] px-4 py-6 flex flex-col items-center">
+
+      {/* 🔙 Top Navigation */}
+      <div className="w-full max-w-3xl flex justify-between py-4 no-print print:hidden">
+        <button
+          onClick={() => navigate("/children-profile")}
+          className="text-walnut hover:text-earth flex items-center gap-2"
+        >
+          <ArrowLeft size={20} />
+          <span className="text-base font-medium">Back</span>
+        </button>
+        <button
+          onClick={() => navigate("/login")}
+          className="text-sm bg-walnut text-white px-4 py-2 rounded-md"
+        >
+          Logout
+        </button>
+      </div>
+
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-4">
 
-      <div className="flex flex-col items-center justify-center space-y-2">
-      <img
-          src="/Images/organization_logo.png"
-          alt="Yuva Chetana Logo"
-          className="h-22 w-auto object-contain mb-2"
-          loading="eager"
-        />
+        <div className="flex flex-col items-center justify-center space-y-2">
+          <img
+            src="/Images/organization_logo.png"
+            alt="Yuva Chetana Logo"
+            className="h-22 w-auto object-contain mb-2"
+            loading="eager"
+          />
 
-        <h2 className="text-xl font-bold text-walnut">Children Profiles</h2>
-      </div>
+          <h2 className="text-xl font-bold text-walnut">Children Profiles</h2>
+        </div>
 
         <Input
           placeholder="Search by name"
@@ -87,28 +108,31 @@ const ViewChildren = () => {
         <p className="text-sm text-gray-600">Showing {filtered.length} students</p>
 
         <div className="space-y-4">
+
           {paginatedData.map((child) => (
             <div
               key={child.id}
-              className="flex items-center gap-4 bg-gray-100 p-4 border border-gray-300 rounded-lg"
+              className="bg-gray-100 p-4 rounded-lg shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
             >
-              <img
-                src={
-                  child.child_photo_s3_url ||
-                  "https://via.placeholder.com/100?text=No+Photo"
-                }
-                alt="Profile"
-                className="w-16 h-16 rounded-full object-cover"
-              />
-              <div className="flex-1 space-y-1">
-                <div className="font-medium text-lg">{toProperCase(child.full_name)}</div>
-                <div className="text-sm text-gray-600">
-                  Class: {toProperCase(child.child_class)} | Speaking: {toProperCase(child.speaking_level)} | Reading: {toProperCase(child.reading_level)} | Status: {toProperCase(child.status)}
+              {/* Left side: Profile info */}
+              <div className="flex items-center gap-4">
+                <img
+                  src={child.child_photo_s3_url || "https://via.placeholder.com/100?text=No+Photo"}
+                  alt="Profile"
+                  className="w-14 h-14 rounded-full object-cover"
+                />
+                <div>
+                  <div className="text-base font-semibold text-gray-900">{child.full_name}</div>
+                  <div className="text-sm text-gray-600">
+                    Class: {child.child_class || "—"} | Speaking: {child.speaking_level || "—"} | Reading: {child.reading_level || "—"} | Status: {child.status || "—"}
+                  </div>
                 </div>
               </div>
-              <div className="flex flex-col gap-2">
+
+              {/* Right side: View Button */}
+              <div className="sm:self-end">
                 <Button
-                  className="bg-walnut text-white"
+                  className="bg-walnut text-white w-full sm:w-auto mt-2 sm:mt-0"
                   onClick={() => window.location.href = `/children/view/${child.id}`}
                 >
                   View Profile
@@ -116,6 +140,8 @@ const ViewChildren = () => {
               </div>
             </div>
           ))}
+
+
         </div>
 
         <div className="flex justify-center mt-4 gap-2">

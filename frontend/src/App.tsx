@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from '@/pages/Home';
 import Login from '@/pages/Login';
-import SignUp from '@/pages/SignUp'; 
+import SignUp from '@/pages/SignUp';
 import ForgotPassword from '@/pages/ForgotPassword';
 import Register from '@/pages/Register';
 import Tasks from '@/pages/Tasks';
@@ -16,6 +16,7 @@ import ChildrenProfile from '@/pages/ChildrenProfile';
 import AddChildProfile from '@/pages/AddChildProfile';
 import ViewChildren from '@/pages/ViewChildren';
 import ViewChildProfile from '@/pages/ViewChildProfile';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -38,6 +39,7 @@ export default function App() {
               <Route path="/recorder-page/record" element={<RecScreen2 />} />
               <Route path="/children-profile" element={<ChildrenProfile />} />
               <Route path="/add-child-profile" element={<AddChildProfile />} />
+              <Route path="/children/edit/:id" element={<AddChildProfile />} /> {/* ✅ Add this line */}
               <Route path="/view-children" element={<ViewChildren />} />
               <Route path="/children/view/:id" element={<ViewChildProfile />} />
             </Routes>

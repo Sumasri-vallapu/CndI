@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; //Import useParams to extract the child ID from URL
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -114,10 +114,19 @@ const STATUS_OPTIONS = [
 const AddChildProfile = () => {
     const navigate = useNavigate();
 
+
+    // Extract child ID from route param and check if we're in edit mode
+    const { id } = useParams<{ id?: string }>();
+    const isEditMode = Boolean(id); // ✅ true if we're editing an existing profile
+
     const [activeSection, setActiveSection] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
+    const [customMotherOccupation, setCustomMotherOccupation] = useState("");
+    const [customFatherOccupation, setCustomFatherOccupation] = useState("");
+
     const [locationData, setLocationData] = useState({
         states: [] as LocationOption[],
         districts: [] as LocationOption[],
@@ -317,13 +326,13 @@ const AddChildProfile = () => {
 
 
     const handleFinalSubmit = async () => {
-        // 1. Validate photo
-        if (!photoBlob) {
+        // 1. Validate photo for add mode
+        if (!isEditMode && !photoBlob) {
             alert("Please upload a profile photo before submitting.");
             return;
         }
 
-        // 2. Prepare initial payload
+        // 2. Prepare payload
         const payload: any = {
             full_name: profileData.full_name,
             gender: profileData.gender,
@@ -347,8 +356,20 @@ const AddChildProfile = () => {
             fellow_mobile_number: localStorage.getItem("mobile_number"),
         };
 
+        if (profileData.father_occupation === "Other") {
+            payload.father_occupation = `Other: ${customFatherOccupation}`;
+        }
+
+        if (profileData.mother_occupation === "Other") {
+            payload.mother_occupation = `Other: ${customMotherOccupation}`;
+        }
+
+        if (isEditMode) {
+            payload.id = id; // ✅ for update
+        }
+
         try {
-            // 3. Submit child profile first
+            // 3. Save child profile (add or update)
             const res = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -358,42 +379,49 @@ const AddChildProfile = () => {
             const result = await res.json();
             if (!res.ok) throw new Error(result?.errors || "Save failed");
 
-            const newChildId = result.child_id;
+            const newChildId = isEditMode ? id : result.child_id;
             setChildId(newChildId);
 
-            // 4. Upload photo to S3
-            const uploadedUrl = await uploadPhotoToS3(photoBlob, newChildId);
-            if (!uploadedUrl) throw new Error("Photo upload failed");
+            // 4. Upload photo if available
+            if (photoBlob) {
+                const uploadedUrl = await uploadPhotoToS3(photoBlob, newChildId);
+                if (!uploadedUrl) throw new Error("Photo upload failed");
 
-            console.log("✅ Photo uploaded to:", uploadedUrl);
+                console.log("✅ Photo uploaded to:", uploadedUrl);
 
-            // 5. Update child profile with photo URL
-            const photoUpdatePayload = {
-                id: newChildId,
-                fellow_mobile_number: localStorage.getItem("mobile_number"),
-                child_photo_s3_url: uploadedUrl,
-            };
+                // 5. Update child profile with photo URL
+                const photoUpdatePayload = {
+                    id: newChildId,
+                    fellow_mobile_number: localStorage.getItem("mobile_number"),
+                    child_photo_s3_url: uploadedUrl,
+                };
 
-            const updateRes = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
-                method: "POST", // ✅ same POST used for updating
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(photoUpdatePayload),
-            });
+                const updateRes = await fetch(ENDPOINTS.SAVE_CHILD_PROFILE, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(photoUpdatePayload),
+                });
 
-            const updateResult = await updateRes.json();
-            if (!updateRes.ok) {
-                console.warn("⚠️ Failed to update photo URL:", updateResult.errors);
-            } else {
-                console.log("✅ Photo URL updated in backend");
+                const updateResult = await updateRes.json();
+                if (!updateRes.ok) {
+                    console.warn("⚠️ Failed to update photo URL:", updateResult.errors);
+                } else {
+                    console.log("✅ Photo URL updated");
+                }
             }
 
-            alert("Child profile saved successfully!");
-            navigate("/view-child-profile");
+            if (isEditMode) {
+                alert("Child profile updated successfully!");
+            } else {
+                alert("Child profile created successfully!");
+            }
+            navigate("/view-children");
         } catch (err) {
             console.error("❌ Save error:", err);
             alert("Failed to save child profile.");
         }
     };
+
 
 
     useEffect(() => {
@@ -451,6 +479,51 @@ const AddChildProfile = () => {
             console.error("Failed to fetch grampanchayats:", error);
         }
     };
+
+    // 🔜  Fetch location data if the child is in edit mode
+    useEffect(() => {
+        if (isEditMode && profileData.state) {
+            fetchDistricts(profileData.state);
+        }
+    }, [isEditMode, profileData.state]);
+
+    useEffect(() => {
+        if (isEditMode && profileData.district) {
+            fetchMandals(profileData.district);
+        }
+    }, [isEditMode, profileData.district]);
+
+    useEffect(() => {
+        if (isEditMode && profileData.mandal) {
+            fetchGrampanchayats(profileData.mandal);
+        }
+    }, [isEditMode, profileData.mandal]);
+
+
+    // 🔜  Fetch child profile data if we're in edit mode
+    useEffect(() => {
+        if (isEditMode) {
+            const fetchChild = async () => {
+                try {
+                    const res = await fetch(ENDPOINTS.GET_CHILD_PROFILE(id!));
+                    const data = await res.json();
+
+                    if (data.status === "success") {
+                        setProfileData(data.data);
+                        setPhotoPreviewUrl(data.data.child_photo_s3_url || null);
+                        setChildId(id!);
+                    } else {
+                        console.error("❌ Failed to fetch child for edit mode");
+                    }
+                } catch (err) {
+                    console.error("❌ Error fetching child:", err);
+                }
+            };
+
+            fetchChild();
+        }
+    }, [id]);
+
 
     const renderInput = (
         key: keyof ChildProfileData,
@@ -560,7 +633,7 @@ const AddChildProfile = () => {
             {/* Top bar with Back and Logout */}
             <div className="w-full flex items-center justify-between max-w-3xl py-4">
                 <button
-                    onClick={() => navigate("/main")}
+                    onClick={() => navigate("/children-profile")}
                     className="text-walnut hover:text-earth flex items-center gap-2"
                 >
                     <ArrowLeft size={20} />
@@ -573,6 +646,13 @@ const AddChildProfile = () => {
                     Logout
                 </button>
             </div>
+
+            <div>
+                <h2 className="text-xl font-bold text-walnut">
+                    {isEditMode ? "Edit Child Profile" : "Add Child Profile"}
+                </h2>
+            </div>
+
 
             {/* Main Card */}
             <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6 mt-6">
@@ -721,9 +801,97 @@ const AddChildProfile = () => {
                     {activeSection === "parent" && (
                         <div className="space-y-4">
                             {renderInput("mother_name", "Mother's Name")}
-                            {renderDropdown("mother_occupation", "Mother's Occupation", MOTHER_OCCUPATION_OPTIONS)}
+
+                            {/*mother Occupation with the input box for others section */}
+
+                            <div className="space-y-2">
+                                <Label>Mother's Occupation</Label>
+                                {isEditing ? (
+                                    <>
+                                        <Select
+                                            value={profileData.mother_occupation}
+                                            onValueChange={(val) => {
+                                                handleChange("mother_occupation", val);
+                                                if (val !== "Other") setCustomMotherOccupation("");
+                                            }}
+                                        >
+                                            <SelectTrigger className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walnut/40 focus:border-walnut/40 bg-white">
+                                                <SelectValue placeholder="Select Mother's Occupation" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-white">
+                                                {MOTHER_OCCUPATION_OPTIONS.map((opt) => (
+                                                    <SelectItem key={opt.value} value={opt.value}>
+                                                        {opt.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+
+                                        {profileData.mother_occupation === "Other" && (
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter mother's occupation"
+                                                value={customMotherOccupation}
+                                                onChange={(e) => setCustomMotherOccupation(e.target.value)}
+                                                className="mt-2"
+                                            />
+                                        )}
+                                    </>
+                                ) : (
+                                    <p className="bg-gray-100 p-3 rounded text-gray-700">
+                                        {profileData.mother_occupation === "Other"
+                                            ? customMotherOccupation || "Other"
+                                            : MOTHER_OCCUPATION_OPTIONS.find((o) => o.value === profileData.mother_occupation)?.label || "Please Provide"}
+                                    </p>
+                                )}
+                            </div>
+
                             {renderInput("father_name", "Father's Name")}
-                            {renderDropdown("father_occupation", "Father's Occupation", FATHER_OCCUPATION_OPTIONS)}
+
+                            {/*father Occupation with the input box for others section*/}
+
+                            <div className="space-y-2">
+                                <Label>Father's Occupation</Label>
+                                {isEditing ? (
+                                    <>
+                                        <Select
+                                            value={profileData.father_occupation}
+                                            onValueChange={(val) => {
+                                                handleChange("father_occupation", val);
+                                                if (val !== "Other") setCustomFatherOccupation("");
+                                            }}
+                                        >
+                                            <SelectTrigger className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walnut/40 focus:border-walnut/40 bg-white">
+                                                <SelectValue placeholder="Select Father's Occupation" />
+                                            </SelectTrigger>
+                                            <SelectContent className="bg-white">
+                                                {FATHER_OCCUPATION_OPTIONS.map((opt) => (
+                                                    <SelectItem key={opt.value} value={opt.value}>
+                                                        {opt.label}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+
+                                        {profileData.father_occupation === "Other" && (
+                                            <Input
+                                                type="text"
+                                                placeholder="Enter Father's occupation"
+                                                value={customFatherOccupation}
+                                                onChange={(e) => setCustomFatherOccupation(e.target.value)}
+                                                className="mt-2"
+                                            />
+                                        )}
+                                    </>
+                                ) : (
+                                    <p className="bg-gray-100 p-3 rounded text-gray-700">
+                                        {profileData.father_occupation === "Other"
+                                            ? customFatherOccupation || "Other"
+                                            : FATHER_OCCUPATION_OPTIONS.find((o) => o.value === profileData.father_occupation)?.label || "Please Provide"}
+                                    </p>
+                                )}
+                            </div>
+
 
                             <Button
                                 onClick={() =>
@@ -791,9 +959,8 @@ const AddChildProfile = () => {
                     onClick={handleFinalSubmit}
                     className="w-full bg-walnut text-white text-lg mt-6"
                 >
-                    Submit Child Profile
+                    {isEditMode ? "Update Child Profile" : "Submit Child Profile"}
                 </Button>
-
 
 
             </div>
