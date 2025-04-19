@@ -68,19 +68,27 @@ const LearningCenter = () => {
     if (!mobile) return;
 
     const fetchFullName = async () => {
+      const mobile = localStorage.getItem("mobile_number");
+      if (!mobile) return;
+
       try {
         const res = await fetch(ENDPOINTS.GET_FELLOW_PROFILE(mobile));
         const result = await res.json();
+
         if (result?.status === "success") {
           setCenterData((prev) => ({
             ...prev,
             fullName: result.data?.personal_details?.full_name || "",
           }));
+        } else {
+          console.warn("⚠️ Full name fetch returned no success:", result);
         }
       } catch (err) {
-        console.error("Failed to fetch full name:", err);
+        console.error("❌ Failed to fetch full name:", err);
       }
     };
+
+
 
     const fetchData = async () => {
       try {
@@ -186,7 +194,6 @@ const LearningCenter = () => {
       setCenterData((prev) => ({ ...prev, [fieldKey]: value }));
     }
   };
-
 
   //Save Learning Center Data
   const handleSave = async (section: string) => {
@@ -567,7 +574,7 @@ const LearningCenter = () => {
 
           {isEditing === "top" ? (
             <>
-              <Button onClick={handleSave} className="w-full bg-green-600 text-white">Save Changes</Button>
+              <Button onClick={() => handleSave("top")} className="w-full bg-green-600 text-white">Save Changes</Button>
               <Button onClick={() => setIsEditing(null)} className="w-full">Cancel</Button>
             </>
           ) : (
