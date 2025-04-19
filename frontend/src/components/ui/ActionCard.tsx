@@ -1,5 +1,3 @@
-import { ArrowRight } from "lucide-react";
-
 interface ActionCardProps {
   label: string;
   onClick: () => void;
