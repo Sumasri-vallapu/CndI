@@ -33,13 +33,11 @@ const AddChildrenAttendance = () => {
             try {
                 const res = await fetch(ENDPOINTS.GET_CHILDREN_LIST(mobile));
                 const data = await res.json();
-                console.log("Fetched data:", data);
 
                 if (data.status === "success") {
                     const sorted = [...data.data].sort((a, b) =>
                         a.full_name.localeCompare(b.full_name)
                     );
-                    console.log("Sorted data:", sorted);
 
                     setChildren(sorted);                     // All children
                     setFiltered(sorted);                     // Filtered children for search
@@ -177,11 +175,11 @@ const AddChildrenAttendance = () => {
                     return (
                         <div
                             key={child.id}
-                            className={`grid grid-cols-[1fr_1fr_auto] items-center px-4 py-3 rounded-md transition-colors ${isPresent ? "bg-green-100 text-black" : "bg-gray-100 text-black"
+                            className={`grid grid-cols-[1fr_1fr_auto] items-center px-4 py-3 rounded-md transition-colors ${isPresent ? "bg-green-50 text-green-600" : "bg-gray-100 text-black"
                                 } text-sm`}
                         >
-                            <div className="font-medium">{child.full_name}</div>
-                            <div className="text-left">{child.child_class}</div>
+                            <div className="font-medium text-black">{child.full_name}</div>
+                            <div className="text-left text-black">{child.child_class}</div>
                             <div className="flex justify-center">
                                 <ToggleButton
                                     checked={isPresent}
