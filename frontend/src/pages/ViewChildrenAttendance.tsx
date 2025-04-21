@@ -30,7 +30,6 @@ const ViewChildrenAttendance = () => {
 
     const [presentCount, setPresentCount] = useState(0); // Stores the count of present children
     const [absentCount, setAbsentCount] = useState(0); // Stores the count of absent children
-    const [loading, setLoading] = useState(false); // Stores the loading state
     const [attendancePercentage, setAttendancePercentage] = useState(0); // Stores the attendance percentage
     const [hasViewed, setHasViewed] = useState(false);
 
@@ -60,7 +59,7 @@ const ViewChildrenAttendance = () => {
         const mobile = localStorage.getItem("mobile_number");
         if (!mobile || !selectedDate) return;
 
-        setLoading(true);
+        
         try {
             const res = await fetch(
                 `${ENDPOINTS.GET_ATTENDANCE_VIEW}?mobile=${mobile}&date=${selectedDate}&week=${selectedWeek}`
@@ -81,8 +80,6 @@ const ViewChildrenAttendance = () => {
             }
         } catch (err) {
             console.error("Error fetching attendance:", err);
-        } finally {
-            setLoading(false);
         }
     };
 
