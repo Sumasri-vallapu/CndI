@@ -15,7 +15,8 @@ from .models import (
     Course,
     TestimonialRecord,
     ChildrenProfile,
-    FellowAttendance
+    FellowAttendance,
+    ChildrenAttendance
 )
 
 class FellowSignUpSerializer(serializers.ModelSerializer):
@@ -301,3 +302,8 @@ class FellowAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = FellowAttendance
         fields = ['date', 'week', 'status']
+
+class ChildrenAttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ChildrenAttendance
+        fields = ['child', 'date', 'status', 'week']

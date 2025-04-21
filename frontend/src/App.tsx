@@ -17,9 +17,14 @@ import AddChildProfile from '@/pages/AddChildProfile';
 import ViewChildren from '@/pages/ViewChildren';
 import ViewChildProfile from '@/pages/ViewChildProfile';
 import LearningCenter from '@/pages/LearningCenter';
+
 import FellowAttendance from '@/pages/FellowAttendance';
 import FellowAttendanceHistory from '@/pages/FellowAttendanceHistory';
 import MyAttendancePage from '@/pages/MyAttendancePage';
+import AddChildrenAttendance from '@/pages/AddChildrenAttendance';
+import ViewChildrenAttendance from '@/pages/ViewChildrenAttendance';
+import ChildrenAttendance from '@/pages/ChildrenAttendance';
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -49,6 +54,9 @@ export default function App() {
               <Route path="/fellow-attendance" element={<FellowAttendance />} />
               <Route path="/fellow-attendance-history" element={<FellowAttendanceHistory />} />
               <Route path="/my-attendance" element={<MyAttendancePage />} />
+              <Route path="/add-children-attendance" element={<AddChildrenAttendance />} />
+              <Route path="/view-children-attendance" element={<ViewChildrenAttendance />} />
+              <Route path="/children-attendance" element={<ChildrenAttendance />} />
             </Routes>
           </main>
         </div>

@@ -77,12 +77,15 @@ const MainScreen = () => {
                   {section.subItems.map((subItem) => (
                     <div key={subItem} className="py-2 border-b border-gray-100 last:border-b-0">
                       <p className="text-blue-700 hover:text-blue-900 cursor-pointer pl-3 text-sm"
+
                         onClick={() => {
                           if (subItem === "My Attendance") {
                             navigate("/my-attendance");
-                          } 
-                          
+                          } else if (subItem === "Children Attendance") {
+                          navigate("/children-attendance");
+                          }
                         }}
+                        
                       >{subItem}</p>
                     </div>
                   ))}
