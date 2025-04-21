@@ -44,6 +44,8 @@ from .views import (
     delete_lc_photo,
     get_district_leads_by_district,
     get_team_leads_by_dl,
+    save_fellow_attendance,
+    get_fellow_attendance_history,
 )   
 
 urlpatterns = [
@@ -97,6 +99,9 @@ urlpatterns = [
     path('learning-center/photo/delete/', delete_lc_photo, name='delete_lc_photo'),
     path('district-leads/<str:district_id>/', get_district_leads_by_district, name='get_district_leads_by_district'),
     path('team-leads/', get_team_leads_by_dl, name='get_team_leads_by_dl'),
+    #attendance api
+    path('fellow-attendance/', save_fellow_attendance, name='save_fellow_attendance'),
+    path('fellow/attendance/history/<str:mobile_number>/', get_fellow_attendance_history, name='get_fellow_attendance_history'),
     
 
 ]

@@ -437,4 +437,14 @@ class LearningCenter(models.Model):
     lc_photo_url = models.URLField(max_length=500, blank=True, null=True)
 
 
-    
+class FellowAttendance(models.Model):
+    fellow = models.ForeignKey(FellowProfile, on_delete=models.CASCADE)
+    date = models.DateField()
+    week = models.CharField(max_length=20)
+    status = models.CharField(max_length=10)  # “Present” or “Absent”
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("fellow", "date")  # Prevent double entry for same date
+
+

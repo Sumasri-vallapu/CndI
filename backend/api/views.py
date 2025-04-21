@@ -11,6 +11,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
+from datetime import datetime, timedelta, date
+
 
 from .models import (
     FellowSignUp,
@@ -29,7 +31,8 @@ from .models import (
     TestimonialProgress,
     TestimonialRecord,
     ChildrenProfile,
-    LearningCenter
+    LearningCenter,
+    FellowAttendance
 )
 from .serializers import (
     FellowSignUpSerializer,
@@ -46,14 +49,14 @@ from .serializers import (
     CollegeSerializer,
     CourseSerializer,
     TestimonialSubmitSerializer,
-    ChildrenProfileSerializer
+    ChildrenProfileSerializer,
+    FellowAttendanceSerializer
 )
 
 from django.db.models import Count
 import base64
 from django.core.files.base import ContentFile
-
-
+from datetime import timedelta, date
 
 
 logger = logging.getLogger(__name__)
@@ -1251,3 +1254,69 @@ def delete_child_profile(request, child_id):
         print(f"❌ Unexpected error during deletion: {e}")
         return Response({"status": "error", "message": "Something went wrong"}, status=500)
 
+#attendance 
+@api_view(["POST"])
+def save_fellow_attendance(request):
+    data = request.data
+    mobile = data.get("mobile_number")
+    date = data.get("date")
+    status = data.get("status")
+    week = data.get("week")
+
+    fellow = FellowProfile.objects.filter(mobile_number=mobile).first()
+    if not fellow:
+        return Response({"status": "error", "message": "Fellow not found"}, status=400)
+
+    # Save or update record
+    obj, created = FellowAttendance.objects.update_or_create(
+        fellow=fellow,
+        date=date,
+        defaults={"status": status, "week": week}
+    )
+
+    return Response({"status": "success", "message": "Attendance saved"})
+
+
+
+
+@api_view(["GET"])
+def get_fellow_attendance_history(request, mobile_number):
+    try:
+        fellow = FellowProfile.objects.get(mobile_number=mobile_number)
+    except FellowProfile.DoesNotExist:
+        return Response({"status": "error", "message": "Fellow not found"}, status=404)
+
+    start_date_str = request.query_params.get("start_date")
+    end_date_str = request.query_params.get("end_date")
+
+    if not start_date_str or not end_date_str:
+        return Response({"status": "error", "message": "Missing date range"}, status=400)
+
+    try:
+        start_date = datetime.strptime(start_date_str, "%Y-%m-%d").date()
+        end_date = datetime.strptime(end_date_str, "%Y-%m-%d").date()
+    except ValueError:
+        return Response({"status": "error", "message": "Invalid date format"}, status=400)
+
+    # Create the full list of dates in range
+    all_days = [(start_date + timedelta(days=i)) for i in range((end_date - start_date).days + 1)]
+
+    # Query existing attendance records
+    attendance_qs = FellowAttendance.objects.filter(fellow=fellow, date__range=(start_date, end_date))
+    attendance_map = {att.date: att for att in attendance_qs}
+
+    results = []
+    for day in all_days:
+        if day in attendance_map:
+            att = attendance_map[day]
+            results.append({
+                "date": att.date.strftime("%Y-%m-%d"),
+                "status": att.status
+            })
+        else:
+            results.append({
+                "date": day.strftime("%Y-%m-%d"),
+                "status": "Not Marked"
+            })
+
+    return Response({"status": "success", "data": results})

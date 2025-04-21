@@ -1,9 +1,9 @@
 // API configuration
-// const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'http://localhost:8000/api';
 
-const BASE_URL = 'https://yuvachetana.com/api';
+//const BASE_URL = 'https://yuvachetana.com/api';
 
-
+import { format } from "date-fns"
 // API endpoints
 export const ENDPOINTS = {
   // Fellow endpoints
@@ -26,6 +26,10 @@ export const ENDPOINTS = {
   GET_DISTRICT_LEADS: (district_id: string) => `${BASE_URL}/district-leads/${district_id}/`,
   GET_TEAM_LEADS: (dl_id: string) => `${BASE_URL}/team-leads/?dl_id=${dl_id}`,
 
+  //fellow attendance
+  SAVE_FELLOW_ATTENDANCE: `${BASE_URL}/fellow-attendance/`,
+  GET_FELLOW_ATTENDANCE_HISTORY: (mobile: string, start: Date, end: Date) =>
+    `${BASE_URL}/fellow/attendance/history/${mobile}/?start_date=${format(start, "yyyy-MM-dd")}&end_date=${format(end, "yyyy-MM-dd")}`,
 
 
   // Location endpoints
