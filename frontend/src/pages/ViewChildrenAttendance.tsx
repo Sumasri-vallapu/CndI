@@ -32,6 +32,7 @@ const ViewChildrenAttendance = () => {
     const [absentCount, setAbsentCount] = useState(0); // Stores the count of absent children
     const [loading, setLoading] = useState(false); // Stores the loading state
     const [attendancePercentage, setAttendancePercentage] = useState(0); // Stores the attendance percentage
+    const [hasViewed, setHasViewed] = useState(false);
 
     // Fetching the children list added by loggedin fellow
 
@@ -55,6 +56,7 @@ const ViewChildrenAttendance = () => {
 
     // Fetching the attendance records for the selected date and week
     const handleViewAttendance = async () => {
+        setHasViewed(true);
         const mobile = localStorage.getItem("mobile_number");
         if (!mobile || !selectedDate) return;
 
@@ -144,11 +146,17 @@ const ViewChildrenAttendance = () => {
                     View Attendance
                 </button>
 
+                {hasViewed && attendance.length === 0 && (
+                    <div className="mt-4 p-4 bg-yellow-100 text-yellow-800 rounded-md text-sm text-center">
+                        Attendance is yet to be marked for the selected date and week.
+                    </div>
+                )}
+
                 {/* Summary Box */}
                 {attendance.length > 0 && (
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
                         <div className="bg-gray-100 rounded-lg shadow-md p-4 text-center border border-gray-300">
-                            <p className="text-xs text-black mb-1">Total Students</p>
+                            <p className="text-xs text-black mb-1">Total Children</p>
                             <p className="text-3xl font-bold text-black">{attendance.length}</p>
                         </div>
 
@@ -174,7 +182,7 @@ const ViewChildrenAttendance = () => {
                 {/* Table Header */}
                 {attendance.length > 0 && (
                     <div className="grid grid-cols-[1.5fr_1fr_auto] bg-[#7A3D1A] text-white px-4 py-2 rounded-md text-sm font-semibold">
-                        <div>Student Name</div>
+                        <div>Child Name</div>
                         <div>Class</div>
                         <div>Status</div>
                     </div>
