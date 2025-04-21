@@ -29,7 +29,8 @@ from .models import (
     TestimonialProgress,
     TestimonialRecord,
     ChildrenProfile,
-    LearningCenter
+    LearningCenter,
+    ChildrenAttendance
 )
 from .serializers import (
     FellowSignUpSerializer,
@@ -46,7 +47,8 @@ from .serializers import (
     CollegeSerializer,
     CourseSerializer,
     TestimonialSubmitSerializer,
-    ChildrenProfileSerializer
+    ChildrenProfileSerializer,
+    ChildrenAttendanceSerializer
 )
 
 from django.db.models import Count
@@ -1250,4 +1252,71 @@ def delete_child_profile(request, child_id):
     except Exception as e:
         print(f"❌ Unexpected error during deletion: {e}")
         return Response({"status": "error", "message": "Something went wrong"}, status=500)
+
+
+
+@api_view(['POST'])
+def save_children_attendance(request):
+    print("📩 [POST] save_attendance called")
+
+    data = request.data
+    records = data.get("attendance", [])
+    date = data.get("date")
+    week = data.get("week")
+
+    if not date or not records:
+        return Response({"error": "Date and attendance records are required."}, status=400)
+
+    saved_count = 0
+    for item in records:
+        child_id = item.get("child_id")
+        status = item.get("status")
+
+        try:
+            child = ChildrenProfile.objects.get(id=child_id)
+        except ChildrenProfile.DoesNotExist:
+            continue  # skip if invalid child ID
+
+        # Create or update attendance
+        obj, created = ChildrenAttendance.objects.update_or_create(
+            child=child,
+            date=date,
+            defaults={"status": status, "week": week}
+        )
+        saved_count += 1
+
+    return Response({
+        "status": "success",
+        "message": f"{saved_count} attendance records saved successfully."
+    }, status=200)
+
+
+
+@api_view(['GET'])
+def get_children_attendance_by_date(request):
+    date = request.GET.get("date")
+    week = request.GET.get("week")  # optional
+    mobile = request.GET.get("mobile")
+
+    if not date or not mobile:
+        return Response({"error": "Date and mobile number are required."}, status=400)
+
+    try:
+        fellow = FellowSignUp.objects.get(mobile_number=mobile)
+    except FellowSignUp.DoesNotExist:
+        return Response({"error": "Fellow not found."}, status=404)
+
+    children = ChildrenProfile.objects.filter(fellow=fellow)
+    attendance = ChildrenAttendance.objects.filter(child__in=children, date=date)
+
+    if week:
+        attendance = attendance.filter(week=week)
+
+    serializer = ChildrenAttendanceSerializer(attendance, many=True)
+    return Response({
+        "status": "success",
+        "count": len(serializer.data),
+        "data": serializer.data
+    }, status=200)
+
 
