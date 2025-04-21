@@ -75,12 +75,16 @@ const SCHOOL_TYPE_OPTIONS = [
 
 const CLASS_OPTIONS = [
     { value: "out_of_school", label: "Out of School" },
+    { value: "1", label: "Class 1" },
+    { value: "2", label: "Class 2" },
     { value: "3", label: "Class 3" },
     { value: "4", label: "Class 4" },
     { value: "5", label: "Class 5" },
     { value: "6", label: "Class 6" },
     { value: "7", label: "Class 7" },
     { value: "8", label: "Class 8" },
+    { value: "9", label: "Class 9" },
+    { value: "10", label: "Class 10" },
     { value: "Other", label: "Other" }
 ];
 
@@ -229,7 +233,7 @@ const AddChildProfile = () => {
         if (!profileData.state) newErrors.state = "State is required";
         if (!profileData.district) newErrors.district = "District is required";
         if (!profileData.mandal) newErrors.mandal = "Mandal is required";
-        if (!profileData.grampanchayat) newErrors.grampanchayat = "Grampanchayat is required";
+        if (!profileData.grampanchayat) newErrors.grampanchayat = "Village is required";
 
         return newErrors;
     };
@@ -698,7 +702,7 @@ const AddChildProfile = () => {
 
 
                             {/* Grampanchayat Dropdown */}
-                            {renderLocationDropdown("grampanchayat", "Grampanchayat", locationData.grampanchayats, (val) => {
+                            {renderLocationDropdown("grampanchayat", "Village", locationData.grampanchayats, (val) => {
                                 handleChange("grampanchayat", val);
                             })}
 
@@ -912,7 +916,7 @@ const AddChildProfile = () => {
                         <div className="space-y-4">
                             {renderDropdown("speaking_level", "Speaking Level", SPEAKING_LEVEL_OPTIONS)}
                             {renderDropdown("reading_level", "Reading Level", READING_LEVEL_OPTIONS)}
-                            {renderDropdown("status", "Status", STATUS_OPTIONS)}
+                            {renderDropdown("status", "Child Status", STATUS_OPTIONS)}
 
                             <Button
                                 onClick={() =>

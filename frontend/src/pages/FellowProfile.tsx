@@ -109,17 +109,7 @@ const dropdownOptions = {
   stream: ["Arts", "Science", "Commerce", "Engineering", "Other"],
 };
 
-const TECHNICAL_SKILLS = [
-  "Computer Skills",
-  "Programming",
-  "Data Analysis",
-  "MS Office",
-  "Data Entry",
-  "Web Design",
-  "Digital Marketing",
-  "Video Editing",
-  "Other"
-];
+
 
 const ProfileForm = () => {
   const location = useLocation();
@@ -142,7 +132,7 @@ const ProfileForm = () => {
     colleges: [],
     courses: []
   });
-  const [selectedTechnicalSkills, setSelectedTechnicalSkills] = useState<string[]>([]);
+  //const [selectedTechnicalSkills, setSelectedTechnicalSkills] = useState<string[]>([]);
 
   // Get mobile number from both location state and localStorage
   const mobileNumber = location.state?.mobileNumber || localStorage.getItem('mobile_number');
@@ -242,11 +232,7 @@ const ProfileForm = () => {
     fetchStates();
   }, []);
 
-  useEffect(() => {
-    if (profileData) {
-      setSelectedTechnicalSkills(profileData.skills.technical_skills?.split(',') || []);
-    }
-  }, [profileData]);
+  
 
   const handleChange = (section: string, key: string, value: string) => {
     if (!profileData) return;
@@ -558,14 +544,7 @@ const ProfileForm = () => {
     fetchEducationData();
   }, [profileData?.education_details.university_name, profileData?.education_details.college_name]);
 
-  const handleTechnicalSkillChange = (skill: string) => {
-    setSelectedTechnicalSkills(prev => {
-      if (prev.includes(skill)) {
-        return prev.filter(s => s !== skill);
-      }
-      return [...prev, skill];
-    });
-  };
+  
 
   const fetchProfileData = async () => {
     if (!mobileNumber) return;
@@ -697,9 +676,9 @@ const ProfileForm = () => {
           },
           { 
             key: "grampanchayat", 
-            label: "Grampanchayat", 
+            label: "Village", 
             type: "location",
-            render: () => renderLocationDropdown("grampanchayat", "Grampanchayat", locationData.grampanchayats, 
+            render: () => renderLocationDropdown("grampanchayat", "Village", locationData.grampanchayats, 
               (value) => handleChange('Personal Details', 'grampanchayat', value)),
             display: profileData?.personal_details.grampanchayat_name
           },
@@ -711,7 +690,6 @@ const ProfileForm = () => {
           { key: "mother_occupation", label: "Mother's Occupation" },
           { key: "father_name", label: "Father's Name" },
           { key: "father_occupation", label: "Father's Occupation" },
-          { key: "current_job", label: "Current Job" }
         ])}
         {renderSection("Education Details", [
           { 
@@ -757,31 +735,7 @@ const ProfileForm = () => {
             render: () => renderDropdown("semester", "Semester", dropdownOptions.semester.map(value => ({ value, label: value })))
           },
         ])}
-        {renderSection("Skills", [
-          {
-            key: "technical_skills",
-            label: "Technical Skills",
-            render: () => (
-              <div className="flex flex-wrap gap-2">
-                {TECHNICAL_SKILLS.map(skill => (
-                  <label key={skill} className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={selectedTechnicalSkills.includes(skill)}
-                      onChange={() => handleTechnicalSkillChange(skill)}
-                    />
-                    <span>{skill}</span>
-                  </label>
-                ))}
-              </div>
-            )
-          },
-          {
-            key: "artistic_skills",
-            label: "Artistic Skills",
-            type: "select"
-          }
-        ])}
+        
       </div>
 
       {/* Sidebar Overlay */}
