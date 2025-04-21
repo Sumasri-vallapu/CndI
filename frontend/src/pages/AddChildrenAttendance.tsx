@@ -162,9 +162,9 @@ const AddChildrenAttendance = () => {
 
                 {/* Header Row */}
                 <div>
-                    <p className="text-sm text-gray-600 px-1 py-0 mb-1">Total Students: {filtered.length}</p>
+                    <p className="text-sm text-gray-600 px-1 py-0 mb-1">Total Children: {filtered.length}</p>
                     <div className="grid grid-cols-[1fr_1fr_auto] text-white font-semibold bg-walnut px-4 py-2 rounded-md shadow text-sm text-left ">
-                        <div>Student name</div>
+                        <div>Child name</div>
                         <div> Child Class</div>
                         <div className="text-center">Attendance</div>
                     </div>

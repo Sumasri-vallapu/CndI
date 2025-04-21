@@ -101,7 +101,7 @@ const ViewChildren = () => {
           className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-walnut/80 focus:border-walnut/60"
         />
 
-        <p className="text-sm text-gray-600">Showing {filtered.length} students</p>
+        <p className="text-sm text-gray-600">Showing {filtered.length} Children</p>
 
         <div className="space-y-4">
           {paginatedData.map((child) => (
