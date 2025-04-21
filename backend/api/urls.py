@@ -44,6 +44,8 @@ from .views import (
     delete_lc_photo,
     get_district_leads_by_district,
     get_team_leads_by_dl,
+    save_children_attendance,
+    get_children_attendance_by_date,
 )   
 
 urlpatterns = [
@@ -97,6 +99,8 @@ urlpatterns = [
     path('learning-center/photo/delete/', delete_lc_photo, name='delete_lc_photo'),
     path('district-leads/<str:district_id>/', get_district_leads_by_district, name='get_district_leads_by_district'),
     path('team-leads/', get_team_leads_by_dl, name='get_team_leads_by_dl'),
+    path("children/attendance/save/", save_children_attendance, name="save_children_attendance"),
+    path("children/attendance/view/", get_children_attendance_by_date, name="get_children_attendance_by_date"),
     
 
 ]
