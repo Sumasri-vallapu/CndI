@@ -118,7 +118,7 @@ const ViewChildrenAttendance = () => {
                 </div>
 
                 {/* Filters */}
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <select
                         value={selectedWeek}
                         onChange={(e) => setSelectedWeek(e.target.value)}
@@ -188,11 +188,11 @@ const ViewChildrenAttendance = () => {
                     return (
                         <div
                             key={record.child}
-                            className={`grid grid-cols-[1.5fr_1fr_auto] items-center px-4 py-3 rounded-md transition-colors ${record.status === "Present" ? "bg-green-100" : "bg-red-100"
+                            className={`grid grid-cols-[1.5fr_1fr_auto] items-center px-4 py-3 rounded-md transition-colors ${record.status === "Present" ? "bg-green-50 border-1 border-green-100 text-green-600" : "bg-red-50 border-1 border-red-100 text-red-600"
                                 } text-sm`}
                         >
-                            <div>{student.full_name}</div>
-                            <div>{student.child_class}</div>
+                            <div className="font-semibold text-black">{student.full_name}</div>
+                            <div className="font-semibold text-black">{student.child_class}</div>
                             <div className="font-semibold text-center">{record.status}</div>
                         </div>
                     );
