@@ -15,6 +15,7 @@ from .models import (
     Course,
     TestimonialRecord,
     ChildrenProfile,
+    FellowAttendance,
     ChildrenAttendance
 )
 
@@ -297,6 +298,10 @@ class ChildrenProfileSerializer(serializers.ModelSerializer):
         validated_data.pop("fellow", None)  # Prevent overriding fellow
         return super().update(instance, validated_data)
 
+class FellowAttendanceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowAttendance
+        fields = ['date', 'week', 'status']
 
 class ChildrenAttendanceSerializer(serializers.ModelSerializer):
     class Meta:

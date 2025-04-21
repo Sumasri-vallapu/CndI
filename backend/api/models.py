@@ -436,6 +436,16 @@ class LearningCenter(models.Model):
     landmark = models.CharField(max_length=200, blank=True, null=True)
     lc_photo_url = models.URLField(max_length=500, blank=True, null=True)
 
+class FellowAttendance(models.Model):
+    fellow = models.ForeignKey(FellowProfile, on_delete=models.CASCADE)
+    date = models.DateField()
+    week = models.CharField(max_length=20)
+    status = models.CharField(max_length=10)  # “Present” or “Absent”
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ("fellow", "date")  # Prevent double entry for same date
+
 
 class ChildrenAttendance(models.Model):
     child = models.ForeignKey("ChildrenProfile", on_delete=models.CASCADE, related_name="attendance_records")
@@ -451,5 +461,3 @@ class ChildrenAttendance(models.Model):
     def __str__(self):
         return f"{self.child.full_name} - {self.date} - {self.status}"
 
-
-    

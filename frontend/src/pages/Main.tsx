@@ -49,7 +49,7 @@ const MainScreen = () => {
       {/* Main Content Container - Following Register.tsx style */}
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6 mt-6">
         <div className="flex flex-col items-center mb-6">
-          <ProfilePhoto 
+          <ProfilePhoto
             initialPhotoUrl={localStorage.getItem('profile_photo')}
             mobileNumber={mobileNumber || ''}
           />
@@ -60,7 +60,7 @@ const MainScreen = () => {
         <div className="space-y-4">
           {[
             { title: "Learning Program", subItems: ["Monthly Module List", "My Progress"] },
-            { title: "Attendance", subItems: ["My Attendance", "Children Attendance"] },
+            { title: "Attendance", subItems: ["My Attendance","Children Attendance"] },
             { title: "My Tasks", subItems: ["My Task List", "My Task Status D/ND", "My Task Completion Rate (%)"] },
             { title: "My Performance", subItems: ["My Monthly Attendance %", "LC Monthly Attendance %", "My Task Completion %", "My TL Rating"] },
           ].map((section) => (
@@ -77,11 +77,15 @@ const MainScreen = () => {
                   {section.subItems.map((subItem) => (
                     <div key={subItem} className="py-2 border-b border-gray-100 last:border-b-0">
                       <p className="text-blue-700 hover:text-blue-900 cursor-pointer pl-3 text-sm"
-                      onClick={() => {
-                        if (subItem === "Children Attendance") {
+
+                        onClick={() => {
+                          if (subItem === "My Attendance") {
+                            navigate("/my-attendance");
+                          } else if (subItem === "Children Attendance") {
                           navigate("/children-attendance");
-                        }
-                      }}
+                          }
+                        }}
+                        
                       >{subItem}</p>
                     </div>
                   ))}
@@ -99,22 +103,21 @@ const MainScreen = () => {
 
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 w-64 bg-[#F4F1E3] p-5 shadow-lg transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform z-50`}
+        className={`fixed inset-y-0 left-0 w-64 bg-[#F4F1E3] p-5 shadow-lg transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } transition-transform z-50`}
       >
         <button onClick={() => setIsSidebarOpen(false)} className="mb-5">
           <Menu className="h-6 w-6 text-walnut" />
         </button>
         {[
-          { 
-            title: "Profiles", 
+          {
+            title: "Profiles",
             subItems: ["My Profile", "Children", "Learning Center (LC)"]
           },
           { title: "Assessments", subItems: ["Baseline", "Endline"] },
-          { 
-            title: "Reflections", 
-            subItems: ["Monthly Reflections", "Quarterly Feedbacks", "Annual Testimonials"] 
+          {
+            title: "Reflections",
+            subItems: ["Monthly Reflections", "Quarterly Feedbacks", "Annual Testimonials"]
           },
         ].map((section) => (
           <div key={section.title} className="w-full p-3 bg-white shadow-md rounded-lg mb-3">
@@ -128,8 +131,8 @@ const MainScreen = () => {
             {activeSidebar === section.title && (
               <div className="mt-2">
                 {section.subItems.map((item) => (
-                  <div 
-                    key={item} 
+                  <div
+                    key={item}
                     onClick={() => {
                       if (item === "My Profile") {
                         navigate("/fellow-profile");
@@ -138,7 +141,7 @@ const MainScreen = () => {
                       } else if (item === "Annual Testimonials") {
                       } else if (item === "Learning Center (LC)") {
                         navigate("/learning-center");
-                      }else if (item === "Annual Testimonials") {
+                      } else if (item === "Annual Testimonials") {
                         navigate("/recorder-page");
                       }
                       setIsSidebarOpen(false); // Close sidebar after navigation
