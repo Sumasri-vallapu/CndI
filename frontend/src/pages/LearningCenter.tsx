@@ -418,7 +418,7 @@ const LearningCenter = () => {
       <div className="w-full max-w-3xl bg-white p-6 rounded-lg shadow-md space-y-6 mt-6">
         <div className="flex justify-center mb-6"> <img src="/Images/organization_logo.png" alt="Organization Logo" className="h-20 w-auto object-contain" /> </div>
 
-        {renderField({ section: "info", fieldKey: "fullName", label: "Full Name", value: centerData.fullName, readOnly: true })}
+        {renderField({ section: "info", fieldKey: "fullName", label: "Fellow Name", value: centerData.fullName, readOnly: true })}
 
         <div className="w-full p-6 bg-white shadow-lg rounded-lg">
           <h3 className="text-lg font-bold text-walnut cursor-pointer flex justify-between items-center" onClick={() => toggleSection("address")}> Learning Center Address <span>{activeSection === "address" ? "▼" : "►"}</span> </h3>
@@ -449,14 +449,14 @@ const LearningCenter = () => {
           {renderSelect("top", "District Lead", centerData.districtLeadName, locationData.districtLeads, handleDistrictLeadChange)}
           {renderSelect("top", "Team Lead", centerData.teamLeadName, locationData.teamLeads, (v) => handleInputChange("top", "teamLeadName", v))}
 
-          <div className="space-y-2">
-            <Label>Status</Label>
+          <div className="space-y-2 bg-white">
+            <Label>LC Status</Label>
             {isEditing === "top" ? (
               <Select value={centerData.status} onValueChange={(v) => handleInputChange("top", "status", v)}>
                 <SelectTrigger className="w-full signup-input">
                   <SelectValue placeholder="Select Status" />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-white">
                   <SelectItem value="Active">Active</SelectItem>
                   <SelectItem value="Inactive">Inactive</SelectItem>
                 </SelectContent>

@@ -87,6 +87,7 @@ const AddChildrenAttendance = () => {
 
             if (res.ok) {
                 alert("✅ Attendance saved successfully!");
+                navigate("/children-attendance");
             } else {
                 alert(`❌ Failed to save attendance: ${data.message || data.error}`);
             }

@@ -112,7 +112,7 @@ const MainScreen = () => {
         {[
           {
             title: "Profiles",
-            subItems: ["My Profile", "Children", "Learning Center (LC)"]
+            subItems: ["My Profile", "My Children", "My Learning Center (LC)"]
           },
           { title: "Assessments", subItems: ["Baseline", "Endline"] },
           {
@@ -136,10 +136,10 @@ const MainScreen = () => {
                     onClick={() => {
                       if (item === "My Profile") {
                         navigate("/fellow-profile");
-                      } else if (item === "Children") {
+                      } else if (item === "My Children") {
                         navigate("/children-profile");
                       } else if (item === "Annual Testimonials") {
-                      } else if (item === "Learning Center (LC)") {
+                      } else if (item === "My Learning Center (LC)") {
                         navigate("/learning-center");
                       } else if (item === "Annual Testimonials") {
                         navigate("/recorder-page");

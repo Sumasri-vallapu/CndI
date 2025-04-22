@@ -83,9 +83,9 @@ type ProfileSection = {
 };
 
 const GENDER_OPTIONS = [
-  { value: "MALE", label: "Male" },
-  { value: "FEMALE", label: "Female" },
-  { value: "OTHER", label: "Other" }
+  { value: "Male", label: "Male" },
+  { value: "Female", label: "Female" },
+  { value: "Other", label: "Other" }
 ];
 
 const CASTE_OPTIONS = [
@@ -100,7 +100,7 @@ const CASTE_OPTIONS = [
 ];
 
 const dropdownOptions = {
-  gender: ["MALE", "FEMALE", "OTHER"],
+  gender: ["Male", "Female", "Other"],
   caste_category: ["OC", "BC", "SC", "ST", "OTHER"],
   mode_of_study: ["College Hostel", "Private Hostel", "Day-Scholar", "Distance"],
   type_of_college: ["Government", "Private"],
@@ -608,7 +608,7 @@ const ProfileForm = () => {
         {/* Hero Section - Always Visible */}
         <div className="w-full bg-white p-6 shadow-lg rounded-lg space-y-4">
           <div className="space-y-2">
-            <Label>Full Name</Label>
+            <Label>Fellow Name</Label>
             <p className="bg-gray-100 p-3 rounded text-gray-700">
               {profileData?.personal_details.full_name || "Please Provide"}
             </p>
