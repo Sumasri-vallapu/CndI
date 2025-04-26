@@ -668,6 +668,7 @@ def update_fellow_profile(request, mobile_number, section):
                 'status': 'success',
                 'message': f'{section} updated successfully'
             })
+        print("❌ Serializer Errors:", serializer.errors)
         return Response({
             'status': 'error',
             'message': serializer.errors
