@@ -38,6 +38,7 @@ const Summary = () => {
   const [assessmentType, setAssessmentType] = useState<"baseline" | "endline">("baseline");
   const [readingLevelFilter, setReadingLevelFilter] = useState<string | "All">("All");
   const [speakingLevelFilter, setSpeakingLevelFilter] = useState<string | "All">("All");
+  
 
   const mobile = localStorage.getItem("mobile_number");
 
@@ -121,7 +122,7 @@ const Summary = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="bg-gray-100 rounded-lg shadow-md p-4 text-center border border-gray-300">
             <p className="text-xs text-black mb-1">Avg. Learning Level of LC</p>
-            <p className="text-lg font-bold text-black">Proficient</p>
+            <p className="text-lg font-bold text-black">85%</p>
           </div>
           <div className="bg-gray-100 rounded-lg shadow-md p-4 text-center border border-gray-300">
             <p className="text-xs text-black mb-1">Avg Fellow Attendance at LC</p>
