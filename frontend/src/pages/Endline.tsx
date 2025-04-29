@@ -24,7 +24,7 @@ const Endline = () => {
       if (!mobileNumber) return;
 
       try {
-        // Fetch children
+        setIsLoading(true);
         const resChildren = await fetch(ENDPOINTS.GET_CHILDREN_LIST(mobileNumber));
         const dataChildren = await resChildren.json();
 
@@ -40,7 +40,6 @@ const Endline = () => {
           }));
           setChildren(formattedChildren);
 
-          // Fetch existing Endline scores
           const resScores = await fetch(
             `${ENDPOINTS.GET_ASSESSMENTS}?fellow_mobile_number=${mobileNumber}&assessment_type=endline`
           );
@@ -49,14 +48,9 @@ const Endline = () => {
           if (dataScores.status === "success") {
             const updatedChildren = formattedChildren.map((child) => {
               const existing = dataScores.data.find((a: any) => a.student_id === child.id);
-              if (existing) {
-                return {
-                  ...child,
-                  reading_level: existing.reading_level,
-                  speaking_level: existing.speaking_level,
-                };
-              }
-              return child;
+              return existing
+                ? { ...child, reading_level: existing.reading_level, speaking_level: existing.speaking_level }
+                : child;
             });
             setChildren(updatedChildren);
           }
@@ -67,12 +61,9 @@ const Endline = () => {
         setIsLoading(false);
       }
     };
-    console.log("Fetching endline scores for:", mobileNumber);
-    console.log("GET URL:", `${ENDPOINTS.GET_ASSESSMENTS}?fellow_mobile_number=${mobileNumber}&assessment_type=endline`);
 
     fetchChildrenAndScores();
   }, [mobileNumber]);
-
 
   const handleReadingChange = (index: number, value: string) => {
     const updated = [...children];
@@ -106,7 +97,7 @@ const Endline = () => {
 
       if (response.ok) {
         alert("Endline scores submitted successfully!");
-        navigate("/main");
+        setTimeout(() => navigate("/main"), 2000);
       } else {
         alert("Failed to submit scores.");
       }
@@ -118,17 +109,17 @@ const Endline = () => {
   return (
     <div className="min-h-screen bg-[#F4F1E3] px-4 py-6 flex flex-col items-center">
       {/* Top bar */}
-      <div className="w-full max-w-3xl flex justify-between py-4">
+      <div className="w-full max-w-3xl flex justify-between items-center py-4">
         <button
           onClick={() => navigate("/main")}
-          className="text-walnut hover:text-earth flex items-center gap-2"
+          className="text-walnut hover:text-earth flex items-center gap-2 text-sm font-medium"
         >
           <ArrowLeft size={20} />
-          <span className="text-base font-medium">Back</span>
+          <span>Back</span>
         </button>
         <button
           onClick={() => navigate("/login")}
-          className="text-sm bg-walnut text-white px-4 py-2 rounded-md"
+          className="text-sm bg-walnut text-white px-4 py-2 rounded-md hover:bg-earth"
         >
           Logout
         </button>
@@ -144,12 +135,12 @@ const Endline = () => {
             className="h-22 w-auto object-contain mb-2"
             loading="eager"
           />
-          <h2 className="text-xl font-bold text-walnut">Endline Assessments</h2>
+          <h2 className="text-xl font-bold text-walnut">Update Endline Assessment Score</h2>
         </div>
 
         {/* Table Header */}
         {children.length > 0 && (
-          <div className="grid grid-cols-[1fr_2fr_3fr_3fr] bg-[#7A3D1A] text-white px-4 py-2 rounded-md text-sm font-semibold mb-3">
+          <div className="hidden sm:grid grid-cols-[1fr_2fr_3fr_3fr] bg-[#7A3D1A] text-white px-4 py-2 rounded-md text-sm font-semibold mb-3">
             <div>Sl No</div>
             <div>Name</div>
             <div>Reading Level</div>
@@ -166,10 +157,10 @@ const Endline = () => {
           children.map((child, index) => (
             <div
               key={child.id}
-              className="grid grid-cols-[1fr_2fr_3fr_3fr] items-center p-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm text-sm mb-3"
+              className="grid grid-cols-1 sm:grid-cols-[1fr_2fr_3fr_3fr] gap-2 sm:gap-4 items-center p-3 bg-gray-50 border border-gray-200 rounded-lg shadow-sm text-sm mb-3"
             >
-              <div>{index + 1}</div>
-              <div>{child.full_name}</div>
+              <div className="sm:col-span-1 font-medium">{index + 1}</div>
+              <div className="sm:col-span-1">{child.full_name}</div>
 
               <select
                 value={child.reading_level}
