@@ -60,9 +60,10 @@ const MainScreen = () => {
         <div className="space-y-4">
           {[
             { title: "Learning Program", subItems: ["Monthly Module List", "My Progress"] },
-            { title: "Attendance", subItems: ["My Attendance","Children Attendance"] },
+            { title: "Attendance", subItems: ["My Attendance", "Children Attendance"] },
+            { title: "Assessments", subItems: ["Baseline", "Endline"] },
             { title: "My Tasks", subItems: ["My Task List", "My Task Status D/ND", "My Task Completion Rate (%)"] },
-            { title: "My Performance", subItems: ["My Monthly Attendance %", "LC Monthly Attendance %", "My Task Completion %", "My TL Rating"] },
+            { title: "My Performance", subItems: ["Performance Summary"] },
           ].map((section) => (
             <div key={section.title} className="w-full p-5 bg-white shadow-md rounded-lg">
               <h3
@@ -82,10 +83,16 @@ const MainScreen = () => {
                           if (subItem === "My Attendance") {
                             navigate("/my-attendance");
                           } else if (subItem === "Children Attendance") {
-                          navigate("/children-attendance");
+                            navigate("/children-attendance");
+                          } else if (subItem === "Baseline") {
+                            navigate("/baseline");
+                          } else if (subItem === "Endline") {
+                            navigate("/endline");
+                          } else if (subItem === "Performance Summary") {
+                            navigate("/summary");
                           }
                         }}
-                        
+
                       >{subItem}</p>
                     </div>
                   ))}

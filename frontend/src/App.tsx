@@ -24,6 +24,10 @@ import MyAttendancePage from '@/pages/MyAttendancePage';
 import AddChildrenAttendance from '@/pages/AddChildrenAttendance';
 import ViewChildrenAttendance from '@/pages/ViewChildrenAttendance';
 import ChildrenAttendance from '@/pages/ChildrenAttendance';
+import Summary from '@/pages/Summary';
+import Baseline from '@/pages/Baseline';
+import Endline from '@/pages/Endline';
+//import TaskAssignment from '@/pages/TaskAssignment';
 
 export default function App() {
   return (
@@ -57,6 +61,10 @@ export default function App() {
               <Route path="/add-children-attendance" element={<AddChildrenAttendance />} />
               <Route path="/view-children-attendance" element={<ViewChildrenAttendance />} />
               <Route path="/children-attendance" element={<ChildrenAttendance />} />
+              <Route path="/summary" element={<Summary />} />
+              <Route path="/baseline" element={<Baseline />} />
+              <Route path="/endline" element={<Endline />} />
+              
             </Routes>
           </main>
         </div>
