@@ -48,6 +48,8 @@ from .views import (
     get_fellow_attendance_history,
     save_children_attendance,
     get_children_attendance_by_date,
+    submit_assessments,
+    get_assessments
 )   
 
 urlpatterns = [
@@ -106,6 +108,7 @@ urlpatterns = [
     path('fellow/attendance/history/<str:mobile_number>/', get_fellow_attendance_history, name='get_fellow_attendance_history'),
     path("children/attendance/save/", save_children_attendance, name="save_children_attendance"),
     path("children/attendance/view/", get_children_attendance_by_date, name="get_children_attendance_by_date"),
-    
+    path('student-assessments/submit/', submit_assessments, name='submit_assessments'),
+    path('student-assessments/get/', get_assessments),
 
 ]

@@ -248,7 +248,18 @@ const ProfileForm = () => {
 
   const handleSave = async (section: string, data: any) => {
     try {
-      await updateProfileSection(section, data);
+      const formattedData = { ...data };
+  
+      // Fix: Convert arrays to comma-separated strings
+      if (Array.isArray(formattedData.technical_skills)) {
+        formattedData.technical_skills = formattedData.technical_skills.join(", ");
+      }
+      if (Array.isArray(formattedData.artistic_skills)) {
+        formattedData.artistic_skills = formattedData.artistic_skills.join(", ");
+      }
+  
+      await updateProfileSection(section, formattedData);
+  
       // Refresh data after update
       fetchProfileData();
       setIsEditing(null);
@@ -256,6 +267,7 @@ const ProfileForm = () => {
       alert("Failed to update profile. Please try again.");
     }
   };
+  
 
   const toggleSection = (section: string) => {
     setActiveSection(activeSection === section ? null : section);
@@ -406,8 +418,8 @@ const ProfileForm = () => {
 
   const updateProfileSection = async (section: string, data: any) => {
     try {
-      const response = await fetch(ENDPOINTS.UPDATE_FELLOW_PROFILE(mobileNumber, section), {
-        method: "POST",
+      const response = await fetch(ENDPOINTS.UPDATE_FELLOW_PROFILE(mobileNumber, section.toLowerCase().replace(" ", "_")), {
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
