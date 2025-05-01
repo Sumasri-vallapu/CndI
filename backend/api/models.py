@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 import uuid
 
 class State(models.Model):
@@ -495,3 +496,41 @@ class StudentAssessment(models.Model):
 
     def __str__(self):
         return f"{self.student.full_name} - {self.assessment_type}"
+
+
+
+class FellowTasks(models.Model):
+    task_name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.task_name
+
+
+
+class FellowTaskStatusUpdate(models.Model):
+    sl_no = models.PositiveIntegerField()
+    task_name = models.CharField(max_length=255)
+    assigned_date = models.DateField()
+    deadline_date = models.DateField()
+    
+    status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Completed", "Completed"),
+    ],
+    null=True,
+    blank=True)
+
+    def __str__(self):
+        return f"{self.sl_no} - {self.task_name} - {self.status}"
+
+status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Completed", "Completed"),
+    ],
+    null=True,
+    blank=True
+)

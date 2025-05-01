@@ -12,6 +12,9 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from datetime import datetime, timedelta, date
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib import admin
 
 
 from .models import (
@@ -34,7 +37,10 @@ from .models import (
     LearningCenter,
     FellowAttendance,
     ChildrenAttendance,
-    StudentAssessment
+    StudentAssessment,
+    FellowTasks,
+    FellowTaskStatusUpdate
+    
 
 )
 from .serializers import (
@@ -55,7 +61,9 @@ from .serializers import (
     ChildrenProfileSerializer,
     FellowAttendanceSerializer,
     ChildrenAttendanceSerializer,
-    StudentAssessmentSerializer
+    StudentAssessmentSerializer,
+    FellowTasksSerializer,
+    FellowTaskStatusUpdateSerializer
 )
 
 from django.db.models import Count
@@ -1451,3 +1459,35 @@ def get_assessments(request):
     ).values('student_id', 'reading_level', 'speaking_level')
 
     return Response({'status': 'success', 'data': list(assessments)}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_fellow_tasks(request):
+    tasks = FellowTasks.objects.all()
+    serializer = FellowTasksSerializer(tasks, many=True)
+    return Response({'status': 'success', 'data': serializer.data})
+
+
+
+
+# api/views.py
+
+@csrf_exempt
+def submit_task_status(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            task_list = data.get("tasks", [])
+            for item in task_list:
+                sl_no = item.get("task_id")
+                status = item.get("status")
+                if not sl_no or not status:
+                    continue
+                try:
+                    task = FellowTaskStatusUpdate.objects.get(sl_no=sl_no)
+                    task.status = status
+                    task.save()
+                except FellowTaskStatusUpdate.DoesNotExist:
+                    continue
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
