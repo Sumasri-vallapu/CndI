@@ -119,6 +119,36 @@ const dropdownOptions = {
 };
 
 
+const MOTHER_OCCUPATION_OPTIONS = [
+  { value: "Home Maker", label: "Home Maker" },
+  { value: "Tailor", label: "Tailor" },
+  { value: "Agricultural Labour", label: "Agricultural Labour" },
+  { value: "Construction Labour", label: "Construction Labour" },
+  { value: "Daily Wage Worker", label: "Daily Wage Worker" },
+  { value: "School Teacher", label: "School Teacher" },
+  { value: "Anganwadi Teacher", label: "Anganwadi Teacher" },
+  { value: "DWCRA Member", label: "DWCRA Member" },
+  { value: "Factory Worker", label: "Factory Worker" },
+  { value: "Expired", label: "Expired" },
+  { value: "Other", label: "Other" },
+];
+
+const FATHER_OCCUPATION_OPTIONS = [
+  { value: "Tailor", label: "Tailor" },
+  { value: "Agricultural Labour", label: "Agricultural Labour" },
+  { value: "Construction Labour", label: "Construction Labour" },
+  { value: "Daily Wage Worker", label: "Daily Wage Worker" },
+  { value: "School Teacher", label: "School Teacher" },
+  { value: "Factory Worker", label: "Factory Worker" },
+  { value: "Expired", label: "Expired" },
+  { value: "Plumber", label: "Plumber" },
+  { value: "Electrician", label: "Electrician" },
+  { value: "Driver", label: "Driver" },
+  { value: "Business", label: "Business" },
+  { value: "Other", label: "Other" },
+];
+
+
 
 const ProfileForm = () => {
   const location = useLocation();
@@ -146,6 +176,11 @@ const ProfileForm = () => {
   const [customUniversityName, setCustomUniversityName] = useState('');
   const [customCollegeName, setCustomCollegeName] = useState('');
   const [customCourseName, setCustomCourseName] = useState('');
+
+
+  const [customMotherOccupation, setCustomMotherOccupation] = useState('');
+  const [customFatherOccupation, setCustomFatherOccupation] = useState('');
+
 
 
 
@@ -301,7 +336,17 @@ const ProfileForm = () => {
         delete formattedData.college_name;
         delete formattedData.course_name;
       }
+      
 
+      if (section === "Family Details") {
+        if (data.mother_occupation === "Other") {
+          formattedData.mother_occupation = customMotherOccupation;
+        }
+        if (data.father_occupation === "Other") {
+          formattedData.father_occupation = customFatherOccupation;
+        }
+      }
+      
       // Convert arrays to strings for multi-select skill fields
       if (Array.isArray(formattedData.technical_skills)) {
         formattedData.technical_skills = formattedData.technical_skills.join(", ");
@@ -371,6 +416,42 @@ const ProfileForm = () => {
       </SelectContent>
     </Select>
   );
+
+
+  const renderFamilyOccupationDropdown = (
+    key: "mother_occupation" | "father_occupation",
+    label: string,
+    options: { value: string; label: string }[],
+    value: string,
+    onChange: (value: string) => void,
+    customValue: string,
+    setCustomValue: (val: string) => void
+  ) => (
+    <div className="space-y-2">
+      <Select value={value} onValueChange={(val) => onChange(val)}>
+        <SelectTrigger className="w-full signup-input">
+          <SelectValue placeholder={`Select ${label}`} />
+        </SelectTrigger>
+        <SelectContent className="bg-white text-black">
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+  
+      {value === "Other" && (
+        <Input
+          value={customValue}
+          onChange={(e) => setCustomValue(e.target.value)}
+          placeholder={`Enter ${label}`}
+          className="signup-input mt-2"
+        />
+      )}
+    </div>
+  );
+  
 
   const renderEducationDropdown = (key: string, label: string, options: any[], onChange: (value: string) => void) => {
     let value = getFieldValue('Education Details', key)?.toString() || '';
@@ -823,9 +904,42 @@ const ProfileForm = () => {
         ])}
         {renderSection("Family Details", [
           { key: "mother_name", label: "Mother's Name" },
-          { key: "mother_occupation", label: "Mother's Occupation" },
+          {
+            key: "mother_occupation",
+            label: "Mother's Occupation",
+            render: () =>
+              renderFamilyOccupationDropdown(
+                "mother_occupation",
+                "Mother's Occupation",
+                MOTHER_OCCUPATION_OPTIONS,
+                getFieldValue("Family Details", "mother_occupation"),
+                (val) => handleChange("Family Details", "mother_occupation", val),
+                customMotherOccupation,
+                setCustomMotherOccupation
+              ),
+            display: profileData?.family_details.mother_occupation === "Other"
+              ? customMotherOccupation
+              : profileData?.family_details.mother_occupation
+          },
+
           { key: "father_name", label: "Father's Name" },
-          { key: "father_occupation", label: "Father's Occupation" },
+          {
+            key: "father_occupation",
+            label: "Father's Occupation",
+            render: () =>
+              renderFamilyOccupationDropdown(
+                "father_occupation",
+                "Father's Occupation",
+                FATHER_OCCUPATION_OPTIONS,
+                getFieldValue("Family Details", "father_occupation"),
+                (val) => handleChange("Family Details", "father_occupation", val),
+                customFatherOccupation,
+                setCustomFatherOccupation
+              ),
+            display: profileData?.family_details.father_occupation === "Other"
+              ? customFatherOccupation
+              : profileData?.family_details.father_occupation
+          },
         ])}
 
 
