@@ -35,15 +35,15 @@ interface ProfileData {
     university: number | null;
     university_name: string | null;
     university_other: string | null;
-  
+
     college: number | null;
     college_name: string | null;
     college_other: string | null;
-  
+
     course: number | null;
     course_name: string | null;
     course_other: string | null;
-  
+
     semester: string;
     type_of_college: string;
     study_mode: string;
@@ -268,40 +268,40 @@ const ProfileForm = () => {
   const handleSave = async (section: string, data: any) => {
     try {
       const formattedData = { ...data };
-  
+
       console.log("Original Section:", section);
       console.log("Original Data before formatting:", data);
-  
+
       // Special handling for Education Details
       if (section === "Education Details") {
         if (isUniversityOther) {
           // If "Others" is selected
           formattedData.university = null;
           formattedData.university_other = customUniversityName;
-  
+
           formattedData.college = null;
           formattedData.college_other = customCollegeName;
-  
+
           formattedData.course = null;
           formattedData.course_other = customCourseName;
         } else {
           // Normal dropdown case - send FK IDs and clear "other" fields
           formattedData.university = data.university_name;
           formattedData.university_other = null;
-  
+
           formattedData.college = data.college_name;
           formattedData.college_other = null;
-  
+
           formattedData.course = data.course_name;
           formattedData.course_other = null;
         }
-  
+
         // Remove the string fields you previously used
         delete formattedData.university_name;
         delete formattedData.college_name;
         delete formattedData.course_name;
       }
-  
+
       // Convert arrays to strings for multi-select skill fields
       if (Array.isArray(formattedData.technical_skills)) {
         formattedData.technical_skills = formattedData.technical_skills.join(", ");
@@ -309,20 +309,20 @@ const ProfileForm = () => {
       if (Array.isArray(formattedData.artistic_skills)) {
         formattedData.artistic_skills = formattedData.artistic_skills.join(", ");
       }
-  
+
       console.log("Final formatted data to save:", formattedData);
-  
+
       await updateProfileSection(section, formattedData);
-  
+
       console.log("Profile update successful for section:", section);
-  
+
       await fetchProfileData(); // Refresh data after update
       setIsEditing(null);
     } catch (error) {
       console.error("Error during save operation:", error);
       alert("Failed to update profile. Please try again.");
     }
-  };  
+  };
 
 
 
@@ -373,7 +373,10 @@ const ProfileForm = () => {
   );
 
   const renderEducationDropdown = (key: string, label: string, options: any[], onChange: (value: string) => void) => {
-    const value = getFieldValue('Education Details', key)?.toString() || '';
+    let value = getFieldValue('Education Details', key)?.toString() || '';
+    if (key === "university_name" && isUniversityOther) {
+      value = "others";
+    }
     const selectedOption = options.find((option) => option.id.toString() === value);
 
     return (
