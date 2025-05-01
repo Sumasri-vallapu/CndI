@@ -16,7 +16,11 @@ from .models import (
     TestimonialRecord,
     ChildrenProfile,
     FellowAttendance,
-    ChildrenAttendance
+    ChildrenAttendance,
+    StudentAssessment,
+    FellowTasks,
+    FellowTaskStatusUpdate
+
 )
 
 class FellowSignUpSerializer(serializers.ModelSerializer):
@@ -316,3 +320,23 @@ class ChildrenAttendanceSerializer(serializers.ModelSerializer):
     class Meta:
         model = ChildrenAttendance
         fields = ['child', 'date', 'status', 'week']
+
+class StudentAssessmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StudentAssessment
+        fields = '__all__'
+
+
+class FellowTasksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowTasks
+        fields = ['id', 'task_name']
+
+
+class FellowTaskStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowTaskStatusUpdate
+        fields = ['sl_no', 'task_name', 'assigned_date', 'deadline_date', 'status']
+        read_only_fields = ['sl_no', 'task_name', 'assigned_date', 'deadline_date']
+
+

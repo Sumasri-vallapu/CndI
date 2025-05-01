@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 import uuid
 
 class State(models.Model):
@@ -467,3 +468,75 @@ class ChildrenAttendance(models.Model):
     def __str__(self):
         return f"{self.child.full_name} - {self.date} - {self.status}"
 
+#Assessmet Model
+# models.py
+
+from django.db import models
+
+READING_LEVEL_CHOICES = [
+    ("Basic", "Basic"),
+    ("Intermediate", "Intermediate"),
+    ("Proficient", "Proficient"),
+]
+
+SPEAKING_LEVEL_CHOICES = [
+    ("Emergent", "Emergent"),
+    ("Letter", "Letter"),
+    ("Word", "Word"),
+    ("Para", "Para"),
+    ("Story", "Story"),
+]
+
+ASSESSMENT_TYPE_CHOICES = [
+    ("baseline", "Baseline"),
+    ("endline", "Endline"),
+]
+
+class StudentAssessment(models.Model):
+    student = models.ForeignKey('api.ChildrenProfile', on_delete=models.CASCADE, related_name='assessments')
+    fellow_mobile_number = models.CharField(max_length=15)
+    assessment_type = models.CharField(max_length=10, choices=ASSESSMENT_TYPE_CHOICES)
+    reading_level = models.CharField(max_length=20, choices=READING_LEVEL_CHOICES)
+    speaking_level = models.CharField(max_length=20, choices=SPEAKING_LEVEL_CHOICES)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.student.full_name} - {self.assessment_type}"
+
+
+
+class FellowTasks(models.Model):
+    task_name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.task_name
+
+
+
+class FellowTaskStatusUpdate(models.Model):
+    sl_no = models.PositiveIntegerField()
+    task_name = models.CharField(max_length=255)
+    assigned_date = models.DateField()
+    deadline_date = models.DateField()
+    
+    status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Completed", "Completed"),
+    ],
+    null=True,
+    blank=True)
+
+    def __str__(self):
+        return f"{self.sl_no} - {self.task_name} - {self.status}"
+
+status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Completed", "Completed"),
+    ],
+    null=True,
+    blank=True
+)

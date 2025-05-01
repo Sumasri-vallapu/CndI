@@ -12,6 +12,9 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework import status
 from datetime import datetime, timedelta, date
+from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
+from django.contrib import admin
 
 
 from .models import (
@@ -33,7 +36,12 @@ from .models import (
     ChildrenProfile,
     LearningCenter,
     FellowAttendance,
-    ChildrenAttendance
+    ChildrenAttendance,
+    StudentAssessment,
+    FellowTasks,
+    FellowTaskStatusUpdate
+    
+
 )
 from .serializers import (
     FellowSignUpSerializer,
@@ -52,7 +60,10 @@ from .serializers import (
     TestimonialSubmitSerializer,
     ChildrenProfileSerializer,
     FellowAttendanceSerializer,
-    ChildrenAttendanceSerializer
+    ChildrenAttendanceSerializer,
+    StudentAssessmentSerializer,
+    FellowTasksSerializer,
+    FellowTaskStatusUpdateSerializer
 )
 
 from django.db.models import Count
@@ -1391,3 +1402,92 @@ def get_children_attendance_by_date(request):
         "data": serializer.data
     }, status=200)
 
+#Assessment View
+# views.py
+
+
+@api_view(['POST'])
+def submit_assessments(request):
+    data = request.data
+    fellow_mobile_number = data.get('fellow_mobile_number')
+    assessment_type = data.get('assessment_type')
+    scores = data.get('scores', [])
+
+    if not scores:
+        return Response({'status': 'error', 'message': 'No scores provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    for score in scores:
+        student_id = score['student_id']
+        reading_level = score['reading_level']
+        speaking_level = score['speaking_level']
+
+        # Check if assessment already exists
+        existing_assessment = StudentAssessment.objects.filter(
+            student_id=student_id,
+            assessment_type=assessment_type,
+            fellow_mobile_number=fellow_mobile_number
+        ).first()
+
+        if existing_assessment:
+            # Update existing record
+            existing_assessment.reading_level = reading_level
+            existing_assessment.speaking_level = speaking_level
+            existing_assessment.save()
+        else:
+            # Create new record
+            StudentAssessment.objects.create(
+                student_id=student_id,
+                fellow_mobile_number=fellow_mobile_number,
+                assessment_type=assessment_type,
+                reading_level=reading_level,
+                speaking_level=speaking_level
+            )
+
+    return Response({'status': 'success', 'message': 'Assessments submitted successfully'}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_assessments(request):
+    fellow_mobile_number = request.GET.get('fellow_mobile_number')
+    assessment_type = request.GET.get('assessment_type')
+
+    if not fellow_mobile_number or not assessment_type:
+        return Response({'status': 'error', 'message': 'Missing parameters'}, status=status.HTTP_400_BAD_REQUEST)
+
+    assessments = StudentAssessment.objects.filter(
+        fellow_mobile_number=fellow_mobile_number,
+        assessment_type=assessment_type
+    ).values('student_id', 'reading_level', 'speaking_level')
+
+    return Response({'status': 'success', 'data': list(assessments)}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def get_fellow_tasks(request):
+    tasks = FellowTasks.objects.all()
+    serializer = FellowTasksSerializer(tasks, many=True)
+    return Response({'status': 'success', 'data': serializer.data})
+
+
+
+
+# api/views.py
+
+@csrf_exempt
+def submit_task_status(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            task_list = data.get("tasks", [])
+            for item in task_list:
+                sl_no = item.get("task_id")
+                status = item.get("status")
+                if not sl_no or not status:
+                    continue
+                try:
+                    task = FellowTaskStatusUpdate.objects.get(sl_no=sl_no)
+                    task.status = status
+                    task.save()
+                except FellowTaskStatusUpdate.DoesNotExist:
+                    continue
+            return JsonResponse({"status": "success"})
+        except Exception as e:
+            return JsonResponse({"status": "error", "message": str(e)}, status=400)
