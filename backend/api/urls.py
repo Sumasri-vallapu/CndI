@@ -49,7 +49,9 @@ from .views import (
     save_children_attendance,
     get_children_attendance_by_date,
     submit_assessments,
-    get_assessments
+    get_assessments,
+    get_fellow_tasks,
+    submit_task_status
 )   
 
 urlpatterns = [
@@ -110,5 +112,6 @@ urlpatterns = [
     path("children/attendance/view/", get_children_attendance_by_date, name="get_children_attendance_by_date"),
     path('student-assessments/submit/', submit_assessments, name='submit_assessments'),
     path('student-assessments/get/', get_assessments),
-
+    path('fellow/tasks/list/', get_fellow_tasks, name='get_fellow_tasks'), 
+    path("submit-task-status/", submit_task_status),
 ]

@@ -1,7 +1,7 @@
 // API configuration
 const BASE_URL = 'http://localhost:8000/api';
 
-//const BASE_URL = 'https://yuvachetana.com/api';
+// const BASE_URL = 'https://yuvachetana.com/api';
 
 import { format } from "date-fns"
 // API endpoints
@@ -14,6 +14,8 @@ export const ENDPOINTS = {
   FELLOW_TESTIMONIAL: `${BASE_URL}/fellow/testimonial/`,
   UPLOAD_PROFILE_PHOTO: `${BASE_URL}/fellow/profile/photo/upload/`,
   SAVE_USER_TESTIMONIAL_RECORDING: `${BASE_URL}/fellow/testimonial/upload/`,
+  SUBMIT_TASK_STATUS: `${BASE_URL}/submit-task-status/`,
+
 
 
   //Learning Center endpoints
@@ -92,6 +94,7 @@ export const ENDPOINTS = {
   GET_ATTENDANCE_VIEW: `${BASE_URL}/children/attendance/view/`,
   SUBMIT_BASELINE_SCORES: `${BASE_URL}/student-assessments/submit/`,
   GET_ASSESSMENTS: `${BASE_URL}/student-assessments/get/`,
-
+  GET_FELLOW_TASKS: `${BASE_URL}/fellow/tasks/list`,
+  
   
 } as const; 
