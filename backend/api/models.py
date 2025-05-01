@@ -257,8 +257,14 @@ class FellowProfile(models.Model):
 
     # Education Details
     university = models.ForeignKey('University', on_delete=models.SET_NULL, null=True, blank=True)
+    university_other = models.CharField(max_length=255, blank=True, null=True)
+
     college = models.ForeignKey('College', on_delete=models.SET_NULL, null=True, blank=True)
+    college_other = models.CharField(max_length=255, blank=True, null=True)
+
     course = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True, blank=True)
+    course_other = models.CharField(max_length=255, blank=True, null=True)
+    
     semester = models.CharField(max_length=20, blank=True, null=True)
     type_of_college = models.CharField(max_length=50, blank=True, null=True)
     study_mode = models.CharField(max_length=50, blank=True, null=True)

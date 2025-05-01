@@ -155,15 +155,23 @@ class FellowProfileEducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = FellowProfile
         fields = [
+            'university',
             'university_name',
+            'university_other',
+
+            'college',
             'college_name',
+            'college_other',
+
+            'course',
             'course_name',
+            'course_other',
+
             'semester',
             'type_of_college',
             'study_mode',
             'stream',
             'subjects',
-            'type_of_college',
             'mode_of_study',
             'technical_skills',
             'artistic_skills'

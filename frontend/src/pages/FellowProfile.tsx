@@ -32,9 +32,18 @@ interface ProfileData {
     academic_year: string;
   };
   education_details: {
+    university: number | null;
     university_name: string | null;
+    university_other: string | null;
+  
+    college: number | null;
     college_name: string | null;
+    college_other: string | null;
+  
+    course: number | null;
     course_name: string | null;
+    course_other: string | null;
+  
     semester: string;
     type_of_college: string;
     study_mode: string;
@@ -259,50 +268,61 @@ const ProfileForm = () => {
   const handleSave = async (section: string, data: any) => {
     try {
       const formattedData = { ...data };
-
+  
       console.log("Original Section:", section);
       console.log("Original Data before formatting:", data);
-
-      // Handle special case for "Others"
-      if (section === "Education Details" && isUniversityOther) {
-        formattedData.university_name = customUniversityName;
-        formattedData.college_name = customCollegeName;
-        formattedData.course_name = customCourseName;
-        console.log("Saving custom university, college, course:", customUniversityName, customCollegeName, customCourseName);
+  
+      // Special handling for Education Details
+      if (section === "Education Details") {
+        if (isUniversityOther) {
+          // If "Others" is selected
+          formattedData.university = null;
+          formattedData.university_other = customUniversityName;
+  
+          formattedData.college = null;
+          formattedData.college_other = customCollegeName;
+  
+          formattedData.course = null;
+          formattedData.course_other = customCourseName;
+        } else {
+          // Normal dropdown case - send FK IDs and clear "other" fields
+          formattedData.university = data.university_name;
+          formattedData.university_other = null;
+  
+          formattedData.college = data.college_name;
+          formattedData.college_other = null;
+  
+          formattedData.course = data.course_name;
+          formattedData.course_other = null;
+        }
+  
+        // Remove the string fields you previously used
+        delete formattedData.university_name;
+        delete formattedData.college_name;
+        delete formattedData.course_name;
       }
-
-      // Normal dropdown flow – just log
-      if (section === "Education Details" && !isUniversityOther) {
-        console.log("Saving selected university/college/course IDs:", formattedData.university_name, formattedData.college_name, formattedData.course_name);
-      }
-
-      // Convert arrays to strings
+  
+      // Convert arrays to strings for multi-select skill fields
       if (Array.isArray(formattedData.technical_skills)) {
         formattedData.technical_skills = formattedData.technical_skills.join(", ");
       }
       if (Array.isArray(formattedData.artistic_skills)) {
         formattedData.artistic_skills = formattedData.artistic_skills.join(", ");
       }
-
+  
       console.log("Final formatted data to save:", formattedData);
-
+  
       await updateProfileSection(section, formattedData);
-
+  
       console.log("Profile update successful for section:", section);
-
-      // Refresh data after update
-      await fetchProfileData();
-      console.log("Profile data refreshed.");
-
+  
+      await fetchProfileData(); // Refresh data after update
       setIsEditing(null);
     } catch (error) {
       console.error("Error during save operation:", error);
       alert("Failed to update profile. Please try again.");
     }
-  };
-
-
-
+  };  
 
 
 
@@ -824,7 +844,7 @@ const ProfileForm = () => {
                 )}
               </div>
             ),
-            display: isUniversityOther ? customUniversityName : profileData?.education_details.university_name  // 🔥 Show custom name if Others
+            display: profileData?.education_details.university_other || profileData?.education_details.university_name
           },
 
           {
@@ -839,7 +859,7 @@ const ProfileForm = () => {
                 className="signup-input"
               />
             ) : renderEducationDropdown("college_name", "College", educationData.colleges, handleCollegeChange),
-            display: isUniversityOther ? customCollegeName : profileData?.education_details.college_name
+            display: profileData?.education_details.college_other || profileData?.education_details.college_name
           },
 
           {
@@ -854,7 +874,7 @@ const ProfileForm = () => {
                 className="signup-input"
               />
             ) : renderEducationDropdown("course_name", "Course", educationData.courses, handleCourseChange),
-            display: isUniversityOther ? customCourseName : profileData?.education_details.course_name
+            display: profileData?.education_details.course_other || profileData?.education_details.course_name
           },
 
           {
