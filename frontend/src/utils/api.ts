@@ -32,6 +32,7 @@ export const ENDPOINTS = {
     `${BASE_URL}/fellow/attendance/history/${mobile}/?start_date=${format(start, "yyyy-MM-dd")}&end_date=${format(end, "yyyy-MM-dd")}`,
 
 
+
   // Location endpoints
   GET_STATES: `${BASE_URL}/states/`,
   GET_DISTRICTS: `${BASE_URL}/districts/`,
@@ -92,6 +93,8 @@ export const ENDPOINTS = {
   GET_ATTENDANCE_VIEW: `${BASE_URL}/children/attendance/view/`,
   SUBMIT_BASELINE_SCORES: `${BASE_URL}/student-assessments/submit/`,
   GET_ASSESSMENTS: `${BASE_URL}/student-assessments/get/`,
+ 
 
-  
+
+
 } as const; 

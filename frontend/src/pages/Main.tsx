@@ -21,18 +21,32 @@ const MainScreen = () => {
   };
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
+    const fetchFellowProfile = async () => {
       if (!mobileNumber) return;
       try {
-        const response = await fetch(`${ENDPOINTS.GET_FELLOW_DETAILS}?mobile_number=${mobileNumber}`);
-        const data = await response.json();
-        setFullName(data.full_name);
+        const res = await fetch(ENDPOINTS.GET_FELLOW_PROFILE(mobileNumber));
+        const data = await res.json();
+        console.log("Fetched Profile Data:", data); // 🔍 Log full data
+
+        if (data.status === "success") {
+          const name = data?.data?.personal_details?.full_name;
+          console.log("Extracted name:", name); // ✅ Log name specifically
+
+          const properName = name
+            ? name.replace(/\w\S*/g, (txt: string) =>
+              txt.charAt(0).toUpperCase() + txt.slice(1).toLowerCase()
+            )
+            : "";
+          setFullName(properName);
+        }
       } catch (error) {
-        console.error('Error fetching user details:', error);
+        console.error("Error fetching profile:", error);
       }
     };
-    fetchUserDetails();
+
+    fetchFellowProfile();
   }, [mobileNumber]);
+
 
   return (
     <div className="relative flex flex-col items-center min-h-screen bg-[#F4F1E3] px-4 py-6">
@@ -53,17 +67,17 @@ const MainScreen = () => {
             initialPhotoUrl={localStorage.getItem('profile_photo')}
             mobileNumber={mobileNumber || ''}
           />
-          <h2 className="text-2xl font-bold text-walnut mt-4">{fullName}</h2>
+          <h2 className="text-2xl font-bold text-walnut mt-4">Hello {fullName}!</h2>
         </div>
 
         {/* Main Sections */}
         <div className="space-y-4">
           {[
             { title: "Learning Program", subItems: ["Monthly Module List", "My Progress"] },
-            { title: "Attendance", subItems: ["My Attendance", "Children Attendance"] },
-            { title: "Assessments", subItems: ["Baseline", "Endline"] },
+            { title: "Attendance", subItems: ["My Attendance", "Children's Attendance"] },
+            //{ title: "Assessments", subItems: ["Baseline", "Endline"] },
             { title: "My Tasks", subItems: ["My Task List", "My Task Status D/ND", "My Task Completion Rate (%)"] },
-            { title: "My Performance", subItems: ["Performance Summary"] },
+            { title: "Performance", subItems: ["Children Summary","My Summary"] },
           ].map((section) => (
             <div key={section.title} className="w-full p-5 bg-white shadow-md rounded-lg">
               <h3
@@ -88,7 +102,7 @@ const MainScreen = () => {
                             navigate("/baseline");
                           } else if (subItem === "Endline") {
                             navigate("/endline");
-                          } else if (subItem === "Performance Summary") {
+                          } else if (subItem === "Children Summary") {
                             navigate("/summary");
                           }
                         }}
@@ -121,7 +135,7 @@ const MainScreen = () => {
             title: "Profiles",
             subItems: ["My Profile", "My Children", "My Learning Center (LC)"]
           },
-          { title: "Assessments", subItems: ["Baseline", "Endline"] },
+          { title: "Assessments", subItems: ["My Assessment", "Children's Assesment"] },
           {
             title: "Reflections",
             subItems: ["Monthly Reflections", "Quarterly Feedbacks", "Annual Testimonials"]
@@ -150,6 +164,8 @@ const MainScreen = () => {
                         navigate("/learning-center");
                       } else if (item === "Annual Testimonials") {
                         navigate("/recorder-page");
+                      } else if (item === "Children's Assesment") {
+                        navigate("/children-assessment");
                       }
                       setIsSidebarOpen(false); // Close sidebar after navigation
                     }}

@@ -27,6 +27,7 @@ import ChildrenAttendance from '@/pages/ChildrenAttendance';
 import Summary from '@/pages/Summary';
 import Baseline from '@/pages/Baseline';
 import Endline from '@/pages/Endline';
+import ChildrenAssessment from './pages/ChildrenAssessment';
 //import TaskAssignment from '@/pages/TaskAssignment';
 
 export default function App() {
@@ -64,6 +65,7 @@ export default function App() {
               <Route path="/summary" element={<Summary />} />
               <Route path="/baseline" element={<Baseline />} />
               <Route path="/endline" element={<Endline />} />
+              <Route path="/children-assessment" element={<ChildrenAssessment />} />
               
             </Routes>
           </main>
