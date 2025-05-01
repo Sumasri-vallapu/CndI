@@ -172,6 +172,7 @@ class FellowProfileEducationSerializer(serializers.ModelSerializer):
             'study_mode',
             'stream',
             'subjects',
+            'type_of_college',
             'mode_of_study',
             'technical_skills',
             'artistic_skills'
