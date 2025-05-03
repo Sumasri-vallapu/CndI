@@ -148,12 +148,12 @@ class FellowRegistration(models.Model):
     mobile_number = models.CharField(max_length=10, editable=False, null=True, blank=True)
     date_of_birth = models.DateField()
 
-    GENDER_CHOICES = [('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')]
+    GENDER_CHOICES = [('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')]
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
 
     CASTE_CATEGORY_CHOICES = [
         ('ST', 'ST'), ('SC', 'SC'), ('BC', 'BC'), ('OBC', 'OBC'), ('OC', 'OC'),
-        ('MUSLIM', 'Muslim'), ('CHRISTIAN', 'Christian'), ('OTHER', 'Other'),
+        ('Muslim', 'Muslim'), ('Christian', 'Christian'), ('OTHER', 'Other'),
     ]
     caste_category = models.CharField(max_length=20, choices=CASTE_CATEGORY_CHOICES)
 
@@ -232,6 +232,7 @@ class FellowProfile(models.Model):
     # Registration Info (from FellowRegistration)
     date_of_birth = models.DateField(null=True)
     gender = models.CharField(max_length=10, choices=FellowRegistration.GENDER_CHOICES, default='OTHER')
+    religion = models.CharField(max_length=30, blank=True, null=True)
     caste_category = models.CharField(max_length=20, choices=FellowRegistration.CASTE_CATEGORY_CHOICES, null=True, blank=True)
     
     # Location Info (from FellowRegistration)

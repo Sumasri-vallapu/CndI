@@ -14,6 +14,7 @@ interface ProfileData {
     mobile_number: string;
     email: string;
     gender: string;
+    religion: string;
     caste_category: string;
     date_of_birth: string;
     state: string;
@@ -97,14 +98,22 @@ const GENDER_OPTIONS = [
   { value: "Other", label: "Other" }
 ];
 
+
+const RELIGION_OPTIONS = [
+  { value: "Atheist", label: "Atheist" },
+  { value: "Hindu", label: "Hindu" },
+  { value: "Muslim", label: "Muslim" },
+  { value: "Christian", label: "Christian" },
+  { value: "Sikh", label: "Sikh" },
+  { value: "Jew", label: "Jew" },
+  { value: "Other", label: "Other" },
+];
+
 const CASTE_OPTIONS = [
   { value: "ST", label: "ST" },
   { value: "SC", label: "SC" },
-  { value: "BC", label: "BC" },
   { value: "OBC", label: "OBC" },
   { value: "OC", label: "OC" },
-  { value: "MUSLIM", label: "Muslim" },
-  { value: "CHRISTIAN", label: "Christian" },
   { value: "OTHER", label: "Other" }
 ];
 
@@ -117,6 +126,36 @@ const dropdownOptions = {
   semester: ["1", "2", "3", "4", "5", "6", "other"],
   stream: ["Arts", "Science", "Commerce", "Engineering", "Other"],
 };
+
+
+const MOTHER_OCCUPATION_OPTIONS = [
+  { value: "Home Maker", label: "Home Maker" },
+  { value: "Tailor", label: "Tailor" },
+  { value: "Agricultural Labour", label: "Agricultural Labour" },
+  { value: "Construction Labour", label: "Construction Labour" },
+  { value: "Daily Wage Worker", label: "Daily Wage Worker" },
+  { value: "School Teacher", label: "School Teacher" },
+  { value: "Anganwadi Teacher", label: "Anganwadi Teacher" },
+  { value: "DWCRA Member", label: "DWCRA Member" },
+  { value: "Factory Worker", label: "Factory Worker" },
+  { value: "Expired", label: "Expired" },
+  { value: "Other", label: "Other" },
+];
+
+const FATHER_OCCUPATION_OPTIONS = [
+  { value: "Tailor", label: "Tailor" },
+  { value: "Agricultural Labour", label: "Agricultural Labour" },
+  { value: "Construction Labour", label: "Construction Labour" },
+  { value: "Daily Wage Worker", label: "Daily Wage Worker" },
+  { value: "School Teacher", label: "School Teacher" },
+  { value: "Factory Worker", label: "Factory Worker" },
+  { value: "Expired", label: "Expired" },
+  { value: "Plumber", label: "Plumber" },
+  { value: "Electrician", label: "Electrician" },
+  { value: "Driver", label: "Driver" },
+  { value: "Business", label: "Business" },
+  { value: "Other", label: "Other" },
+];
 
 
 
@@ -146,6 +185,16 @@ const ProfileForm = () => {
   const [customUniversityName, setCustomUniversityName] = useState('');
   const [customCollegeName, setCustomCollegeName] = useState('');
   const [customCourseName, setCustomCourseName] = useState('');
+
+
+  const [customMotherOccupation, setCustomMotherOccupation] = useState('');
+  const [customFatherOccupation, setCustomFatherOccupation] = useState('');
+  const [customCaste, setCustomCaste] = useState('');
+  const [customStream, setCustomStream] = useState('');
+  const [customSemester, setCustomSemester] = useState('');
+  const [customGender, setCustomGender] = useState('');
+  const [customReligion, setCustomReligion] = useState('');
+
 
 
 
@@ -296,11 +345,44 @@ const ProfileForm = () => {
           formattedData.course_other = null;
         }
 
+        if (data.stream === "Other") {
+          formattedData.stream = customStream;
+        }
+
+        if (data.semester === "other") {
+          formattedData.semester = customSemester;
+        }
+
         // Remove the string fields you previously used
         delete formattedData.university_name;
         delete formattedData.college_name;
         delete formattedData.course_name;
       }
+
+
+      if (section === "Family Details") {
+        if (data.mother_occupation === "Other") {
+          formattedData.mother_occupation = customMotherOccupation;
+        }
+        if (data.father_occupation === "Other") {
+          formattedData.father_occupation = customFatherOccupation;
+        }
+      }
+
+      if (section === "Personal Details") {
+        if (data.gender === "Other") {
+          formattedData.gender = customGender;
+        }
+        if (data.caste_category === "OTHER") {
+          formattedData.caste_category = customCaste;
+        }
+        if (data.religion === "Other") {
+          formattedData.religion = customReligion;
+        }
+      
+        delete formattedData.mobile_number;
+      } 
+
 
       // Convert arrays to strings for multi-select skill fields
       if (Array.isArray(formattedData.technical_skills)) {
@@ -371,6 +453,42 @@ const ProfileForm = () => {
       </SelectContent>
     </Select>
   );
+
+
+  const renderFamilyOccupationDropdown = (
+    key: "mother_occupation" | "father_occupation",
+    label: string,
+    options: { value: string; label: string }[],
+    value: string,
+    onChange: (value: string) => void,
+    customValue: string,
+    setCustomValue: (val: string) => void
+  ) => (
+    <div className="space-y-2">
+      <Select value={value} onValueChange={(val) => onChange(val)}>
+        <SelectTrigger className="w-full signup-input">
+          <SelectValue placeholder={`Select ${label}`} />
+        </SelectTrigger>
+        <SelectContent className="bg-white text-black">
+          {options.map((opt) => (
+            <SelectItem key={opt.value} value={opt.value}>
+              {opt.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+
+      {value === "Other" && (
+        <Input
+          value={customValue}
+          onChange={(e) => setCustomValue(e.target.value)}
+          placeholder={`Enter ${label}`}
+          className="signup-input mt-2"
+        />
+      )}
+    </div>
+  );
+
 
   const renderEducationDropdown = (key: string, label: string, options: any[], onChange: (value: string) => void) => {
     let value = getFieldValue('Education Details', key)?.toString() || '';
@@ -776,18 +894,119 @@ const ProfileForm = () => {
         </div>
 
         {renderSection("Personal Details", [
+
+
           {
             key: "gender",
             label: "Gender",
-            type: "dropdown",
-            render: () => renderDropdown("gender", "Gender", GENDER_OPTIONS)
+            render: () => (
+              <div className="space-y-2">
+                <Select
+                  value={getFieldValue("Personal Details", "gender")}
+                  onValueChange={(val) => handleChange("Personal Details", "gender", val)}
+                >
+                  <SelectTrigger className="w-full signup-input">
+                    <SelectValue placeholder="Select Gender" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white text-black">
+                    {GENDER_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {getFieldValue("Personal Details", "gender") === "Other" && (
+                  <Input
+                    value={customGender}
+                    onChange={(e) => setCustomGender(e.target.value)}
+                    placeholder="Enter Gender"
+                    className="signup-input mt-2"
+                  />
+                )}
+              </div>
+            ),
+            display:
+              profileData?.personal_details.gender === "Other"
+                ? customGender
+                : profileData?.personal_details.gender
           },
+
+          {
+            key: "religion",
+            label: "Religion",
+            render: () => (
+              <div className="space-y-2">
+                <Select
+                  value={getFieldValue("Personal Details", "religion")}
+                  onValueChange={(val) => handleChange("Personal Details", "religion", val)}
+                >
+                  <SelectTrigger className="w-full signup-input">
+                    <SelectValue placeholder="Select Religion" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white text-black">
+                    {RELIGION_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+          
+                {getFieldValue("Personal Details", "religion") === "Other" && (
+                  <Input
+                    value={customReligion}
+                    onChange={(e) => setCustomReligion(e.target.value)}
+                    placeholder="Enter Religion"
+                    className="signup-input mt-2"
+                  />
+                )}
+              </div>
+            ),
+            display:
+              profileData?.personal_details.religion === "Other"
+                ? customReligion
+                : profileData?.personal_details.religion
+          },          
+
           {
             key: "caste_category",
             label: "Caste Category",
-            type: "dropdown",
-            render: () => renderDropdown("caste_category", "Caste Category", CASTE_OPTIONS)
+            render: () => (
+              <div className="space-y-2">
+                <Select
+                  value={getFieldValue("Personal Details", "caste_category")}
+                  onValueChange={(val) => handleChange("Personal Details", "caste_category", val)}
+                >
+                  <SelectTrigger className="w-full signup-input">
+                    <SelectValue placeholder="Select Caste Category" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white text-black">
+                    {CASTE_OPTIONS.map((opt) => (
+                      <SelectItem key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {getFieldValue("Personal Details", "caste_category") === "OTHER" && (
+                  <Input
+                    value={customCaste}
+                    onChange={(e) => setCustomCaste(e.target.value)}
+                    placeholder="Enter Caste"
+                    className="signup-input mt-2"
+                  />
+                )}
+              </div>
+            ),
+            display:
+              profileData?.personal_details.caste_category === "OTHER"
+                ? customCaste
+                : profileData?.personal_details.caste_category
           },
+
           { key: "date_of_birth", label: "Date of Birth", type: "date" },
           {
             key: "state",
@@ -823,9 +1042,42 @@ const ProfileForm = () => {
         ])}
         {renderSection("Family Details", [
           { key: "mother_name", label: "Mother's Name" },
-          { key: "mother_occupation", label: "Mother's Occupation" },
+          {
+            key: "mother_occupation",
+            label: "Mother's Occupation",
+            render: () =>
+              renderFamilyOccupationDropdown(
+                "mother_occupation",
+                "Mother's Occupation",
+                MOTHER_OCCUPATION_OPTIONS,
+                getFieldValue("Family Details", "mother_occupation"),
+                (val) => handleChange("Family Details", "mother_occupation", val),
+                customMotherOccupation,
+                setCustomMotherOccupation
+              ),
+            display: profileData?.family_details.mother_occupation === "Other"
+              ? customMotherOccupation
+              : profileData?.family_details.mother_occupation
+          },
+
           { key: "father_name", label: "Father's Name" },
-          { key: "father_occupation", label: "Father's Occupation" },
+          {
+            key: "father_occupation",
+            label: "Father's Occupation",
+            render: () =>
+              renderFamilyOccupationDropdown(
+                "father_occupation",
+                "Father's Occupation",
+                FATHER_OCCUPATION_OPTIONS,
+                getFieldValue("Family Details", "father_occupation"),
+                (val) => handleChange("Family Details", "father_occupation", val),
+                customFatherOccupation,
+                setCustomFatherOccupation
+              ),
+            display: profileData?.family_details.father_occupation === "Other"
+              ? customFatherOccupation
+              : profileData?.family_details.father_occupation
+          },
         ])}
 
 
@@ -890,16 +1142,80 @@ const ProfileForm = () => {
             label: "Mode of Study",
             render: () => renderDropdown("mode_of_study", "Mode of Study", dropdownOptions.mode_of_study.map(value => ({ value, label: value })))
           },
+
           {
             key: "stream",
             label: "Stream",
-            render: () => renderDropdown("stream", "Stream", dropdownOptions.stream.map(value => ({ value, label: value })))
+            render: () => (
+              <div className="space-y-2">
+                <Select
+                  value={getFieldValue("Education Details", "stream")}
+                  onValueChange={(val) => handleChange("Education Details", "stream", val)}
+                >
+                  <SelectTrigger className="w-full signup-input">
+                    <SelectValue placeholder="Select Stream" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white text-black">
+                    {dropdownOptions.stream.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {getFieldValue("Education Details", "stream") === "Other" && (
+                  <Input
+                    value={customStream}
+                    onChange={(e) => setCustomStream(e.target.value)}
+                    placeholder="Enter Custom Stream"
+                    className="signup-input mt-2"
+                  />
+                )}
+              </div>
+            ),
+            display:
+              profileData?.education_details.stream === "Other"
+                ? customStream
+                : profileData?.education_details.stream
           },
+
           {
             key: "semester",
             label: "Semester",
-            render: () => renderDropdown("semester", "Semester", dropdownOptions.semester.map(value => ({ value, label: value })))
-          },
+            render: () => (
+              <div className="space-y-2">
+                <Select
+                  value={getFieldValue("Education Details", "semester")}
+                  onValueChange={(val) => handleChange("Education Details", "semester", val)}
+                >
+                  <SelectTrigger className="w-full signup-input">
+                    <SelectValue placeholder="Select Semester" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white text-black">
+                    {dropdownOptions.semester.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {value}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {getFieldValue("Education Details", "semester") === "other" && (
+                  <Input
+                    value={customSemester}
+                    onChange={(e) => setCustomSemester(e.target.value)}
+                    placeholder="Enter Semester"
+                    className="signup-input mt-2"
+                  />
+                )}
+              </div>
+            ),
+            display:
+              profileData?.education_details.semester === "other"
+                ? customSemester
+                : profileData?.education_details.semester
+          }
         ])}
 
 
