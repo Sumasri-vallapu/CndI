@@ -139,7 +139,7 @@ class FellowProfilePersonalSerializer(serializers.ModelSerializer):
     class Meta:
         model = FellowProfile
         fields = [
-            'full_name', 'mobile_number', 'email', 'gender', 
+            'full_name', 'mobile_number', 'email', 'gender', 'religion',
             'caste_category', 'date_of_birth', 
             'state', 'state_name',
             'district', 'district_name',
