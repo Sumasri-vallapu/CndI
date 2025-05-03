@@ -1491,3 +1491,5 @@ def submit_task_status(request):
             return JsonResponse({"status": "success"})
         except Exception as e:
             return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+

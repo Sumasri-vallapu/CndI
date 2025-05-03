@@ -42,9 +42,6 @@ interface ChildProfileData {
     father_name: string;
     mother_occupation: string;
     father_occupation: string;
-    speaking_level: string;
-    reading_level: string;
-    status: string;
     child_photo_s3_url?: string;
 }
 
@@ -64,6 +61,7 @@ const CASTE_OPTIONS = [
     { value: "Christian", label: "CHRISTIAN" },
     { value: "Other", label: "OTHER" }
 ];
+
 
 const SCHOOL_TYPE_OPTIONS = [
     { value: "GOVERNMENT", label: "Government" },
@@ -118,24 +116,6 @@ const FATHER_OCCUPATION_OPTIONS = [
 
 ];
 
-const SPEAKING_LEVEL_OPTIONS = [
-    { value: "BASIC", label: "Basic" },
-    { value: "INTERMEDIATE", label: "Intermediate" },
-    { value: "PROFICIENT", label: "Proficient" },
-];
-
-const READING_LEVEL_OPTIONS = [
-    { value: "EMERGENT", label: "Emergent" },
-    { value: "LETTERS", label: "Letters" },
-    { value: "WORDS", label: "Words" },
-    { value: "PARAGRAPHS", label: "Paragraphs" },
-    { value: "STORY", label: "Story" },
-];
-
-const STATUS_OPTIONS = [
-    { value: "Active", label: "Active" },
-    { value: "Dropout", label: "Dropout" }
-];
 
 const AddChildProfile = () => {
     const navigate = useNavigate();
@@ -205,9 +185,6 @@ const AddChildProfile = () => {
         mother_occupation: "",
         father_occupation: "",
 
-        speaking_level: "",
-        reading_level: "",
-        status: "",
         child_photo_s3_url: null
     });
 
@@ -297,26 +274,6 @@ const AddChildProfile = () => {
     };
 
 
-    const validateLearningDetails = () => {
-        const newErrors: { [key: string]: string } = {};
-        if (!profileData.speaking_level) newErrors.speaking_level = "Speaking level is required";
-        if (!profileData.reading_level) newErrors.reading_level = "Reading level is required";
-        if (!profileData.status) newErrors.status = "Status is required";
-        return newErrors;
-    };
-
-    const handleSaveLearningDetails = () => {
-        const validationErrors = validateLearningDetails();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-
-        setErrors({});
-        setIsEditing(null);
-        alert("Learning details saved.");
-    };
-
 
     const handleFinalSubmit = async () => {
         // 1. Validate photo for add mode
@@ -339,13 +296,10 @@ const AddChildProfile = () => {
             school_name: profileData.school_name,
             type_of_school: profileData.type_of_school,
             child_class: profileData.child_class,
-            status: profileData.status,
             mother_name: profileData.mother_name,
             mother_occupation: profileData.mother_occupation,
             father_name: profileData.father_name,
             father_occupation: profileData.father_occupation,
-            reading_level: profileData.reading_level,
-            speaking_level: profileData.speaking_level,
             fellow_mobile_number: localStorage.getItem("mobile_number"),
         };
 
@@ -892,47 +846,6 @@ const AddChildProfile = () => {
                                     className="w-full bg-green-600 text-white mt-2"
                                 >
                                     Save Parent Details
-                                </Button>
-                            )}
-                        </div>
-                    )}
-                </div>
-
-
-                {/* Section: Child Learning Details */}
-
-                <div className="w-full p-6 bg-white shadow-lg rounded-lg space-y-4">
-                    <h3
-                        className="text-lg font-bold text-walnut cursor-pointer flex justify-between items-center"
-                        onClick={() =>
-                            setActiveSection(activeSection === "learning" ? null : "learning")
-                        }
-                    >
-                        Child Learning Details
-                        <span>{activeSection === "learning" ? "▼" : "►"}</span>
-                    </h3>
-
-                    {activeSection === "learning" && (
-                        <div className="space-y-4">
-                            {renderDropdown("speaking_level", "Speaking Level", SPEAKING_LEVEL_OPTIONS)}
-                            {renderDropdown("reading_level", "Reading Level", READING_LEVEL_OPTIONS)}
-                            {renderDropdown("status", "Child Status", STATUS_OPTIONS)}
-
-                            <Button
-                                onClick={() =>
-                                    setIsEditing(isEditing === "learning" ? null : "learning")
-                                }
-                                className="w-full"
-                            >
-                                {isEditing === "learning" ? "Cancel" : "Edit"}
-                            </Button>
-
-                            {isEditing === "learning" && (
-                                <Button
-                                    onClick={handleSaveLearningDetails}
-                                    className="w-full bg-green-600 text-white mt-2"
-                                >
-                                    Save Learning Details
                                 </Button>
                             )}
                         </div>

@@ -29,6 +29,7 @@ import Baseline from '@/pages/Baseline';
 import Endline from '@/pages/Endline';
 import FellowTasksPage from "@/pages/FellowTasksPage";
 import AdminAssignTasks from "@/pages/AdminAssignTasks";
+import ChildrenAssessment from './pages/ChildrenAssessment';
 //import TaskAssignment from '@/pages/TaskAssignment';
 
 export default function App() {
@@ -68,6 +69,7 @@ export default function App() {
               <Route path="/endline" element={<Endline />} />
               <Route path="/fellow-tasks" element={<FellowTasksPage />} />
               <Route path="/assign-task" element={<AdminAssignTasks />} />
+              <Route path="/children-assessment" element={<ChildrenAssessment />} />
               
             </Routes>
           </main>

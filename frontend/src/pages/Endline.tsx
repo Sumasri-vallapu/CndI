@@ -111,7 +111,7 @@ const Endline = () => {
       {/* Top bar */}
       <div className="w-full max-w-3xl flex justify-between items-center py-4">
         <button
-          onClick={() => navigate("/main")}
+          onClick={() => navigate("/children-assessment")}
           className="text-walnut hover:text-earth flex items-center gap-2 text-sm font-medium"
         >
           <ArrowLeft size={20} />

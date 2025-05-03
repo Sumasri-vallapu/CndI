@@ -128,7 +128,7 @@ const Summary = () => {
             className="h-22 w-auto object-contain mb-2"
             loading="eager"
           />
-          <h2 className="text-xl font-bold text-walnut">Performance Summary</h2>
+          <h2 className="text-xl font-bold text-walnut">Children Summary</h2>
         </div>
 
         {/* Metrics Cards */}

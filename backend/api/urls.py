@@ -52,6 +52,7 @@ from .views import (
     get_assessments,
     get_fellow_tasks,
     submit_task_status
+    
 )   
 
 urlpatterns = [
@@ -114,4 +115,7 @@ urlpatterns = [
     path('student-assessments/get/', get_assessments),
     path('fellow/tasks/list/', get_fellow_tasks, name='get_fellow_tasks'), 
     path("submit-task-status/", submit_task_status),
+    
+
+
 ]
