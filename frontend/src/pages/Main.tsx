@@ -99,7 +99,7 @@ const MainScreen = () => {
                         onClick={() => {
                           if (subItem === "My Attendance") {
                             navigate("/my-attendance");
-                          } else if (subItem === "Children Attendance") {
+                          } else if (subItem === "Children's Attendance") {
                             navigate("/children-attendance");
                           } else if (subItem === "Baseline") {
                             navigate("/baseline");
