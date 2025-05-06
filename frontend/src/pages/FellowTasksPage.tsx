@@ -17,7 +17,7 @@ const FellowTasksPage = () => {
 
   const assignedDate = "23-04-2024";
   const deadlineDate = "16-12-2025";
-  const fellowId = localStorage.getItem("fellow_id"); // assuming stored in localStorage
+  // const fellowId = localStorage.getItem("fellow_id"); // assuming stored in localStorage
 
   useEffect(() => {
     const fetchTasks = async () => {
