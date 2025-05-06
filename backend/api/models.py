@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils import timezone
+from django.contrib.auth import get_user_model
 import uuid
 
 class State(models.Model):
@@ -147,12 +148,12 @@ class FellowRegistration(models.Model):
     mobile_number = models.CharField(max_length=10, editable=False, null=True, blank=True)
     date_of_birth = models.DateField()
 
-    GENDER_CHOICES = [('MALE', 'Male'), ('FEMALE', 'Female'), ('OTHER', 'Other')]
+    GENDER_CHOICES = [('Male', 'Male'), ('Female', 'Female'), ('Other', 'Other')]
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
 
     CASTE_CATEGORY_CHOICES = [
         ('ST', 'ST'), ('SC', 'SC'), ('BC', 'BC'), ('OBC', 'OBC'), ('OC', 'OC'),
-        ('MUSLIM', 'Muslim'), ('CHRISTIAN', 'Christian'), ('OTHER', 'Other'),
+        ('Muslim', 'Muslim'), ('Christian', 'Christian'), ('OTHER', 'Other'),
     ]
     caste_category = models.CharField(max_length=20, choices=CASTE_CATEGORY_CHOICES)
 
@@ -231,6 +232,7 @@ class FellowProfile(models.Model):
     # Registration Info (from FellowRegistration)
     date_of_birth = models.DateField(null=True)
     gender = models.CharField(max_length=10, choices=FellowRegistration.GENDER_CHOICES, default='OTHER')
+    religion = models.CharField(max_length=30, blank=True, null=True)
     caste_category = models.CharField(max_length=20, choices=FellowRegistration.CASTE_CATEGORY_CHOICES, null=True, blank=True)
     
     # Location Info (from FellowRegistration)
@@ -257,8 +259,14 @@ class FellowProfile(models.Model):
 
     # Education Details
     university = models.ForeignKey('University', on_delete=models.SET_NULL, null=True, blank=True)
+    university_other = models.CharField(max_length=255, blank=True, null=True)
+
     college = models.ForeignKey('College', on_delete=models.SET_NULL, null=True, blank=True)
+    college_other = models.CharField(max_length=255, blank=True, null=True)
+
     course = models.ForeignKey('Course', on_delete=models.SET_NULL, null=True, blank=True)
+    course_other = models.CharField(max_length=255, blank=True, null=True)
+    
     semester = models.CharField(max_length=20, blank=True, null=True)
     type_of_college = models.CharField(max_length=50, blank=True, null=True)
     study_mode = models.CharField(max_length=50, blank=True, null=True)
@@ -495,3 +503,41 @@ class StudentAssessment(models.Model):
 
     def __str__(self):
         return f"{self.student.full_name} - {self.assessment_type}"
+
+
+
+class FellowTasks(models.Model):
+    task_name = models.CharField(max_length=255, unique=True)
+
+    def __str__(self):
+        return self.task_name
+
+
+
+class FellowTaskStatusUpdate(models.Model):
+    sl_no = models.PositiveIntegerField()
+    task_name = models.CharField(max_length=255)
+    assigned_date = models.DateField()
+    deadline_date = models.DateField()
+    
+    status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Completed", "Completed"),
+    ],
+    null=True,
+    blank=True)
+
+    def __str__(self):
+        return f"{self.sl_no} - {self.task_name} - {self.status}"
+
+status = models.CharField(
+    max_length=20,
+    choices=[
+        ("Pending", "Pending"),
+        ("Completed", "Completed"),
+    ],
+    null=True,
+    blank=True
+)

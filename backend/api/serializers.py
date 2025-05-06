@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from datetime import date
 from .models import (
     FellowSignUp,
     FellowRegistration,
@@ -17,7 +18,10 @@ from .models import (
     ChildrenProfile,
     FellowAttendance,
     ChildrenAttendance,
-    StudentAssessment
+    StudentAssessment,
+    FellowTasks,
+    FellowTaskStatusUpdate
+
 )
 
 class FellowSignUpSerializer(serializers.ModelSerializer):
@@ -136,7 +140,7 @@ class FellowProfilePersonalSerializer(serializers.ModelSerializer):
     class Meta:
         model = FellowProfile
         fields = [
-            'full_name', 'mobile_number', 'email', 'gender', 
+            'full_name', 'mobile_number', 'email', 'gender', 'religion',
             'caste_category', 'date_of_birth', 
             'state', 'state_name',
             'district', 'district_name',
@@ -156,9 +160,18 @@ class FellowProfileEducationSerializer(serializers.ModelSerializer):
     class Meta:
         model = FellowProfile
         fields = [
+            'university',
             'university_name',
+            'university_other',
+
+            'college',
             'college_name',
+            'college_other',
+
+            'course',
             'course_name',
+            'course_other',
+
             'semester',
             'type_of_college',
             'study_mode',
@@ -309,11 +322,22 @@ class ChildrenAttendanceSerializer(serializers.ModelSerializer):
         model = ChildrenAttendance
         fields = ['child', 'date', 'status', 'week']
 
-
-
-
-
 class StudentAssessmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentAssessment
         fields = '__all__'
+
+
+class FellowTasksSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowTasks
+        fields = ['id', 'task_name']
+
+
+class FellowTaskStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FellowTaskStatusUpdate
+        fields = ['sl_no', 'task_name', 'assigned_date', 'deadline_date', 'status']
+        read_only_fields = ['sl_no', 'task_name', 'assigned_date', 'deadline_date']
+
+
