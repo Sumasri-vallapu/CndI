@@ -203,14 +203,12 @@ const ProfileForm = () => {
 
   useEffect(() => {
     if (!mobileNumber) {
-      console.log("No mobile number found, redirecting to login");
       navigate('/login');
       return;
     }
 
     const fetchProfile = async () => {
       try {
-        console.log("Fetching profile for:", mobileNumber);
         const response = await fetch(ENDPOINTS.GET_FELLOW_PROFILE(mobileNumber));
 
         if (!response.ok) {
@@ -219,7 +217,6 @@ const ProfileForm = () => {
         }
 
         const responseData = await response.json();
-        console.log("Education Details after refresh:", responseData.data.education_details);
 
         if (responseData.status === "success") {
           setProfileData(responseData.data);
@@ -318,9 +315,6 @@ const ProfileForm = () => {
     try {
       const formattedData = { ...data };
 
-      console.log("Original Section:", section);
-      console.log("Original Data before formatting:", data);
-
       // Special handling for Education Details
       if (section === "Education Details") {
         if (isUniversityOther) {
@@ -392,11 +386,7 @@ const ProfileForm = () => {
         formattedData.artistic_skills = formattedData.artistic_skills.join(", ");
       }
 
-      console.log("Final formatted data to save:", formattedData);
-
       await updateProfileSection(section, formattedData);
-
-      console.log("Profile update successful for section:", section);
 
       await fetchProfileData(); // Refresh data after update
       setIsEditing(null);
@@ -456,7 +446,7 @@ const ProfileForm = () => {
 
 
   const renderFamilyOccupationDropdown = (
-    key: "mother_occupation" | "father_occupation",
+    _key: "mother_occupation" | "father_occupation",
     label: string,
     options: { value: string; label: string }[],
     value: string,
@@ -733,7 +723,6 @@ const ProfileForm = () => {
   useEffect(() => {
     const fetchUniversities = async () => {
       try {
-        console.log("Fetching universities...");
         const universitiesResponse = await fetch(ENDPOINTS.GET_UNIVERSITIES);
 
         if (!universitiesResponse.ok) {
@@ -743,7 +732,6 @@ const ProfileForm = () => {
 
         let universities = await universitiesResponse.json();
         universities = [...universities, { id: "others", name: "Others" }];
-        console.log("Fetched universities:", universities);
 
         setEducationData(prev => ({ ...prev, universities }));
       } catch (error) {
@@ -763,28 +751,21 @@ const ProfileForm = () => {
         const universityId = profileData?.education_details.university_name;
 
         if (universityId && universityId !== "others") {
-          console.log("Fetching colleges for university:", universityId);
 
           const collegesResponse = await fetch(`${ENDPOINTS.GET_COLLEGES}?university=${universityId}`);
           const colleges = await collegesResponse.json();
-          console.log("Fetched colleges:", colleges);
           setEducationData(prev => ({ ...prev, colleges }));
 
           const collegeId = profileData?.education_details.college_name;
 
           if (collegeId) {
-            console.log("Fetching courses for college:", collegeId);
             const coursesResponse = await fetch(`${ENDPOINTS.GET_COURSES}?college=${collegeId}`);
             const courses = await coursesResponse.json();
-            console.log("Fetched courses:", courses);
             setEducationData(prev => ({ ...prev, courses }));
           }
         } else if (universityId === "others") {
-          console.log("University is 'Others' – skipping colleges/courses fetch.");
           setEducationData(prev => ({ ...prev, colleges: [], courses: [] }));
-        } else {
-          console.log("No university_name found, skipping fetch.");
-        }
+        } 
       } catch (error) {
         console.error("Error fetching colleges/courses:", error);
       }
