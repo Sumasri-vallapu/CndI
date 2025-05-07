@@ -16,10 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from api.views import HelloworldView  # Import HelloworldView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("api.urls")),  # ✅ This includes `api/urls.py`
-    path('', HelloworldView.as_view(), name='root-hello-world'),  # Add this for root URL
 ]
