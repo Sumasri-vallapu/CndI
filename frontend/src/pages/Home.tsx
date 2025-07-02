@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API_ENDPOINTS } from "@/utils/api";
+import { ENDPOINTS } from "@/utils/api";
 
 export default function Home() {
   const [name, setName] = useState("");
@@ -10,7 +10,7 @@ export default function Home() {
     if (!name) return;
 
     try {
-      const response = await fetch(API_ENDPOINTS.SUBMIT_NAME, {
+      const response = await fetch(ENDPOINTS.SUBMIT_NAME, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

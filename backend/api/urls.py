@@ -1,6 +1,8 @@
 from django.urls import path
-from .views import NameSubmitView
+from api import views
 
 urlpatterns = [
-    path("submit-name/", NameSubmitView.as_view(), name="submit-name"),
+    path('send_otp/', views.send_otp),
+    path('verify_otp/', views.verify_otp),
+    path('protected/', views.protected_view),
 ]

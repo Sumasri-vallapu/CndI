@@ -23,7 +23,6 @@ Development should **prioritize modularity, responsiveness, maintainability, and
   - **Tailwind CSS 4 + ShadCN UI + Radix UI**
   - **ESLint & Prettier**
   - **Node.js 22.14.0**
-
 ---
 
 ## 📜 Specification & Planning (But No Overhead)

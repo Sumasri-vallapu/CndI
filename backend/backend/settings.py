@@ -15,6 +15,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://www.clearmyfile.org"
 ]
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True  # or specify your frontend URL
 CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
 CORS_ALLOW_HEADERS = [
     "accept", "accept-encoding", "authorization", "content-type", "dnt",
@@ -38,6 +39,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'storages',
     'api',
+    'rest_framework_simplejwt',
+
 ]
 
 MIDDLEWARE = [
@@ -101,6 +104,12 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'vallapusumasri@gmail.com'  # your Gmail
+EMAIL_HOST_PASSWORD = 'qscx ijoi hnyl fwxf'  # Gmail app password
 
 # S3 Storage
 # AWS_ACCESS_KEY_ID = 'your-clearmyfile-access-key'
