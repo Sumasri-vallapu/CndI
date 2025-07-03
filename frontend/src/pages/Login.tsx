@@ -6,6 +6,8 @@ import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { ENDPOINTS } from '../utils/api';
 
+const PROFESSIONAL_GRADIENT = "linear-gradient(135deg, #1e3a8a, #3b82f6, #60a5fa)";
+
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -46,45 +48,49 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-[#7A3D1A] via-[#A86543] to-[#7A3D1A] flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
-                <Card className="backdrop-blur-sm bg-white/90 border-0 shadow-xl">
-                    <CardHeader className="text-center">
-                        <CardTitle className="text-2xl font-bold text-[#7A3D1A]">Welcome Back</CardTitle>
+                <Card className="bg-white shadow-xl border-0">
+                    <CardHeader className="text-center bg-gradient-to-r from-slate-50 to-blue-50 border-b">
+                        <CardTitle className="text-3xl font-semibold text-slate-800">Welcome Back</CardTitle>
+                        <p className="text-slate-600 mt-2">Sign in to your account</p>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div>
-                            <Label htmlFor="email">Email Address</Label>
+                    <CardContent className="p-8 space-y-6">
+                        <div className="space-y-2">
+                            <Label htmlFor="email" className="text-sm font-medium text-slate-700">Email Address</Label>
                             <Input
                                 id="email"
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 placeholder="your.email@example.com"
+                                className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                             />
                         </div>
-                        <div>
-                            <Label htmlFor="password">Password</Label>
+                        <div className="space-y-2">
+                            <Label htmlFor="password" className="text-sm font-medium text-slate-700">Password</Label>
                             <Input
                                 id="password"
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 placeholder="Enter your password"
+                                className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
                             />
                         </div>
                         <Button
                             onClick={handleLogin}
                             disabled={isLoading}
-                            className="w-full bg-[#7A3D1A] hover:bg-[#A86543] text-white font-medium"
+                            style={{ background: PROFESSIONAL_GRADIENT }}
+                            className="w-full h-11 text-white font-medium"
                         >
                             {isLoading ? 'Signing in...' : 'Sign In'}
                         </Button>
-                        <div className="text-center pt-4">
-                            <p className="text-sm text-gray-600">
+                        <div className="text-center pt-4 border-t border-slate-200">
+                            <p className="text-sm text-slate-600">
                                 Don't have an account?{' '}
-                                <Link to="/signup" className="text-[#7A3D1A] hover:underline font-medium">
-                                    Sign up here
+                                <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium">
+                                    Create account
                                 </Link>
                             </p>
                         </div>

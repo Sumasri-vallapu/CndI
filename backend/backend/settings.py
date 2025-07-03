@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'your-clearmyfile-secret-key'  # Change before production
 DEBUG = True
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "clearmyfile.org", "www.clearmyfile.org"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "clearmyfile.org", "www.clearmyfile.org", "https://clearmyfile.org",]
 
 # CORS
 CORS_ALLOWED_ORIGINS = [
@@ -108,8 +108,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'vallapusumasri@gmail.com'  # your Gmail
-EMAIL_HOST_PASSWORD = 'qscx ijoi hnyl fwxf'  # Gmail app password
+EMAIL_HOST_USER = 'clearmyfile.org@gmail.com'  # your Gmail
+EMAIL_HOST_PASSWORD = 'vdnl xmcv pmih jwks'  # Gmail app password
 
 # S3 Storage
 # AWS_ACCESS_KEY_ID = 'your-clearmyfile-access-key'
