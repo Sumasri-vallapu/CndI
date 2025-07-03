@@ -1,14 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
-const VerifyOtp = ({ email }: { email: string }) => {
+const VerifyOtp = ({ email }: { email?: string }) => {
     const [otp, setOtp] = useState('');
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    
+    // Get email from props, URL params, or localStorage
+    const userEmail = email || searchParams.get('email') || localStorage.getItem('verifyEmail') || '';
 
     const handleVerify = async () => {
         try {
-            const res = await axios.post('http://127.0.0.1:8000/api/verify_otp/', { email, otp });
+            const res = await axios.post('http://127.0.0.1:8000/api/verify_otp/', { email: userEmail, otp });
             localStorage.setItem('token', res.data.access);
             alert('Login successful');
             navigate('/protected');

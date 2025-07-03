@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ENDPOINTS } from '../utils/api';
 
@@ -51,9 +51,10 @@ const ForgotPassword = () => {
             }
         } catch (error) {
             console.error('Network error details:', error);
-            console.log('Error type:', error.constructor.name);
-            console.log('Error message:', error.message);
-            alert(`Network error: ${error.message}. Make sure your backend server is running on http://localhost:8000`);
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.log('Error type:', error instanceof Error ? error.constructor.name : 'Unknown');
+            console.log('Error message:', errorMessage);
+            alert(`Network error: ${errorMessage}. Make sure your backend server is running on http://localhost:8000`);
         } finally {
             setIsLoading(false);
         }
