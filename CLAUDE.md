@@ -37,6 +37,7 @@ python manage.py collectstatic        # Collect static files
 ## Architecture Overview
 
 ### Frontend Architecture
+- **Modern UI/UX Design**: Professional, clean design with emphasis on modularity, responsiveness, maintainability, and performance
 - **Mobile-first design** with responsive layouts using Tailwind CSS 4
 - **Component structure**: Reusable UI components in `src/components/`, page components in `src/pages/`
 - **UI Library**: ShadCN UI + Radix UI components
@@ -44,6 +45,11 @@ python manage.py collectstatic        # Collect static files
 - **API Integration**: Centralized API configuration in `src/utils/api.ts`
 - **Routing**: React Router DOM for client-side routing
 - **Form Handling**: React Hook Form with Zod validation
+- **Performance Optimization**: Lazy loading, code splitting, and optimized rendering patterns
+- **Scalable Architecture**: Modular component design with clear separation of concerns
+- **Design System**: Clean, professional interface with consistent gradient backgrounds and glass morphism effects
+- **Responsive Design**: Fully adaptive UI with proper breakpoints for mobile, tablet, and desktop
+- **CSS Strategy**: Inline Tailwind CSS for consistency and maintainability
 
 ### Backend Architecture  
 - **Django REST Framework** for API endpoints
@@ -72,10 +78,27 @@ Common production commands are documented in `backend_common_commands.txt`.
 
 ### Frontend
 - Use **functional components with hooks** (no class components)
-- Follow **Tailwind CSS v4 conventions** with mobile-first responsive design
-- **PascalCase** for components, **camelCase** for variables/functions
+- Follow **Tailwind CSS v4 conventions** with mobile-first responsive design using **inline classes only**
+- **Color Palette**: 
+  - Primary gradient: `bg-gradient-to-r from-[#5C258D] to-[#4389A2]`
+  - Accent color: `#FFEB3B` (yellow for buttons and highlights)
+  - Text: White on gradient backgrounds
+- **Design Principles**:
+  - Clean, professional layouts with consistent spacing
+  - Glass morphism effects using `bg-white/10 backdrop-blur-sm border border-white/20`
+  - Responsive icons and proper visual hierarchy
+  - Smooth transitions and hover effects
+  - Full responsive design with proper breakpoints (sm:, md:, lg:)
+- **UI Components**:
+  - Navigation: Clean header with gradient background
+  - Forms: Glass morphism containers with proper input styling
+  - Buttons: Yellow accent (#FFEB3B) for primary actions, ghost buttons for secondary
+  - Icons: Emoji-based with proper sizing and contrast
+- **Performance Best Practices**: Component optimization, lazy loading, minimal re-renders
+- **Code Standards**: **PascalCase** for components, **camelCase** for variables/functions
 - **TypeScript strict mode** enabled
-- API calls centralized in utils/api.ts with typed endpoints
+- **Accessibility**: WCAG 2.1 AA compliance with proper contrast ratios and keyboard navigation
+- **CSS Strategy**: Use only inline Tailwind classes, avoid external CSS files for styling
 
 ### Backend
 - Follow **Django best practices** with proper model-view-serializer structure

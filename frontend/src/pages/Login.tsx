@@ -1,12 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { ENDPOINTS } from '../utils/api';
-
-const PRIMARY_GRADIENT = "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)";
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -48,81 +42,80 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Header */}
-            <header className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="min-h-screen bg-gradient-to-r from-[#5C258D] to-[#4389A2] text-white flex flex-col">
+            {/* Navigation */}
+            <nav className="border-b border-white/20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex justify-between items-center">
-                        <Link to="/" className="text-2xl font-bold" style={{ color: '#7c3aed' }}>
+                        <Link to="/" className="text-xl sm:text-2xl font-bold text-white">
                             clearmyfile.org
                         </Link>
-                        <div className="flex gap-4">
-                            <Button 
-                                onClick={() => navigate('/signup')}
-                                variant="outline"
-                                className="border-purple-600 text-purple-600 hover:bg-purple-50"
-                            >
-                                Create Account
-                            </Button>
-                        </div>
+                        <button 
+                            onClick={() => navigate('/signup')}
+                            className="bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-2 px-4 rounded text-sm sm:text-base"
+                        >
+                            Create Account
+                        </button>
                     </div>
                 </div>
-            </header>
+            </nav>
 
-            <div className="flex items-center justify-center py-20 px-4">
-                <div className="w-full max-w-md">
-                    <Card className="bg-white shadow-lg border">
-                        <CardHeader className="text-center border-b bg-slate-50">
-                            <CardTitle className="text-2xl font-semibold text-slate-900">
-                                Welcome Back
-                            </CardTitle>
-                            <p className="text-slate-600 mt-2">Sign in to your account</p>
-                        </CardHeader>
-                        
-                        <CardContent className="p-8 space-y-6">
-                            <div className="space-y-2">
-                                <Label htmlFor="email" className="text-sm font-medium text-slate-700">
+            {/* Main Content */}
+            <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+                <div className="w-full max-w-md space-y-8">
+                    {/* Header */}
+                    <div className="text-center">
+                        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+                            Welcome Back
+                        </h1>
+                        <p className="text-lg text-white/80">Sign in to your account</p>
+                    </div>
+                    
+                    {/* Form */}
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20">
+                        <div className="space-y-6">
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                                     Email Address
-                                </Label>
-                                <Input
+                                </label>
+                                <input
                                     id="email"
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
                                     placeholder="Enter your email address"
-                                    className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200"
                                 />
                             </div>
                             
-                            <div className="space-y-2">
-                                <Label htmlFor="password" className="text-sm font-medium text-slate-700">
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
                                     Password
-                                </Label>
-                                <Input
+                                </label>
+                                <input
                                     id="password"
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Enter your password"
-                                    className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500"
+                                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200"
                                 />
                             </div>
                             
-                            <Button
+                            <button
                                 onClick={handleLogin}
                                 disabled={isLoading}
-                                className="w-full h-11 text-white font-medium"
-                                style={{ background: PRIMARY_GRADIENT }}
+                                className="w-full bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
                                 {isLoading ? 'Signing in...' : 'Sign In'}
-                            </Button>
+                            </button>
                             
-                            <div className="text-center pt-4 border-t border-slate-200">
-                                <p className="text-sm text-slate-600">
+                            <div className="text-center pt-4 border-t border-white/20">
+                                <p className="text-sm text-white/80">
                                     Don't have an account?{' '}
                                     <Link 
                                         to="/signup" 
-                                        className="font-medium text-purple-600 hover:text-purple-800"
+                                        className="text-[#FFEB3B] hover:text-yellow-300 font-medium transition-colors duration-200"
                                     >
                                         Create account
                                     </Link>
@@ -132,15 +125,19 @@ const Login = () => {
                             <div className="text-center">
                                 <Link 
                                     to="/forgot-password" 
-                                    className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+                                    className="text-sm text-[#FFEB3B] hover:text-yellow-300 font-medium transition-colors duration-200"
                                 >
                                     Forgot your password?
                                 </Link>
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {/* Floating Elements */}
+            <div className="absolute top-1/4 left-1/4 w-24 sm:w-32 h-24 sm:h-32 bg-[#FFEB3B]/20 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-16 sm:w-24 h-16 sm:h-24 bg-[#5C258D]/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
     );
 };
