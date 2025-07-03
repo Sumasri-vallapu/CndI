@@ -16,9 +16,9 @@ export const ENDPOINTS = {
   RESET_PASSWORD: `${BASE_URL}/reset_password/`,
   
   // Location endpoints
-  GET_STATES: `https://yuvachetana.com/api/states/`,
-  GET_DISTRICTS: `https://yuvachetana.com/api/districts/`,
-  GET_MANDALS: `https://yuvachetana.com/api/mandals/`,
-  GET_GRAMPANCHAYATS: `https://yuvachetana.com/api/grampanchayats/`,
+  GET_STATES: `${BASE_URL}/states/`,
+  GET_DISTRICTS: `${BASE_URL}/districts/`,
+  GET_MANDALS: `${BASE_URL}/mandals/`,
+  GET_GRAMPANCHAYATS: `${BASE_URL}/grampanchayats/`,
 
 } as const; 
