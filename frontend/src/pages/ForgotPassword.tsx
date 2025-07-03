@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { ENDPOINTS } from '../utils/api';
-
-const PRIMARY_GRADIENT = "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)";
-const SUCCESS_GRADIENT = "linear-gradient(135deg, #059669 0%, #10b981 100%)";
 
 const ForgotPassword = () => {
     const [step, setStep] = useState(1); // 1: email, 2: otp, 3: new password
@@ -17,6 +10,8 @@ const ForgotPassword = () => {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
+
+    const inputClasses = "w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200";
 
     const sendResetOtp = async () => {
         if (!email) {
@@ -112,176 +107,182 @@ const ForgotPassword = () => {
     };
 
     const renderEmailStep = () => (
-        <Card className="bg-white shadow-lg border">
-            <CardHeader className="text-center border-b bg-slate-50">
-                <CardTitle className="text-2xl font-semibold text-slate-900">
+        <div className="space-y-6">
+            <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFEB3B] rounded-full mb-6">
+                    <span className="text-3xl">🔒</span>
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
                     Forgot Password
-                </CardTitle>
-                <p className="text-slate-600 mt-2">Enter your email to receive a reset code</p>
-            </CardHeader>
+                </h1>
+                <p className="text-lg text-white/80">Enter your email to receive a reset code</p>
+            </div>
             
-            <CardContent className="p-8 space-y-6">
-                <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-medium text-slate-700">
-                        Email Address
-                    </Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        placeholder="Enter your registered email address"
-                        className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500"
-                    />
-                </div>
-                
-                <Button
-                    onClick={sendResetOtp}
-                    disabled={isLoading}
-                    className="w-full h-11 text-white font-medium"
-                    style={{ background: PRIMARY_GRADIENT }}
-                >
-                    {isLoading ? 'Sending...' : 'Send Reset Code'}
-                </Button>
-                
-                <div className="text-center pt-4 border-t border-slate-200">
-                    <p className="text-sm text-slate-600">
-                        Remember your password?{' '}
-                        <Link 
-                            to="/login" 
-                            className="font-medium text-purple-600 hover:text-purple-800"
-                        >
-                            Back to login
-                        </Link>
-                    </p>
-                </div>
-            </CardContent>
-        </Card>
+            <div>
+                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
+                    Email Address
+                </label>
+                <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your registered email address"
+                    className={inputClasses}
+                />
+            </div>
+            
+            <button
+                onClick={sendResetOtp}
+                disabled={isLoading}
+                className="w-full bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                {isLoading ? 'Sending...' : 'Send Reset Code'}
+            </button>
+            
+            <div className="text-center pt-6 border-t border-white/20">
+                <p className="text-sm text-white/80">
+                    Remember your password?{' '}
+                    <Link 
+                        to="/login" 
+                        className="text-[#FFEB3B] hover:text-yellow-300 font-medium transition-colors duration-200"
+                    >
+                        Back to login
+                    </Link>
+                </p>
+            </div>
+        </div>
     );
 
     const renderOtpAndPasswordStep = () => (
-        <Card className="bg-white shadow-lg border">
-            <CardHeader className="text-center border-b bg-slate-50">
-                <CardTitle className="text-2xl font-semibold text-slate-900">
+        <div className="space-y-6">
+            <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFEB3B] rounded-full mb-6">
+                    <span className="text-3xl">🔑</span>
+                </div>
+                <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
                     Reset Password
-                </CardTitle>
-                <p className="text-slate-600 mt-2">Enter the code and your new password</p>
-            </CardHeader>
+                </h1>
+                <p className="text-lg text-white/80">Enter the code and your new password</p>
+            </div>
             
-            <CardContent className="p-8 space-y-6">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <p className="text-slate-700 text-center">
-                        We've sent a verification code to <strong className="text-blue-600">{email}</strong>
+            <div className="bg-white/10 border border-white/20 rounded-xl p-6 backdrop-blur-sm">
+                <p className="text-white text-center">
+                    We've sent a verification code to <span className="font-bold text-[#FFEB3B]">{email}</span>
+                </p>
+            </div>
+            
+            <div>
+                <label htmlFor="otp" className="block text-sm font-medium text-white mb-2">
+                    Verification Code
+                </label>
+                <input
+                    id="otp"
+                    type="text"
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    placeholder="Enter 6-digit code"
+                    maxLength={6}
+                    className={`${inputClasses} text-center font-mono tracking-wider`}
+                />
+            </div>
+            
+            <div>
+                <label htmlFor="newPassword" className="block text-sm font-medium text-white mb-2">
+                    New Password
+                </label>
+                <input
+                    id="newPassword"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Enter your new password"
+                    className={inputClasses}
+                />
+            </div>
+            
+            <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-2">
+                    Confirm New Password
+                </label>
+                <input
+                    id="confirmPassword"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm your new password"
+                    className={inputClasses}
+                />
+                {newPassword && confirmPassword && newPassword !== confirmPassword && (
+                    <p className="text-red-400 text-sm mt-2 flex items-center">
+                        <span className="mr-2">⚠️</span>
+                        Passwords do not match
                     </p>
-                </div>
-                
-                <div className="space-y-2">
-                    <Label htmlFor="otp" className="text-sm font-medium text-slate-700">
-                        Verification Code
-                    </Label>
-                    <Input
-                        id="otp"
-                        type="text"
-                        value={otp}
-                        onChange={(e) => setOtp(e.target.value)}
-                        placeholder="Enter 6-digit code"
-                        maxLength={6}
-                        className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500 text-center font-mono tracking-wider"
-                    />
-                </div>
-                
-                <div className="space-y-2">
-                    <Label htmlFor="newPassword" className="text-sm font-medium text-slate-700">
-                        New Password
-                    </Label>
-                    <Input
-                        id="newPassword"
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="Enter your new password"
-                        className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500"
-                    />
-                </div>
-                
-                <div className="space-y-2">
-                    <Label htmlFor="confirmPassword" className="text-sm font-medium text-slate-700">
-                        Confirm New Password
-                    </Label>
-                    <Input
-                        id="confirmPassword"
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm your new password"
-                        className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500"
-                    />
-                    {newPassword && confirmPassword && newPassword !== confirmPassword && (
-                        <p className="text-red-600 text-sm">Passwords do not match</p>
-                    )}
-                </div>
-                
-                <div className="flex gap-4">
-                    <Button
-                        onClick={sendResetOtp}
-                        disabled={isLoading}
-                        variant="outline"
-                        className="flex-1 h-11 border-slate-300 text-slate-600 hover:bg-slate-50"
+                )}
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
+                <button
+                    onClick={sendResetOtp}
+                    disabled={isLoading}
+                    className="flex-1 text-white border border-white font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-200 disabled:opacity-50"
+                >
+                    Resend Code
+                </button>
+                <button
+                    onClick={verifyOtpAndResetPassword}
+                    disabled={isLoading}
+                    className="flex-1 bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    {isLoading ? 'Resetting...' : 'Reset Password'}
+                </button>
+            </div>
+            
+            <div className="text-center pt-6 border-t border-white/20">
+                <p className="text-sm text-white/80">
+                    Remember your password?{' '}
+                    <Link 
+                        to="/login" 
+                        className="text-[#FFEB3B] hover:text-yellow-300 font-medium transition-colors duration-200"
                     >
-                        Resend Code
-                    </Button>
-                    <Button
-                        onClick={verifyOtpAndResetPassword}
-                        disabled={isLoading}
-                        className="flex-1 h-11 text-white font-medium"
-                        style={{ background: SUCCESS_GRADIENT }}
-                    >
-                        {isLoading ? 'Resetting...' : 'Reset Password'}
-                    </Button>
-                </div>
-                
-                <div className="text-center pt-4 border-t border-slate-200">
-                    <p className="text-sm text-slate-600">
-                        Remember your password?{' '}
-                        <Link 
-                            to="/login" 
-                            className="font-medium text-purple-600 hover:text-purple-800"
-                        >
-                            Back to login
-                        </Link>
-                    </p>
-                </div>
-            </CardContent>
-        </Card>
+                        Back to login
+                    </Link>
+                </p>
+            </div>
+        </div>
     );
 
     return (
-        <div className="min-h-screen bg-slate-50">
-            {/* Header */}
-            <header className="bg-white shadow-sm border-b">
-                <div className="max-w-7xl mx-auto px-4 py-4">
+        <div className="min-h-screen bg-gradient-to-r from-[#5C258D] to-[#4389A2] text-white flex flex-col">
+            {/* Navigation */}
+            <nav className="border-b border-white/20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
                     <div className="flex justify-between items-center">
-                        <Link to="/" className="text-2xl font-bold" style={{ color: '#7c3aed' }}>
+                        <Link to="/" className="text-xl sm:text-2xl font-bold text-white">
                             clearmyfile.org
                         </Link>
-                        <div className="flex gap-4">
-                            <Button 
-                                onClick={() => navigate('/login')}
-                                variant="outline"
-                                className="border-purple-600 text-purple-600 hover:bg-purple-50"
-                            >
-                                Back to Login
-                            </Button>
-                        </div>
+                        <button 
+                            onClick={() => navigate('/login')}
+                            className="bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-2 px-4 rounded text-sm sm:text-base"
+                        >
+                            Back to Login
+                        </button>
                     </div>
                 </div>
-            </header>
+            </nav>
 
-            <div className="flex items-center justify-center py-20 px-4">
+            {/* Main Content */}
+            <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
                 <div className="w-full max-w-md">
-                    {step === 1 ? renderEmailStep() : renderOtpAndPasswordStep()}
+                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20">
+                        {step === 1 ? renderEmailStep() : renderOtpAndPasswordStep()}
+                    </div>
                 </div>
             </div>
+
+            {/* Floating Elements */}
+            <div className="absolute top-1/4 left-1/4 w-24 sm:w-32 h-24 sm:h-32 bg-[#FFEB3B]/20 rounded-full blur-xl animate-pulse"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-16 sm:w-24 h-16 sm:h-24 bg-[#5C258D]/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
         </div>
     );
 };

@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
-import { Button } from '../components/ui/button';
-import { Input } from '../components/ui/input';
-import { Label } from '../components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Progress } from '../components/ui/progress';
 import { ENDPOINTS } from '../utils/api';
 import { useLocationData } from '../hooks/useLocationData';
-
-const PRIMARY_GRADIENT = "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)";
-const SUCCESS_GRADIENT = "linear-gradient(135deg, #059669 0%, #10b981 100%)";
-const SECONDARY_GRADIENT = "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)";
 
 interface FormData {
   name: string;
@@ -158,415 +150,391 @@ const Signup: React.FC = () => {
     }
   };
 
+  const inputClasses = "w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200";
+
   const renderSection1 = () => (
-    <Card className="bg-white shadow-lg border">
-      <CardHeader className="bg-slate-50 border-b">
-        <CardTitle className="text-2xl font-semibold text-slate-900 flex items-center">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-            <span className="text-blue-600 font-bold">1</span>
-          </div>
-          Personal Information
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-8 space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">
-              Full Name *
-            </Label>
-            <Input 
-              value={formData.name} 
-              onChange={e => handleInputChange('name', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500"
-              placeholder="Enter your full name"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">
-              Gender
-            </Label>
-            <Select value={formData.gender} onValueChange={v => handleInputChange('gender', v)}>
-              <SelectTrigger className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500">
-                <SelectValue placeholder="Select gender" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="male">Male</SelectItem>
-                <SelectItem value="female">Female</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Occupation</Label>
-            <Input 
-              value={formData.occupation} 
-              onChange={e => handleInputChange('occupation', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Your current occupation"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Highest Qualification</Label>
-            <Select value={formData.qualification} onValueChange={v => handleInputChange('qualification', v)}>
-              <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                <SelectValue placeholder="Select qualification" />
-              </SelectTrigger>
-              <SelectContent className="bg-white">
-                <SelectItem value="10th">10th Grade</SelectItem>
-                <SelectItem value="12th">12th Grade</SelectItem>
-                <SelectItem value="diploma">Diploma</SelectItem>
-                <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
-                <SelectItem value="master">Master's Degree</SelectItem>
-                <SelectItem value="phd">PhD</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Email Address *</Label>
-            <Input 
-              type="email" 
-              value={formData.email} 
-              onChange={e => handleInputChange('email', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="your.email@example.com"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Phone Number</Label>
-            <Input 
-              value={formData.phone} 
-              onChange={e => handleInputChange('phone', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Enter your phone number"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Date of Birth</Label>
-            <Input 
-              type="date" 
-              value={formData.dateOfBirth} 
-              onChange={e => handleInputChange('dateOfBirth', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-            />
-          </div>
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FFEB3B] rounded-full mb-4">
+          <span className="text-2xl">👤</span>
         </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-4">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Password *</Label>
-            <Input 
-              type="password" 
-              value={formData.password} 
-              onChange={e => handleInputChange('password', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Create a strong password"
-            />
-            {formData.password && (
-              <div className="mt-3 p-3 bg-slate-50 rounded-lg">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="text-slate-600">Password Strength:</span>
-                  <span className={`font-medium ${
-                    passwordStrength.feedback === 'Weak' ? 'text-red-600' :
-                    passwordStrength.feedback === 'Medium' ? 'text-yellow-600' :
-                    'text-green-600'
-                  }`}>
-                    {passwordStrength.feedback}
-                  </span>
-                </div>
-                <Progress value={passwordStrength.score} className="h-2" />
-              </div>
-            )}
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Confirm Password *</Label>
-            <Input 
-              type="password" 
-              value={formData.confirmPassword} 
-              onChange={e => handleInputChange('confirmPassword', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
-              placeholder="Re-enter your password"
-            />
-            {formData.confirmPassword && !passwordMatch && 
-              <p className="text-red-600 text-sm mt-1 flex items-center">
-                <span className="w-4 h-4 bg-red-100 rounded-full mr-2 flex items-center justify-center">
-                  <span className="text-red-600 text-xs">!</span>
-                </span>
-                Passwords do not match
-              </p>
-            }
-          </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Personal Information</h2>
+        <p className="text-white/80">Tell us about yourself</p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Full Name *</label>
+          <input 
+            value={formData.name} 
+            onChange={e => handleInputChange('name', e.target.value)} 
+            className={inputClasses}
+            placeholder="Enter your full name"
+          />
         </div>
-      </CardContent>
-    </Card>
-  );
-  
-  const renderSection2 = () => (
-    <Card className="bg-white shadow-xl border-0">
-      <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-        <CardTitle className="text-2xl font-semibold text-slate-800 flex items-center">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-            <span className="text-blue-600 font-bold">2</span>
-          </div>
-          Address Information
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-8 space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">State</Label>
-            <Select value={formData.state} onValueChange={v => handleInputChange('state', v)}>
-              <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                <SelectValue placeholder="Select your state" />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-60">
-                {locationData.states.map(state => (
-                  <SelectItem key={state.id} value={state.id}>{state.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">District</Label>
-            <Select value={formData.district} onValueChange={v => handleInputChange('district', v)} disabled={!formData.state}>
-              <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                <SelectValue placeholder="Select your district" />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-60">
-                {locationData.districts.map(district => (
-                  <SelectItem key={district.id} value={district.id}>{district.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Mandal</Label>
-            <Select value={formData.mandal} onValueChange={v => handleInputChange('mandal', v)} disabled={!formData.district}>
-              <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                <SelectValue placeholder="Select your mandal" />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-60">
-                {locationData.mandals.map(mandal => (
-                  <SelectItem key={mandal.id} value={mandal.id}>{mandal.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Gram Panchayat</Label>
-            <Select value={formData.panchayath} onValueChange={v => handleInputChange('panchayath', v)} disabled={!formData.mandal}>
-              <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-                <SelectValue placeholder="Select your gram panchayat" />
-              </SelectTrigger>
-              <SelectContent className="bg-white max-h-60">
-                {locationData.grampanchayats.map(gp => (
-                  <SelectItem key={gp.id} value={gp.id}>{gp.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
-  
-  const renderSection3 = () => (
-    <Card className="bg-white shadow-xl border-0">
-      <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-        <CardTitle className="text-2xl font-semibold text-slate-800 flex items-center">
-          <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-            <span className="text-blue-600 font-bold">3</span>
-          </div>
-          Additional Information
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-8">
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-slate-700">How did you hear about us?</Label>
-          <Select value={formData.referralSource} onValueChange={v => handleInputChange('referralSource', v)}>
-            <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500">
-              <SelectValue placeholder="Select how you heard about us" />
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Gender</label>
+          <Select value={formData.gender} onValueChange={v => handleInputChange('gender', v)}>
+            <SelectTrigger className={inputClasses}>
+              <SelectValue placeholder="Select gender" />
             </SelectTrigger>
-            <SelectContent className="bg-white">
-              <SelectItem value="social-media">Social Media</SelectItem>
-              <SelectItem value="friend-family">Friend/Family</SelectItem>
-              <SelectItem value="google-search">Google Search</SelectItem>
-              <SelectItem value="advertisement">Advertisement</SelectItem>
-              <SelectItem value="news-article">News Article</SelectItem>
-              <SelectItem value="government-office">Government Office</SelectItem>
+            <SelectContent>
+              <SelectItem value="male">Male</SelectItem>
+              <SelectItem value="female">Female</SelectItem>
               <SelectItem value="other">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
-      </CardContent>
-    </Card>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Occupation</label>
+          <input 
+            value={formData.occupation} 
+            onChange={e => handleInputChange('occupation', e.target.value)} 
+            className={inputClasses}
+            placeholder="Your current occupation"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Highest Qualification</label>
+          <Select value={formData.qualification} onValueChange={v => handleInputChange('qualification', v)}>
+            <SelectTrigger className={inputClasses}>
+              <SelectValue placeholder="Select qualification" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="10th">10th Grade</SelectItem>
+              <SelectItem value="12th">12th Grade</SelectItem>
+              <SelectItem value="diploma">Diploma</SelectItem>
+              <SelectItem value="bachelor">Bachelor's Degree</SelectItem>
+              <SelectItem value="master">Master's Degree</SelectItem>
+              <SelectItem value="phd">PhD</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Email Address *</label>
+          <input 
+            type="email" 
+            value={formData.email} 
+            onChange={e => handleInputChange('email', e.target.value)} 
+            className={inputClasses}
+            placeholder="your.email@example.com"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Phone Number</label>
+          <input 
+            value={formData.phone} 
+            onChange={e => handleInputChange('phone', e.target.value)} 
+            className={inputClasses}
+            placeholder="Enter your phone number"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Date of Birth</label>
+          <input 
+            type="date" 
+            value={formData.dateOfBirth} 
+            onChange={e => handleInputChange('dateOfBirth', e.target.value)} 
+            className={inputClasses}
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Password *</label>
+          <input 
+            type="password" 
+            value={formData.password} 
+            onChange={e => handleInputChange('password', e.target.value)} 
+            className={inputClasses}
+            placeholder="Create a strong password"
+          />
+          {formData.password && (
+            <div className="mt-3 p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+              <div className="flex justify-between text-sm mb-2">
+                <span className="text-white/80">Password Strength:</span>
+                <span className={`font-medium ${
+                  passwordStrength.feedback === 'Weak' ? 'text-red-400' :
+                  passwordStrength.feedback === 'Medium' ? 'text-yellow-400' :
+                  'text-green-400'
+                }`}>
+                  {passwordStrength.feedback}
+                </span>
+              </div>
+              <Progress value={passwordStrength.score} className="h-2" />
+            </div>
+          )}
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Confirm Password *</label>
+          <input 
+            type="password" 
+            value={formData.confirmPassword} 
+            onChange={e => handleInputChange('confirmPassword', e.target.value)} 
+            className={inputClasses}
+            placeholder="Re-enter your password"
+          />
+          {formData.confirmPassword && !passwordMatch && 
+            <p className="text-red-400 text-sm mt-2 flex items-center">
+              <span className="mr-2">⚠️</span>
+              Passwords do not match
+            </p>
+          }
+        </div>
+      </div>
+    </div>
+  );
+  
+  const renderSection2 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FFEB3B] rounded-full mb-4">
+          <span className="text-2xl">📍</span>
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Address Information</h2>
+        <p className="text-white/80">Where are you located?</p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">State</label>
+          <Select value={formData.state} onValueChange={v => handleInputChange('state', v)}>
+            <SelectTrigger className={inputClasses}>
+              <SelectValue placeholder="Select your state" />
+            </SelectTrigger>
+            <SelectContent className="max-h-60">
+              {locationData.states.map(state => (
+                <SelectItem key={state.id} value={state.id}>{state.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">District</label>
+          <Select value={formData.district} onValueChange={v => handleInputChange('district', v)} disabled={!formData.state}>
+            <SelectTrigger className={inputClasses}>
+              <SelectValue placeholder="Select your district" />
+            </SelectTrigger>
+            <SelectContent className="max-h-60">
+              {locationData.districts.map(district => (
+                <SelectItem key={district.id} value={district.id}>{district.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Mandal</label>
+          <Select value={formData.mandal} onValueChange={v => handleInputChange('mandal', v)} disabled={!formData.district}>
+            <SelectTrigger className={inputClasses}>
+              <SelectValue placeholder="Select your mandal" />
+            </SelectTrigger>
+            <SelectContent className="max-h-60">
+              {locationData.mandals.map(mandal => (
+                <SelectItem key={mandal.id} value={mandal.id}>{mandal.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-white mb-2">Gram Panchayat</label>
+          <Select value={formData.panchayath} onValueChange={v => handleInputChange('panchayath', v)} disabled={!formData.mandal}>
+            <SelectTrigger className={inputClasses}>
+              <SelectValue placeholder="Select your gram panchayat" />
+            </SelectTrigger>
+            <SelectContent className="max-h-60">
+              {locationData.grampanchayats.map(gp => (
+                <SelectItem key={gp.id} value={gp.id}>{gp.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+    </div>
+  );
+  
+  const renderSection3 = () => (
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FFEB3B] rounded-full mb-4">
+          <span className="text-2xl">ℹ️</span>
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2">Additional Information</h2>
+        <p className="text-white/80">Help us understand you better</p>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-white mb-2">How did you hear about us?</label>
+        <Select value={formData.referralSource} onValueChange={v => handleInputChange('referralSource', v)}>
+          <SelectTrigger className={inputClasses}>
+            <SelectValue placeholder="Select how you heard about us" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="social-media">Social Media</SelectItem>
+            <SelectItem value="friend-family">Friend/Family</SelectItem>
+            <SelectItem value="google-search">Google Search</SelectItem>
+            <SelectItem value="advertisement">Advertisement</SelectItem>
+            <SelectItem value="news-article">News Article</SelectItem>
+            <SelectItem value="government-office">Government Office</SelectItem>
+            <SelectItem value="other">Other</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   );
 
   const renderOtpVerification = () => (
-    <Card className="bg-white/90 backdrop-blur-sm shadow-2xl border-0 overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-b border-green-200">
-        <CardTitle className="text-3xl font-bold text-gray-800 flex items-center justify-center">
-          <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ background: SUCCESS_GRADIENT }}>
-            <span className="text-white text-2xl">📬</span>
-          </div>
-          <div className="text-center">
-            <div className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
-              Check Your Email!
-            </div>
-            <div className="text-sm text-gray-600 font-normal mt-1">We sent you something special ✨</div>
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="p-10 space-y-8 text-center">
-        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-6">
-          <p className="text-gray-700 text-lg leading-relaxed">
-            We've sent a <span className="font-bold text-purple-600">magical 6-digit code</span> to
-            <br/>
-            <span className="font-bold text-pink-600 text-xl">{formData.email}</span> 🎉
-          </p>
+    <div className="space-y-6">
+      <div className="text-center mb-8">
+        <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFEB3B] rounded-full mb-6">
+          <span className="text-3xl">✉️</span>
         </div>
-        <div className="space-y-4">
-          <Label className="text-lg font-bold text-gray-700 flex items-center justify-center">
-            <span className="mr-2">🔢</span>
-            Enter Your Magic Code
-          </Label>
-          <Input 
-            value={otp} 
-            onChange={e => setOtp(e.target.value)} 
-            maxLength={6} 
-            className="text-center text-3xl font-mono h-16 border-4 border-purple-200 focus:border-purple-500 focus:ring-purple-500 tracking-widest rounded-xl shadow-lg" 
-            placeholder="⭐⭐⭐⭐⭐⭐"
-          />
-        </div>
-        <Button 
-          onClick={sendOtp} 
-          disabled={isLoading} 
-          variant="outline"
-          className="w-full h-11 border-slate-300 text-slate-600 hover:bg-slate-50"
-        >
-          {isLoading ? 'Sending...' : 'Resend Code'}
-        </Button>
-      </CardContent>
-    </Card>
+        <h2 className="text-3xl font-bold text-white mb-4">Check Your Email!</h2>
+        <p className="text-white/80 text-lg">We sent you something special ✨</p>
+      </div>
+      
+      <div className="bg-white/10 border border-white/20 rounded-xl p-6 backdrop-blur-sm">
+        <p className="text-white text-center text-lg leading-relaxed">
+          We've sent a <span className="font-bold text-[#FFEB3B]">6-digit code</span> to
+          <br/>
+          <span className="font-bold text-[#FFEB3B] text-xl">{formData.email}</span> 🎉
+        </p>
+      </div>
+      
+      <div>
+        <label className="block text-lg font-bold text-white mb-4 text-center">
+          <span className="mr-2">🔢</span>
+          Enter Your Verification Code
+        </label>
+        <input 
+          value={otp} 
+          onChange={e => setOtp(e.target.value)} 
+          maxLength={6} 
+          className="w-full px-4 py-4 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200 text-center text-2xl font-mono tracking-widest" 
+          placeholder="000000"
+        />
+      </div>
+      
+      <button 
+        onClick={sendOtp} 
+        disabled={isLoading} 
+        className="w-full text-white border border-white font-semibold py-3 px-4 rounded-lg hover:bg-white/10 transition-all duration-200 disabled:opacity-50"
+      >
+        {isLoading ? 'Sending...' : 'Resend Code'}
+      </button>
+    </div>
   );
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
+    <div className="min-h-screen bg-gradient-to-r from-[#5C258D] to-[#4389A2] text-white flex flex-col">
+      {/* Navigation */}
+      <nav className="border-b border-white/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
-            <Link to="/" className="text-2xl font-bold" style={{ color: '#7c3aed' }}>
+            <Link to="/" className="text-xl sm:text-2xl font-bold text-white">
               clearmyfile.org
             </Link>
-            <div className="flex gap-4">
-              <Button 
-                onClick={() => navigate('/login')}
-                variant="outline"
-                className="border-purple-600 text-purple-600 hover:bg-purple-50"
-              >
-                Sign In
-              </Button>
-            </div>
+            <button 
+              onClick={() => navigate('/login')}
+              className="bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-2 px-4 rounded text-sm sm:text-base"
+            >
+              Sign In
+            </button>
           </div>
         </div>
-      </header>
+      </nav>
       
-      <div className="max-w-4xl mx-auto py-12 px-4">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">
-            Create Your Account
-          </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Join our platform and get access to professional tools and services.
-          </p>
-        </div>
-        
-        {/* Progress Bar */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm font-medium text-slate-700">
+      <div className="flex-1 px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-8 sm:mb-12">
+            <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4 sm:mb-6">
+              Create Your Account
+            </h1>
+    
+          </div>
+          
+          {/* Progress Bar */}
+          <div className="mb-8 sm:mb-12">
+            <div className="flex justify-between items-center mb-4 sm:mb-6">
+              <span className="text-sm font-medium text-white/90">
                 {showOtpVerification ? 'Email Verification' : `Step ${currentStep} of 3`}
               </span>
+              <span className="text-sm text-white/70">
+                {showOtpVerification ? 'Verify your email address' : 
+                  currentStep === 1 ? 'Personal Information' : 
+                  currentStep === 2 ? 'Address Information' : 'Additional Information'}
+              </span>
             </div>
-            <span className="text-sm text-slate-500">
-              {showOtpVerification ? 'Verify your email address' : 
-                currentStep === 1 ? 'Personal Information' : 
-                currentStep === 2 ? 'Address Information' : 'Additional Information'}
-            </span>
+            <div className="w-full bg-white/20 rounded-full h-2 sm:h-3">
+              <div 
+                className="bg-[#FFEB3B] h-2 sm:h-3 rounded-full transition-all duration-500 ease-out"
+                style={{ width: `${showOtpVerification ? 100 : (currentStep / 3) * 100}%` }}
+              />
+            </div>
           </div>
-          <div className="w-full bg-slate-200 rounded-full h-2">
-            <div 
-              className="h-2 rounded-full transition-all duration-300 ease-in-out"
-              style={{ 
-                width: `${showOtpVerification ? 100 : (currentStep / 3) * 100}%`,
-                background: PRIMARY_GRADIENT
-              }}
-            />
+          
+          {/* Form Content */}
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20 mb-8">
+            {showOtpVerification ? renderOtpVerification() : (
+              <>
+                {currentStep === 1 && renderSection1()}
+                {currentStep === 2 && renderSection2()}
+                {currentStep === 3 && renderSection3()}
+              </>
+            )}
           </div>
-        </div>
-        
-        {/* Form Content */}
-        {showOtpVerification ? renderOtpVerification() : (
-          <>
-            {currentStep === 1 && renderSection1()}
-            {currentStep === 2 && renderSection2()}
-            {currentStep === 3 && renderSection3()}
-          </>
-        )}
-        
-        {/* Navigation Buttons */}
-        <div className="flex justify-between mt-8">
-          <Button 
-            onClick={showOtpVerification ? () => setShowOtpVerification(false) : () => setCurrentStep(Math.max(1, currentStep - 1))} 
-            disabled={!showOtpVerification && currentStep === 1} 
-            variant="outline"
-            className="h-11 px-8 border-slate-300 text-slate-600 hover:bg-slate-50"
-          >
-            {showOtpVerification ? 'Back to Form' : 'Previous'}
-          </Button>
-          {showOtpVerification ? (
-            <Button 
-              onClick={handleSubmit} 
-              disabled={isLoading || !otp} 
-              className="h-11 px-8 text-white font-medium"
-              style={{ background: SUCCESS_GRADIENT }}
+          
+          {/* Navigation Buttons */}
+          <div className="flex flex-col sm:flex-row justify-between gap-4">
+            <button 
+              onClick={showOtpVerification ? () => setShowOtpVerification(false) : () => setCurrentStep(Math.max(1, currentStep - 1))} 
+              disabled={!showOtpVerification && currentStep === 1} 
+              className="text-white border border-white font-semibold py-3 px-6 sm:px-8 rounded-lg hover:bg-white/10 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1"
             >
-              {isLoading ? 'Verifying...' : 'Verify & Create Account'}
-            </Button>
-          ) : currentStep < 3 ? (
-            <Button 
-              onClick={() => setCurrentStep(currentStep + 1)} 
-              className="h-11 px-8 text-white font-medium"
-              style={{ background: PRIMARY_GRADIENT }}
-            >
-              Next Step
-            </Button>
-          ) : (
-            <Button 
-              onClick={handleSubmit} 
-              disabled={isLoading} 
-              className="h-11 px-8 text-white font-medium"
-              style={{ background: PRIMARY_GRADIENT }}
-            >
-              {isLoading ? 'Sending OTP...' : 'Send Verification Code'}
-            </Button>
-          )}
-        </div>
-        
-        {/* Footer */}
-        <div className="text-center mt-12 pt-8 border-t border-slate-200">
-          <p className="text-sm text-slate-600">
-            Already have an account? 
-            <Link 
-              to="/login" 
-              className="text-purple-600 hover:text-purple-800 font-medium ml-1"
-            >
-              Sign in here
-            </Link>
-          </p>
+              {showOtpVerification ? 'Back to Form' : 'Previous'}
+            </button>
+            {showOtpVerification ? (
+              <button 
+                onClick={handleSubmit} 
+                disabled={isLoading || !otp} 
+                className="bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
+              >
+                {isLoading ? 'Verifying...' : 'Verify & Create Account'}
+              </button>
+            ) : currentStep < 3 ? (
+              <button 
+                onClick={() => setCurrentStep(currentStep + 1)} 
+                className="bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 order-1 sm:order-2"
+              >
+                Next Step
+              </button>
+            ) : (
+              <button 
+                onClick={handleSubmit} 
+                disabled={isLoading} 
+                className="bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-6 sm:px-8 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2"
+              >
+                {isLoading ? 'Sending OTP...' : 'Send Verification Code'}
+              </button>
+            )}
+          </div>
+          
+          {/* Footer */}
+          <div className="text-center mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/20">
+            <p className="text-sm text-white/80">
+              Already have an account? 
+              <Link 
+                to="/login" 
+                className="text-[#FFEB3B] hover:text-yellow-300 font-medium ml-1 transition-colors duration-200"
+              >
+                Sign in here
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Floating Elements */}
+      <div className="absolute top-1/4 left-1/4 w-24 sm:w-32 h-24 sm:h-32 bg-[#FFEB3B]/20 rounded-full blur-xl animate-pulse"></div>
+      <div className="absolute bottom-1/4 right-1/4 w-16 sm:w-24 h-16 sm:h-24 bg-[#5C258D]/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
     </div>
   );
 };

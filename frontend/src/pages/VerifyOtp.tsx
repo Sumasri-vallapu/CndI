@@ -18,27 +18,34 @@ const VerifyOtp = ({ email }: { email: string }) => {
     };
 
     return (
-        <div
-            className="min-h-screen flex items-center justify-center"
-            style={{
-                background: 'linear-gradient(135deg, #3a1c71, #d76d77, #ffaf7b)'
-            }}
-        >
-            <div className="bg-white p-8 rounded-lg shadow-lg w-80 text-center">
-                <h2 className="text-xl font-bold mb-4 text-gray-700">Enter OTP</h2>
-                <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    className="border border-gray-300 p-2 mb-4 w-full rounded"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                />
-                <button
-                    onClick={handleVerify}
-                    className="bg-[#3a1c71] hover:bg-[#5b2d91] text-white px-4 py-2 rounded w-full"
-                >
-                    Verify OTP
-                </button>
+        <div className="min-h-screen bg-gradient-to-r from-[#5C258D] to-[#4389A2] text-white flex items-center justify-center px-4">
+            <div className="w-full max-w-md">
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20">
+                    <div className="text-center mb-8">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFEB3B] rounded-full mb-6">
+                            <span className="text-3xl">🔢</span>
+                        </div>
+                        <h1 className="text-3xl font-bold text-white mb-2">Enter OTP</h1>
+                        <p className="text-white/80">Enter the verification code sent to your email</p>
+                    </div>
+                    
+                    <div className="space-y-6">
+                        <input
+                            type="text"
+                            placeholder="Enter OTP"
+                            className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200 text-center text-xl font-mono tracking-wider"
+                            value={otp}
+                            onChange={(e) => setOtp(e.target.value)}
+                            maxLength={6}
+                        />
+                        <button
+                            onClick={handleVerify}
+                            className="w-full bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-4 rounded-lg transition-all duration-200"
+                        >
+                            Verify OTP
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );

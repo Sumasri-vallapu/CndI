@@ -7,11 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: 'var(--background)',
-        foreground: 'var(--foreground)',
-        walnut: 'var(--color-walnut)',
-        earth: 'var(--color-earth)',
-        onyx: 'var(--color-onyx)',
+        shroomStart: '#5C258D',
+        shroomEnd: '#4389A2',
+        actionYellow: '#FFEB3B',
+        actionYellowHover: '#FDD835',
+        darkNav: '#212121',
+        darkFooter: '#424242',
       },
       fontFamily: {
         sans: ['system-ui', 'sans-serif'],
@@ -19,4 +20,4 @@ export default {
     },
   },
   plugins: [],
-} 
+}
