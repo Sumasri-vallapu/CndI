@@ -197,3 +197,90 @@ def protected_view(request):
 def debug_users(request):
     users = User.objects.all().values('id', 'username', 'email', 'first_name', 'last_name')
     return Response({"users": list(users)})
+
+# Location endpoints
+@api_view(['GET'])
+def get_states(request):
+    states = [
+        {"id": "1", "name": "Andhra Pradesh"},
+        {"id": "2", "name": "Arunachal Pradesh"},
+        {"id": "3", "name": "Assam"},
+        {"id": "4", "name": "Bihar"},
+        {"id": "5", "name": "Chhattisgarh"},
+        {"id": "6", "name": "Goa"},
+        {"id": "7", "name": "Gujarat"},
+        {"id": "8", "name": "Haryana"},
+        {"id": "9", "name": "Himachal Pradesh"},
+        {"id": "10", "name": "Jharkhand"},
+        {"id": "11", "name": "Karnataka"},
+        {"id": "12", "name": "Kerala"},
+        {"id": "13", "name": "Madhya Pradesh"},
+        {"id": "14", "name": "Maharashtra"},
+        {"id": "15", "name": "Manipur"},
+        {"id": "16", "name": "Meghalaya"},
+        {"id": "17", "name": "Mizoram"},
+        {"id": "18", "name": "Nagaland"},
+        {"id": "19", "name": "Odisha"},
+        {"id": "20", "name": "Punjab"},
+        {"id": "21", "name": "Rajasthan"},
+        {"id": "22", "name": "Sikkim"},
+        {"id": "23", "name": "Tamil Nadu"},
+        {"id": "24", "name": "Telangana"},
+        {"id": "25", "name": "Tripura"},
+        {"id": "26", "name": "Uttar Pradesh"},
+        {"id": "27", "name": "Uttarakhand"},
+        {"id": "28", "name": "West Bengal"},
+        {"id": "29", "name": "Delhi"},
+        {"id": "30", "name": "Jammu and Kashmir"},
+        {"id": "31", "name": "Ladakh"},
+        {"id": "32", "name": "Puducherry"},
+        {"id": "33", "name": "Chandigarh"},
+        {"id": "34", "name": "Dadra and Nagar Haveli and Daman and Diu"},
+        {"id": "35", "name": "Lakshadweep"},
+        {"id": "36", "name": "Andaman and Nicobar Islands"}
+    ]
+    return Response(states)
+
+@api_view(['GET'])
+def get_districts(request):
+    state_id = request.GET.get('state_id')
+    # Sample districts for demonstration - you can expand this based on state_id
+    districts = [
+        {"id": "1", "name": "Visakhapatnam"},
+        {"id": "2", "name": "Vijayawada"},
+        {"id": "3", "name": "Guntur"},
+        {"id": "4", "name": "Nellore"},
+        {"id": "5", "name": "Kurnool"},
+        {"id": "6", "name": "Rajahmundry"},
+        {"id": "7", "name": "Tirupati"},
+        {"id": "8", "name": "Kadapa"},
+        {"id": "9", "name": "Anantapur"},
+        {"id": "10", "name": "Chittoor"}
+    ]
+    return Response(districts)
+
+@api_view(['GET'])
+def get_mandals(request):
+    district_id = request.GET.get('district_id')
+    # Sample mandals for demonstration
+    mandals = [
+        {"id": "1", "name": "Mandal 1"},
+        {"id": "2", "name": "Mandal 2"},
+        {"id": "3", "name": "Mandal 3"},
+        {"id": "4", "name": "Mandal 4"},
+        {"id": "5", "name": "Mandal 5"}
+    ]
+    return Response(mandals)
+
+@api_view(['GET'])
+def get_grampanchayats(request):
+    mandal_id = request.GET.get('mandal_id')
+    # Sample grampanchayats for demonstration
+    grampanchayats = [
+        {"id": "1", "name": "Grampanchayat 1"},
+        {"id": "2", "name": "Grampanchayat 2"},
+        {"id": "3", "name": "Grampanchayat 3"},
+        {"id": "4", "name": "Grampanchayat 4"},
+        {"id": "5", "name": "Grampanchayat 5"}
+    ]
+    return Response(grampanchayats)
