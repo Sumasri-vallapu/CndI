@@ -11,6 +11,8 @@ export const ENDPOINTS = {
   SIGNUP: `${BASE_URL}/signup/`,
   LOGIN: `${BASE_URL}/login/`,
   VERIFY_OTP: `${BASE_URL}/verify_otp/`,
+  FORGOT_PASSWORD: `${BASE_URL}/forgot_password/`,
+  RESET_PASSWORD: `${BASE_URL}/reset_password/`,
   
   // Location endpoints
   GET_STATES: `https://yuvachetana.com/api/states/`,

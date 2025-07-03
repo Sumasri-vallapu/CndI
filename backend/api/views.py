@@ -131,6 +131,53 @@ def verify_otp(request):
         "refresh": str(refresh),
     })
 
+@api_view(['POST'])
+def forgot_password(request):
+    email = request.data.get('email')
+    if not email:
+        return Response({"error": "Email is required"}, status=400)
+
+    try:
+        user = User.objects.get(email=email)
+        otp = random.randint(1000, 9999)
+        otp_store[f"reset_{email}"] = otp
+
+        send_mail(
+            "Password Reset - ClearMyFile",
+            f"Your password reset code is: {otp}",
+            "yourapp@gmail.com",  # Replace with your email
+            [email],
+            fail_silently=False,
+        )
+        return Response({"message": "Password reset code sent"})
+    except User.DoesNotExist:
+        return Response({"error": "No account found with this email address"}, status=404)
+
+@api_view(['POST'])
+def reset_password(request):
+    email = request.data.get('email')
+    otp = request.data.get('otp')
+    new_password = request.data.get('new_password')
+    
+    if not email or not otp or not new_password:
+        return Response({"error": "Email, OTP, and new password are required"}, status=400)
+    
+    # Verify OTP
+    if otp_store.get(f"reset_{email}") != int(otp):
+        return Response({"error": "Invalid or expired reset code"}, status=400)
+    
+    try:
+        user = User.objects.get(email=email)
+        user.set_password(new_password)
+        user.save()
+        
+        # Clear the reset OTP
+        del otp_store[f"reset_{email}"]
+        
+        return Response({"message": "Password reset successfully"})
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=404)
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def protected_view(request):

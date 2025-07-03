@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -9,7 +9,9 @@ import { Progress } from '../components/ui/progress';
 import { ENDPOINTS } from '../utils/api';
 import { useLocationData } from '../hooks/useLocationData';
 
-const PROFESSIONAL_GRADIENT = "linear-gradient(135deg, #1e3a8a, #3b82f6, #60a5fa)";
+const PRIMARY_GRADIENT = "linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)";
+const SUCCESS_GRADIENT = "linear-gradient(135deg, #059669 0%, #10b981 100%)";
+const SECONDARY_GRADIENT = "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)";
 
 interface FormData {
   name: string;
@@ -157,9 +159,9 @@ const Signup: React.FC = () => {
   };
 
   const renderSection1 = () => (
-    <Card className="bg-white shadow-xl border-0">
-      <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-        <CardTitle className="text-2xl font-semibold text-slate-800 flex items-center">
+    <Card className="bg-white shadow-lg border">
+      <CardHeader className="bg-slate-50 border-b">
+        <CardTitle className="text-2xl font-semibold text-slate-900 flex items-center">
           <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
             <span className="text-blue-600 font-bold">1</span>
           </div>
@@ -169,18 +171,22 @@ const Signup: React.FC = () => {
       <CardContent className="p-8 space-y-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Full Name *</Label>
+            <Label className="text-sm font-medium text-slate-700">
+              Full Name *
+            </Label>
             <Input 
               value={formData.name} 
               onChange={e => handleInputChange('name', e.target.value)} 
-              className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500"
+              className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500"
               placeholder="Enter your full name"
             />
           </div>
           <div className="space-y-2">
-            <Label className="text-sm font-medium text-slate-700">Gender</Label>
+            <Label className="text-sm font-medium text-slate-700">
+              Gender
+            </Label>
             <Select value={formData.gender} onValueChange={v => handleInputChange('gender', v)}>
-              <SelectTrigger className="h-11 border-slate-300 focus:border-blue-500 focus:ring-blue-500">
+              <SelectTrigger className="h-11 border-slate-300 focus:border-purple-500 focus:ring-purple-500">
                 <SelectValue placeholder="Select gender" />
               </SelectTrigger>
               <SelectContent className="bg-white">
@@ -395,29 +401,39 @@ const Signup: React.FC = () => {
   );
 
   const renderOtpVerification = () => (
-    <Card className="bg-white shadow-xl border-0">
-      <CardHeader className="bg-gradient-to-r from-slate-50 to-blue-50 border-b">
-        <CardTitle className="text-2xl font-semibold text-slate-800 flex items-center">
-          <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
-            <span className="text-green-600 font-bold">✓</span>
+    <Card className="bg-white/90 backdrop-blur-sm shadow-2xl border-0 overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-green-500/10 to-blue-500/10 border-b border-green-200">
+        <CardTitle className="text-3xl font-bold text-gray-800 flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mr-4" style={{ background: SUCCESS_GRADIENT }}>
+            <span className="text-white text-2xl">📬</span>
           </div>
-          Verify Your Email
+          <div className="text-center">
+            <div className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              Check Your Email!
+            </div>
+            <div className="text-sm text-gray-600 font-normal mt-1">We sent you something special ✨</div>
+          </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-8 space-y-6">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-slate-700 text-center">
-            We've sent a 6-digit verification code to <strong className="text-blue-600">{formData.email}</strong>
+      <CardContent className="p-10 space-y-8 text-center">
+        <div className="bg-gradient-to-r from-purple-50 to-pink-50 border-2 border-purple-200 rounded-2xl p-6">
+          <p className="text-gray-700 text-lg leading-relaxed">
+            We've sent a <span className="font-bold text-purple-600">magical 6-digit code</span> to
+            <br/>
+            <span className="font-bold text-pink-600 text-xl">{formData.email}</span> 🎉
           </p>
         </div>
-        <div className="space-y-2">
-          <Label className="text-sm font-medium text-slate-700">Enter Verification Code</Label>
+        <div className="space-y-4">
+          <Label className="text-lg font-bold text-gray-700 flex items-center justify-center">
+            <span className="mr-2">🔢</span>
+            Enter Your Magic Code
+          </Label>
           <Input 
             value={otp} 
             onChange={e => setOtp(e.target.value)} 
             maxLength={6} 
-            className="text-center text-xl font-mono h-14 border-slate-300 focus:border-blue-500 focus:ring-blue-500 tracking-widest" 
-            placeholder="000000"
+            className="text-center text-3xl font-mono h-16 border-4 border-purple-200 focus:border-purple-500 focus:ring-purple-500 tracking-widest rounded-xl shadow-lg" 
+            placeholder="⭐⭐⭐⭐⭐⭐"
           />
         </div>
         <Button 
@@ -433,12 +449,36 @@ const Signup: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-slate-50">
+      {/* Header */}
+      <header className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <Link to="/" className="text-2xl font-bold" style={{ color: '#7c3aed' }}>
+              clearmyfile.org
+            </Link>
+            <div className="flex gap-4">
+              <Button 
+                onClick={() => navigate('/login')}
+                variant="outline"
+                className="border-purple-600 text-purple-600 hover:bg-purple-50"
+              >
+                Sign In
+              </Button>
+            </div>
+          </div>
+        </div>
+      </header>
+      
+      <div className="max-w-4xl mx-auto py-12 px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-800 mb-4">Create Your Account</h1>
-          <p className="text-lg text-slate-600">Join our platform and get started today</p>
+          <h1 className="text-4xl font-bold text-slate-900 mb-4">
+            Create Your Account
+          </h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Join our platform and get access to professional tools and services.
+          </p>
         </div>
         
         {/* Progress Bar */}
@@ -450,9 +490,9 @@ const Signup: React.FC = () => {
               </span>
             </div>
             <span className="text-sm text-slate-500">
-              {showOtpVerification ? 'Almost done!' : 
-                currentStep === 1 ? 'Personal Details' : 
-                currentStep === 2 ? 'Address Information' : 'Final Step'}
+              {showOtpVerification ? 'Verify your email address' : 
+                currentStep === 1 ? 'Personal Information' : 
+                currentStep === 2 ? 'Address Information' : 'Additional Information'}
             </span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2">
@@ -460,7 +500,7 @@ const Signup: React.FC = () => {
               className="h-2 rounded-full transition-all duration-300 ease-in-out"
               style={{ 
                 width: `${showOtpVerification ? 100 : (currentStep / 3) * 100}%`,
-                background: PROFESSIONAL_GRADIENT
+                background: PRIMARY_GRADIENT
               }}
             />
           </div>
@@ -490,7 +530,7 @@ const Signup: React.FC = () => {
               onClick={handleSubmit} 
               disabled={isLoading || !otp} 
               className="h-11 px-8 text-white font-medium"
-              style={{ background: PROFESSIONAL_GRADIENT }}
+              style={{ background: SUCCESS_GRADIENT }}
             >
               {isLoading ? 'Verifying...' : 'Verify & Create Account'}
             </Button>
@@ -498,7 +538,7 @@ const Signup: React.FC = () => {
             <Button 
               onClick={() => setCurrentStep(currentStep + 1)} 
               className="h-11 px-8 text-white font-medium"
-              style={{ background: PROFESSIONAL_GRADIENT }}
+              style={{ background: PRIMARY_GRADIENT }}
             >
               Next Step
             </Button>
@@ -507,7 +547,7 @@ const Signup: React.FC = () => {
               onClick={handleSubmit} 
               disabled={isLoading} 
               className="h-11 px-8 text-white font-medium"
-              style={{ background: PROFESSIONAL_GRADIENT }}
+              style={{ background: PRIMARY_GRADIENT }}
             >
               {isLoading ? 'Sending OTP...' : 'Send Verification Code'}
             </Button>
@@ -516,14 +556,14 @@ const Signup: React.FC = () => {
         
         {/* Footer */}
         <div className="text-center mt-12 pt-8 border-t border-slate-200">
-          <p className="text-sm text-slate-500">
+          <p className="text-sm text-slate-600">
             Already have an account? 
-            <button 
-              onClick={() => navigate('/login')} 
-              className="text-blue-600 hover:text-blue-800 font-medium ml-1"
+            <Link 
+              to="/login" 
+              className="text-purple-600 hover:text-purple-800 font-medium ml-1"
             >
               Sign in here
-            </button>
+            </Link>
           </p>
         </div>
       </div>
