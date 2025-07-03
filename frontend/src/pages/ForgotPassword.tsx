@@ -25,6 +25,9 @@ const ForgotPassword = () => {
         }
 
         setIsLoading(true);
+        console.log('Attempting to send reset OTP to:', email);
+        console.log('Using endpoint:', ENDPOINTS.FORGOT_PASSWORD);
+        
         try {
             const response = await fetch(ENDPOINTS.FORGOT_PASSWORD, {
                 method: 'POST',
@@ -34,16 +37,28 @@ const ForgotPassword = () => {
                 body: JSON.stringify({ email }),
             });
 
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+
+            const responseData = await response.json();
+            console.log('Response data:', responseData);
+
             if (response.ok) {
-                alert('Password reset code sent to your email');
+                alert('Password reset code sent! Check your email and backend console logs for the OTP.');
                 setStep(2);
             } else {
-                const errorData = await response.json();
-                alert(errorData.error || 'Failed to send reset code');
+                if (response.status === 404) {
+                    alert('No account found with this email address. Please check your email or create a new account.');
+                } else {
+                    alert(responseData.error || 'Failed to send reset code. Please try again.');
+                }
+                console.error('Reset error:', responseData);
             }
         } catch (error) {
-            console.error('Reset error:', error);
-            alert('Failed to send reset code. Please try again.');
+            console.error('Network error details:', error);
+            console.log('Error type:', error.constructor.name);
+            console.log('Error message:', error.message);
+            alert(`Network error: ${error.message}. Make sure your backend server is running on http://localhost:8000`);
         } finally {
             setIsLoading(false);
         }

@@ -142,16 +142,25 @@ def forgot_password(request):
         otp = random.randint(1000, 9999)
         otp_store[f"reset_{email}"] = otp
 
-        send_mail(
-            "Password Reset - ClearMyFile",
-            f"Your password reset code is: {otp}",
-            "yourapp@gmail.com",  # Replace with your email
-            [email],
-            fail_silently=False,
-        )
+        try:
+            send_mail(
+                "Password Reset - ClearMyFile",
+                f"Your password reset code is: {otp}",
+                "clearmyfile.org@gmail.com",  # Replace with your email
+                [email],
+                fail_silently=False,
+            )
+            print(f"Password reset OTP for {email}: {otp}")  # Development fallback
+        except Exception as e:
+            print(f"Email sending failed: {e}")
+            print(f"Password reset OTP for {email}: {otp}")  # Development fallback
+            
         return Response({"message": "Password reset code sent"})
     except User.DoesNotExist:
         return Response({"error": "No account found with this email address"}, status=404)
+    except Exception as e:
+        print(f"Unexpected error in forgot_password: {e}")
+        return Response({"error": "Failed to process password reset request"}, status=500)
 
 @api_view(['POST'])
 def reset_password(request):
@@ -182,3 +191,9 @@ def reset_password(request):
 @permission_classes([IsAuthenticated])
 def protected_view(request):
     return Response({"message": f"Hello {request.user.username}"})
+
+# Debug endpoint to check users (remove in production)
+@api_view(['GET'])
+def debug_users(request):
+    users = User.objects.all().values('id', 'username', 'email', 'first_name', 'last_name')
+    return Response({"users": list(users)})
