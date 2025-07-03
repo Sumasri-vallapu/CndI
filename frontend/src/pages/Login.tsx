@@ -1,108 +1,95 @@
 import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import logo from '../assets/image.png';
+import { useNavigate, Link } from 'react-router-dom';
+import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
+import { Label } from '../components/ui/label';
+import { ENDPOINTS } from '../utils/api';
 
-const Login = ({ onOtpSent }: { onOtpSent: (email: string) => void }) => {
+const Login = () => {
     const [email, setEmail] = useState('');
-    const [name, setName] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const handleSendOtp = async () => {
+    const handleLogin = async () => {
+        if (!email || !password) {
+            alert('Please enter both email and password');
+            return;
+        }
+
+        setIsLoading(true);
         try {
-            await axios.post('http://127.0.0.1:8000/api/send_otp/', { email, name });
-            alert('OTP sent to your email');
-            onOtpSent(email);
-            navigate('/verify');
-        } catch {
-            alert('Failed to send OTP');
+            const response = await fetch(ENDPOINTS.LOGIN, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                localStorage.setItem('access_token', data.access);
+                localStorage.setItem('refresh_token', data.refresh);
+                navigate('/protected');
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || 'Login failed');
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            alert('Login failed. Please try again.');
+        } finally {
+            setIsLoading(false);
         }
     };
 
     return (
-        <div
-            style={{
-                minHeight: '100vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                padding: '1rem',
-                background: '#f5f5f5',  // Replaced gradient with light grey background
-            }}
-        >
-            <div
-                style={{
-                    background: '#fff',
-                    borderRadius: '1rem',
-                    padding: '1.5rem',
-                    width: '100%',
-                    maxWidth: '320px',
-                    boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-                }}
-            >
-                <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
-                    <img
-                        src={logo}
-                        alt="ClearMyFiles.org"
-                        style={{ width: '40px', height: '40px', marginRight: '0.5rem' }}
-                    />
-                    <div>
-                        <div style={{ fontSize: '1rem', fontWeight: 'bold', color: '#3a1c71' }}>
-                            ClearMyFiles.org
+        <div className="min-h-screen bg-gradient-to-br from-[#7A3D1A] via-[#A86543] to-[#7A3D1A] flex items-center justify-center p-4">
+            <div className="w-full max-w-md">
+                <Card className="backdrop-blur-sm bg-white/90 border-0 shadow-xl">
+                    <CardHeader className="text-center">
+                        <CardTitle className="text-2xl font-bold text-[#7A3D1A]">Welcome Back</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label htmlFor="email">Email Address</Label>
+                            <Input
+                                id="email"
+                                type="email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                placeholder="your.email@example.com"
+                            />
                         </div>
-                        <div style={{ fontSize: '0.7rem', color: '#3a1c71' }}>
-                            Make Your Voice Count
+                        <div>
+                            <Label htmlFor="password">Password</Label>
+                            <Input
+                                id="password"
+                                type="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Enter your password"
+                            />
                         </div>
-                    </div>
-                </div>
-
-                <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', color: '#3a1c71', marginBottom: '0.75rem', textAlign: 'center' }}>
-                    Login to proceed
-                </h3>
-                <p style={{ fontSize: '0.85rem', fontWeight: '600', marginBottom: '0.5rem', textAlign: 'center' }}>
-                    Login With Gmail
-                </p>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    style={{
-                        width: '100%',
-                        padding: '0.5rem',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #ccc',
-                        marginBottom: '0.75rem',
-                    }}
-                />
-                <input
-                    type="text"
-                    placeholder="Name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    style={{
-                        width: '100%',
-                        padding: '0.5rem',
-                        borderRadius: '0.5rem',
-                        border: '1px solid #ccc',
-                        marginBottom: '1rem',
-                    }}
-                />
-                <button
-                    onClick={handleSendOtp}
-                    style={{
-                        width: '100%',
-                        padding: '0.75rem',
-                        background: '#3a1c71',
-                        color: '#fff',
-                        borderRadius: '0.5rem',
-                        fontWeight: 'bold',
-                        border: 'none',
-                        cursor: 'pointer',
-                    }}
-                >
-                    Send OTP
-                </button>
+                        <Button
+                            onClick={handleLogin}
+                            disabled={isLoading}
+                            className="w-full bg-[#7A3D1A] hover:bg-[#A86543] text-white font-medium"
+                        >
+                            {isLoading ? 'Signing in...' : 'Sign In'}
+                        </Button>
+                        <div className="text-center pt-4">
+                            <p className="text-sm text-gray-600">
+                                Don't have an account?{' '}
+                                <Link to="/signup" className="text-[#7A3D1A] hover:underline font-medium">
+                                    Sign up here
+                                </Link>
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
             </div>
         </div>
     );

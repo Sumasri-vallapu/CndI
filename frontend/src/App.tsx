@@ -1,17 +1,17 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login';
+import Signup from './pages/Signup';
 import VerifyOtp from './pages/VerifyOtp';
 import Protected from './pages/Protected';
 
 export default function App() {
-  const [email, setEmail] = useState('');
-
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Login onOtpSent={setEmail} />} />
-        <Route path="/verify" element={<VerifyOtp email={email} />} />
+        <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/verify" element={<VerifyOtp />} />
         <Route path="/protected" element={<Protected />} />
       </Routes>
     </BrowserRouter>
