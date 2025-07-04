@@ -49,9 +49,9 @@ export const FormField = ({
                         <SelectTrigger className="w-full">
                             <SelectValue placeholder={placeholder || `Select ${label}`} />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-gradient-to-r from-[#5C258D] to-[#4389A2] border-white/20 text-white">
                             {options?.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
+                                <SelectItem key={option.value} value={option.value} className="text-white hover:bg-white/20 focus:bg-white/20">
                                     {option.label}
                                 </SelectItem>
                             ))}

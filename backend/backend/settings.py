@@ -104,12 +104,17 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
 STATIC_URL = '/static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Email Configuration
+# For development: use console backend to see OTP in terminal
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# For production: SMTP settings configured
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'clearmyfile.org@gmail.com'  # your Gmail
-EMAIL_HOST_PASSWORD = 'vdnl xmcv pmih jwks'  # Gmail app password
+EMAIL_HOST_USER = 'clearmyfile.org@gmail.com'
+EMAIL_HOST_PASSWORD = 'vdnl xmcv pmih jwks'
 
 # S3 Storage
 # AWS_ACCESS_KEY_ID = 'your-clearmyfile-access-key'
