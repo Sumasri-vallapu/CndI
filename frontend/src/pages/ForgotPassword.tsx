@@ -11,7 +11,6 @@ const ForgotPassword = () => {
     const [isLoading, setIsLoading] = useState(false);
     const navigate = useNavigate();
 
-    const inputClasses = "w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200";
 
     const sendResetOtp = async () => {
         if (!email) {
@@ -129,7 +128,7 @@ const ForgotPassword = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your registered email address"
-                    className={inputClasses}
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200"
                 />
             </div>
             
@@ -184,7 +183,7 @@ const ForgotPassword = () => {
                     onChange={(e) => setOtp(e.target.value)}
                     placeholder="Enter 6-digit code"
                     maxLength={6}
-                    className={`${inputClasses} text-center font-mono tracking-wider`}
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200 text-center font-mono tracking-wider"
                 />
             </div>
             
@@ -198,7 +197,7 @@ const ForgotPassword = () => {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Enter your new password"
-                    className={inputClasses}
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200"
                 />
             </div>
             
@@ -212,7 +211,7 @@ const ForgotPassword = () => {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Confirm your new password"
-                    className={inputClasses}
+                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200"
                 />
                 {newPassword && confirmPassword && newPassword !== confirmPassword && (
                     <p className="text-red-400 text-sm mt-2 flex items-center">
