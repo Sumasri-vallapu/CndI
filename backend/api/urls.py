@@ -1,5 +1,9 @@
 from django.urls import path
 from api import views
+from .views import (get_states,
+    get_districts,
+    get_mandals,
+    get_grampanchayats)
 
 urlpatterns = [
     path('send_otp/', views.send_otp),
@@ -11,9 +15,9 @@ urlpatterns = [
     path('protected/', views.protected_view),
     path('debug_users/', views.debug_users),  # Remove in production
     
-    # Location endpoints
-    path('states/', views.get_states),
-    path('districts/', views.get_districts),
-    path('mandals/', views.get_mandals),
-    path('grampanchayats/', views.get_grampanchayats),
+        # location api   
+    path('states/', get_states, name='get_states'),
+    path('districts/', get_districts, name='get_districts'),
+    path('mandals/', get_mandals, name='get_mandals'),
+    path('grampanchayats/', get_grampanchayats, name='get_grampanchayats'),
 ]

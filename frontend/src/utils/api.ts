@@ -1,8 +1,8 @@
 // API configuration
-//const BASE_URL = 'https://yuvachetana.com//api';
-const BASE_URL = 'https://clearmyfile.com/api';
+const LOC_URL = 'https://yuvachetana.com//api';
+//const BASE_URL = 'https://clearmyfile.com/api';
 
-//const BASE_URL = 'http://localhost:8000/api';
+const BASE_URL = 'http://localhost:8000/api';
 
 // API endpoints
 export const ENDPOINTS = {
@@ -16,9 +16,9 @@ export const ENDPOINTS = {
   RESET_PASSWORD: `${BASE_URL}/reset_password/`,
   
   // Location endpoints
-  GET_STATES: `${BASE_URL}/states/`,
-  GET_DISTRICTS: `${BASE_URL}/districts/`,
-  GET_MANDALS: `${BASE_URL}/mandals/`,
-  GET_GRAMPANCHAYATS: `${BASE_URL}/grampanchayats/`,
+  GET_STATES: `${LOC_URL}/states/`,
+  GET_DISTRICTS: `${LOC_URL}/districts/`,
+  GET_MANDALS: `${LOC_URL}/mandals/`,
+  GET_GRAMPANCHAYATS: `${LOC_URL}/grampanchayats/`,
 
 } as const; 

@@ -36,11 +36,6 @@ class UserProfile(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     qualification = models.CharField(max_length=20, choices=QUALIFICATION_CHOICES, blank=True)
     
-    # Address Information
-    state = models.CharField(max_length=100, blank=True)
-    district = models.CharField(max_length=100, blank=True)
-    mandal = models.CharField(max_length=100, blank=True)
-    panchayath = models.CharField(max_length=100, blank=True)
     
     # Referral Source
     referral_source = models.CharField(max_length=20, choices=REFERRAL_CHOICES, blank=True)
@@ -50,3 +45,33 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} ({self.user.email})"
+    
+class State(models.Model):
+    state_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.state_name
+
+
+class District(models.Model):
+    state = models.ForeignKey(State, on_delete=models.CASCADE)
+    district_name = models.CharField(max_length=100)
+    
+
+    def __str__(self):
+        return self.district_name
+
+class Mandal(models.Model):
+    district = models.ForeignKey(District, on_delete=models.CASCADE)
+    mandal_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.mandal_name
+
+
+class GramPanchayat(models.Model):
+    mandal = models.ForeignKey(Mandal, on_delete=models.CASCADE)
+    gram_panchayat_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.gram_panchayat_name
