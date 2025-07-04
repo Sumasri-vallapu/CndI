@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
-import { Progress } from '../components/ui/progress';
 import { ENDPOINTS } from '../utils/api';
 import { useLocationData } from '../hooks/useLocationData';
 
@@ -23,8 +22,8 @@ interface FormData {
 const CompleteProfile: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState(location.state?.email || '');
-  const [password, setPassword] = useState(location.state?.password || '');
+  const [email] = useState(location.state?.email || '');
+  const [password] = useState(location.state?.password || '');
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({

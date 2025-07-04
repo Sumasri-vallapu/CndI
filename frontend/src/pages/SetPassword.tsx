@@ -5,7 +5,7 @@ import { Progress } from '../components/ui/progress';
 const SetPassword: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [email, setEmail] = useState(location.state?.email || '');
+  const [email] = useState(location.state?.email || '');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: '' });
