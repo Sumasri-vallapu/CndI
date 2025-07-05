@@ -6,14 +6,18 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.utils import timezone
 import random
 from .models import(State,
     District,
     Mandal,
     GramPanchayat)
 
+# In-memory store for OTP verification (for development)
+# In production, you should use Redis or a proper database
 otp_store = {}
+pending_users = {}
 
 @api_view(['POST'])
 def send_otp(request):
@@ -23,14 +27,38 @@ def send_otp(request):
         return Response({"error": "Email is required"}, status=400)
 
     otp = random.randint(100000, 999999)  # 6-digit OTP
-    otp_store[email] = otp
+    
+    # Store OTP with expiration time (10 minutes)
+    expiry_time = timezone.now() + timedelta(minutes=10)
+    otp_store[email] = {
+        'otp': otp,
+        'expires_at': expiry_time,
+        'name': name
+    }
 
+    # HTML email template from emailtemplate.txt
     email_subject = "Verify Your Email - ClearMyFile"
-    email_message = f"""Hello {name}!
+    html_message = f"""<!DOCTYPE html>
+<html>
+  <body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; text-align: center;">
+    <div style="max-width: 500px; background: #fff; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
+      <h2 style="color: #333;">Welcome to <span style="color: #1D4ED8;">ClearMyFile</span>!</h2>
+      <p style="font-size: 16px; color: #555;">To verify your email address, please use the code below:</p>
+      <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: #2563EB;">{otp}</div>
+      <p style="font-size: 12px; color: #999; margin-top: 20px;">This code is valid for 10 minutes. If you didn't create an account, please ignore this email.</p>
+    </div>
+  </body>
+</html>"""
 
-Thank you for joining ClearMyFile! We're excited to have you on board.
+    try:
+        from django.core.mail import EmailMultiAlternatives
+        
+        # Create email with both text and HTML versions
+        text_content = f"""Hello {name}!
 
-To complete your registration and verify your email address, please use the verification code below:
+Thank you for joining ClearMyFile! 
+
+To verify your email address, please use the verification code below:
 
 Verification Code: {otp}
 
@@ -38,22 +66,18 @@ This code will expire in 10 minutes for your security.
 
 If you didn't create an account with ClearMyFile, please ignore this email.
 
-Welcome to the ClearMyFile community!
-
 Best regards,
-The ClearMyFile Team
-
----
-ClearMyFile.org - Making document verification simple and secure"""
-
-    try:
-        send_mail(
+The ClearMyFile Team"""
+        
+        msg = EmailMultiAlternatives(
             email_subject,
-            email_message,
+            text_content,
             "noreply@clearmyfile.org",
-            [email],
-            fail_silently=False,
+            [email]
         )
+        msg.attach_alternative(html_message, "text/html")
+        msg.send()
+        
         print(f"[SUCCESS] OTP sent successfully to {email}: {otp}")
     except Exception as e:
         print(f"[ERROR] Email sending failed: {e}")
@@ -65,10 +89,25 @@ ClearMyFile.org - Making document verification simple and secure"""
 def signup(request):
     data = request.data
     email = data.get('email')
+    otp = data.get('otp')
     
-    # Check if email was verified (new flow doesn't use OTP here)
-    if not otp_store.get(f"verified_{email}"):
-        return Response({"error": "Email must be verified first"}, status=400)
+    # Verify OTP first
+    if not email or not otp:
+        return Response({"error": "Email and OTP are required"}, status=400)
+    
+    # Check if OTP is valid
+    otp_data = otp_store.get(email)
+    if not otp_data:
+        return Response({"error": "No verification code found. Please request a new one."}, status=400)
+    
+    # Check if OTP has expired
+    if timezone.now() > otp_data.get('expires_at'):
+        del otp_store[email]
+        return Response({"error": "Verification code has expired. Please request a new one."}, status=400)
+    
+    # Check if OTP matches
+    if otp_data.get('otp') != int(otp):
+        return Response({"error": "Invalid verification code. Please check and try again."}, status=400)
     
     # Check if user already exists
     if User.objects.filter(email=email).exists():
@@ -107,11 +146,9 @@ def signup(request):
             referral_source=data.get('referralSource', '')
         )
         
-        # Clear OTP and verification status after successful signup
+        # Clear OTP after successful signup
         if email in otp_store:
             del otp_store[email]
-        if f"verified_{email}" in otp_store:
-            del otp_store[f"verified_{email}"]
         
         # Send welcome email
         welcome_subject = "Welcome to ClearMyFile - You're All Set!"
@@ -201,22 +238,7 @@ def login(request):
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
 
-@api_view(['POST'])
-def verify_otp(request):
-    email = request.data.get('email')
-    otp = request.data.get('otp')
-
-    if not email or not otp:
-        return Response({"error": "Email and OTP are required"}, status=400)
-
-    if otp_store.get(email) != int(otp):
-        return Response({"error": "Invalid verification code. Please check and try again."}, status=400)
-
-    # Just verify the OTP, don't create user yet
-    # Store verification status temporarily
-    otp_store[f"verified_{email}"] = True
-    
-    return Response({"message": "Email verified successfully"})
+# OTP verification is now handled directly in the signup endpoint
 
 @api_view(['POST'])
 def forgot_password(request):

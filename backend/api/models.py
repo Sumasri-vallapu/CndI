@@ -36,6 +36,11 @@ class UserProfile(models.Model):
     date_of_birth = models.DateField(null=True, blank=True)
     qualification = models.CharField(max_length=20, choices=QUALIFICATION_CHOICES, blank=True)
     
+    # Location Information
+    state = models.CharField(max_length=100, blank=True)
+    district = models.CharField(max_length=100, blank=True)
+    mandal = models.CharField(max_length=100, blank=True)
+    panchayath = models.CharField(max_length=100, blank=True)
     
     # Referral Source
     referral_source = models.CharField(max_length=20, choices=REFERRAL_CHOICES, blank=True)

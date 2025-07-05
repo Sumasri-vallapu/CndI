@@ -76,39 +76,91 @@ Common production commands are documented in `backend_common_commands.txt`.
 
 ## Code Conventions
 
-### Frontend
-- Use **functional components with hooks** (no class components)
-- Follow **Tailwind CSS v4 conventions** with mobile-first responsive design using **inline classes only**
-- **Color Palette**: 
-  - Primary gradient: `bg-gradient-to-r from-[#5C258D] to-[#4389A2]`
-  - Accent color: `#FFEB3B` (yellow for buttons and highlights)
-  - Text: White on gradient backgrounds
-- **Design Principles**:
-  - Clean, professional layouts with consistent spacing
-  - Glass morphism effects using `bg-white/10 backdrop-blur-sm border border-white/20`
-  - Responsive icons and proper visual hierarchy
-  - Smooth transitions and hover effects
-  - Full responsive design with proper breakpoints (sm:, md:, lg:)
-- **UI Components**:
-  - Navigation: Clean header with gradient background
-  - Forms: Glass morphism containers with proper input styling
-  - Buttons: Yellow accent (#FFEB3B) for primary actions, ghost buttons for secondary
-  - Icons: Emoji-based with proper sizing and contrast
-- **Performance Best Practices**: Component optimization, lazy loading, minimal re-renders
-- **Code Standards**: **PascalCase** for components, **camelCase** for variables/functions
-- **TypeScript strict mode** enabled
-- **Accessibility**: WCAG 2.1 AA compliance with proper contrast ratios and keyboard navigation
-- **CSS Strategy**: Use only inline Tailwind classes, avoid external CSS files for styling
+Frontend
+Use functional components with hooks (no class components).
 
-### Backend
-- Follow **Django best practices** with proper model-view-serializer structure
-- **RESTful API design** with consistent response formats
-- **Environment-based configuration** for different deployment stages
-- **Proper error handling** with meaningful HTTP status codes
+Follow Tailwind CSS v4 conventions with mobile-first design using inline classes only.
 
-## Important Notes
+Typography:
 
-- The project name references "clearmyfile" in various places but the codebase is for a different application
-- Frontend uses comprehensive API endpoint definitions for a social/educational platform
-- Backend has minimal API implementation compared to frontend expectations
-- Development workflow follows git flow with dev/main branch structure
+Font: Use Roboto ('Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif) loaded via Google Fonts.
+
+Weights:
+
+Headings: font-black (900) to simulate Netflix Sans Black.
+
+Body text: font-normal (400) for readability.
+
+Buttons: font-medium (500) for emphasis.
+
+Color Palette:
+
+Background: #f7fafc (bg-[#f7fafc]) for main container and body.
+
+Heading text: #121212
+
+Body text: #23234c
+
+Buttons:
+
+Primary: #243c80 → hover #1a2b5d
+
+Secondary: #0770E3 → hover #0665c0
+
+UI Components:
+
+Container: Rounded card (rounded-lg), padding (p-12), shadow (shadow-lg), max width (max-w-md).
+
+Heading: Large (text-5xl), bold, proper color.
+
+Body text: Medium size (text-xl), readable color.
+
+Buttons:
+
+Use px-8 py-3, rounded-lg, shadow, smooth transition (transition duration-200), hover states.
+
+Text white on buttons for contrast.
+
+Design Principles:
+
+Clean, modern, minimal UI with strong visual hierarchy.
+
+Responsive design: ensure proper scaling on mobile, tablet, and desktop.
+
+Smooth hover and focus transitions for interactive elements.
+
+Code Standards:
+
+Use PascalCase for component names, camelCase for variables/functions.
+
+TypeScript strict mode enabled.
+
+Use inline Tailwind classes only; no external CSS except font and base resets.
+
+Accessibility:
+
+Ensure WCAG 2.1 AA compliance.
+
+Maintain contrast ratios on text/buttons.
+
+Buttons must be keyboard accessible with visible focus states.
+
+Backend
+Follow Django best practices: models, serializers, views properly separated.
+
+RESTful API with consistent response structures.
+
+Use environment-based configuration for dev, staging, production.
+
+Implement meaningful error handling with correct HTTP status codes.
+
+Important Notes
+The UI style is designed for ClearMyFile India platform: clean, civic-focused, professional.
+
+Design aims to empower users while keeping experience simple and direct.
+
+No class components or external CSS frameworks beyond Tailwind + Roboto.
+
+Maintain git flow: use dev and main branches with clear commit messages.
+
+Use only inline tailwind css
