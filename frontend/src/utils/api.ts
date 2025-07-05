@@ -1,6 +1,6 @@
 // API configuration
 //const BASE_URL = 'https://yuvachetana.com//api';
-const BASE_URL = 'https://clearmyfile.org/api';
+const BASE_URL = 'https://clearmyfile.com/api';
 
 //const BASE_URL = 'http://localhost:8000/api';
 

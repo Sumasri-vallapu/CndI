@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ENDPOINTS } from '@/utils/api';
+import { ENDPOINTS } from '../utils/api';
 
 interface LocationOption {
     id: string;
