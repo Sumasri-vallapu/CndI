@@ -7,12 +7,11 @@ export default {
   theme: {
     extend: {
       colors: {
-        shroomStart: '#5C258D',
-        shroomEnd: '#4389A2',
-        actionYellow: '#FFEB3B',
-        actionYellowHover: '#FDD835',
-        darkNav: '#212121',
-        darkFooter: '#424242',
+        primaryBlue: '#0288D1',      // Button Sign In (bright blue)
+        secondaryBlue: '#1A237E',    // Button Create Account (dark blue)
+        primaryText: '#000000',      // Black text
+        pageBg: '#FFFFFF',           // White background
+        divider: '#000000',          // Divider under nav
       },
       fontFamily: {
         sans: ['system-ui', 'sans-serif'],

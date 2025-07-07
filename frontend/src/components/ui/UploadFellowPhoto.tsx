@@ -94,7 +94,7 @@ export const UploadFellowPhoto = ({
       {showConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-md text-center space-y-4">
-            <p className="text-lg font-semibold">Do you want to save this image?</p>
+            <p className="text-lg ">Do you want to save this image?</p>
             <div className="flex justify-around gap-4">
               <Button className="bg-green-600 text-white" onClick={handleUpload}>
                 Yes

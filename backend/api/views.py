@@ -238,6 +238,32 @@ def login(request):
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
 
+@api_view(['POST'])
+def verify_otp(request):
+    """Separate endpoint to verify OTP before proceeding to complete signup"""
+    email = request.data.get('email')
+    otp = request.data.get('otp')
+    
+    if not email or not otp:
+        return Response({"error": "Email and OTP are required"}, status=400)
+    
+    # Check if OTP is valid
+    otp_data = otp_store.get(email)
+    if not otp_data:
+        return Response({"error": "No verification code found. Please request a new one."}, status=400)
+    
+    # Check if OTP has expired
+    if timezone.now() > otp_data.get('expires_at'):
+        del otp_store[email]
+        return Response({"error": "Verification code has expired. Please request a new one."}, status=400)
+    
+    # Check if OTP matches
+    if otp_data.get('otp') != int(otp):
+        return Response({"error": "Invalid verification code. Please check and try again."}, status=400)
+    
+    # OTP is valid - mark email as verified but don't delete OTP yet (will be deleted on signup)
+    return Response({"message": "Email verified successfully"})
+
 # OTP verification is now handled directly in the signup endpoint
 
 @api_view(['POST'])
@@ -315,7 +341,11 @@ def get_states(request):
 @api_view(['GET'])
 def get_districts(request):
     state_id = request.GET.get('state_id')
-    districts = District.objects.filter(state_id=state_id)
+    if state_id:
+        districts = District.objects.filter(state_id=state_id)
+    else:
+        # Load all districts if no state_id provided
+        districts = District.objects.all().order_by('district_name')
     return Response([{"id": district.id, "name": district.district_name} for district in districts])
 
 @api_view(['GET'])

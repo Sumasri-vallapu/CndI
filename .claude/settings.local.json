@@ -21,7 +21,15 @@
       "Bash(python3:*)",
       "Bash(grep:*)",
       "Bash(python:*)",
-      "Bash(python3 manage.py runserver:*)"
+      "Bash(python3 manage.py runserver:*)",
+      "Bash(npm install)",
+      "Bash(rm:*)",
+      "Bash(npm install:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(yarn add:*)",
+      "Bash(tar:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)"
     ],
     "deny": []
   }

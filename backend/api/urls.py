@@ -7,6 +7,7 @@ from .views import (get_states,
 
 urlpatterns = [
     path('send_otp/', views.send_otp),
+    path('verify_otp/', views.verify_otp),
     path('signup/', views.signup),
     path('login/', views.login),
     path('forgot_password/', views.forgot_password),

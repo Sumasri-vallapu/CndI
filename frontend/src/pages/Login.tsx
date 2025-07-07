@@ -1,145 +1,161 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ENDPOINTS } from '../utils/api';
 
-const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-    const navigate = useNavigate();
+const Login: React.FC = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
-    const handleLogin = async () => {
-        if (!email || !password) {
-            alert('Please enter both email and password');
-            return;
-        }
+  const handleInputChange = (field: 'email' | 'password', value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    if (error) setError(''); // Clear error when user starts typing
+  };
 
-        setIsLoading(true);
-        try {
-            const response = await fetch(ENDPOINTS.LOGIN, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
 
-            if (response.ok) {
-                const data = await response.json();
-                localStorage.setItem('access_token', data.access);
-                localStorage.setItem('refresh_token', data.refresh);
-                navigate('/protected');
-            } else {
-                const errorData = await response.json();
-                alert(errorData.error || 'Login failed');
-            }
-        } catch (error) {
-            console.error('Login error:', error);
-            alert('Login failed. Please try again.');
-        } finally {
-            setIsLoading(false);
-        }
-    };
+    if (!formData.email || !formData.password) {
+      setError('Please enter both email and password');
+      return;
+    }
 
-    return (
-        <div className="min-h-screen bg-gradient-to-r from-[#5C258D] to-[#4389A2] text-white flex flex-col">
-            {/* Navigation */}
-            <nav className="border-b border-white/20">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-                    <div className="flex justify-between items-center">
-                        <Link to="/" className="text-xl sm:text-2xl font-bold text-white">
-                            clearmyfile.org
-                        </Link>
-                        <button 
-                            onClick={() => navigate('/signup')}
-                            className="bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-2 px-4 rounded text-sm sm:text-base"
-                        >
-                            Create Account
-                        </button>
-                    </div>
-                </div>
-            </nav>
+    setIsLoading(true);
+    try {
+      const res = await fetch(ENDPOINTS.LOGIN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password
+        })
+      });
 
-            {/* Main Content */}
-            <div className="flex-1 flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12">
-                <div className="w-full max-w-md space-y-8">
-                    {/* Header */}
-                    <div className="text-center">
-                        <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
-                            Welcome Back
-                        </h1>
-                        <p className="text-lg text-white/80">Sign in to your account</p>
-                    </div>
-                    
-                    {/* Form */}
-                    <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-white/20">
-                        <div className="space-y-6">
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                                    Email Address
-                                </label>
-                                <input
-                                    id="email"
-                                    type="email"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    placeholder="Enter your email address"
-                                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200"
-                                />
-                            </div>
-                            
-                            <div>
-                                <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
-                                    Password
-                                </label>
-                                <input
-                                    id="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    placeholder="Enter your password"
-                                    className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-[#FFEB3B] focus:border-transparent transition-all duration-200"
-                                />
-                            </div>
-                            
-                            <button
-                                onClick={handleLogin}
-                                disabled={isLoading}
-                                className="w-full bg-[#FFEB3B] hover:bg-yellow-300 text-black font-semibold py-3 px-4 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {isLoading ? 'Signing in...' : 'Sign In'}
-                            </button>
-                            
-                            <div className="text-center pt-4 border-t border-white/20">
-                                <p className="text-sm text-white/80">
-                                    Don't have an account?{' '}
-                                    <Link 
-                                        to="/signup" 
-                                        className="text-[#FFEB3B] hover:text-yellow-300 font-medium transition-colors duration-200"
-                                    >
-                                        Create account
-                                    </Link>
-                                </p>
-                            </div>
-                            
-                            <div className="text-center">
-                                <Link 
-                                    to="/forgot-password" 
-                                    className="text-sm text-[#FFEB3B] hover:text-yellow-300 font-medium transition-colors duration-200"
-                                >
-                                    Forgot your password?
-                                </Link>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('access_token', data.access);
+        localStorage.setItem('refresh_token', data.refresh);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Redirect to welcome page
+        navigate('/welcome');
+      } else {
+        const err = await res.json();
+        setError(err.error || 'Login failed. Please check your credentials.');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-            {/* Floating Elements */}
-            <div className="absolute top-1/4 left-1/4 w-24 sm:w-32 h-24 sm:h-32 bg-[#FFEB3B]/20 rounded-full blur-xl animate-pulse"></div>
-            <div className="absolute bottom-1/4 right-1/4 w-16 sm:w-24 h-16 sm:h-24 bg-[#5C258D]/20 rounded-full blur-xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+  return (
+    <div className="min-h-screen bg-[#f7fafc] flex flex-col">
+      {/* Navigation */}
+      <nav className="bg-white border-b-2 border-gray-100">
+        <div className="container-main">
+          <div className="flex justify-between items-center py-4">
+            <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
+              ClearMyFile
+            </Link>
+            <Link 
+              to="/signup"
+              className="btn-secondary px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
-    );
+      </nav>
+
+      <div className="flex-1 py-8 sm:py-12 flex items-center justify-center">
+        <div className="container-main max-w-md">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6">
+              Welcome Back
+            </h1>
+            <p className="text-lg text-gray-600 font-bold">
+              Sign in to your ClearMyFile account
+            </p>
+          </div>
+
+          {/* Login Form */}
+          <div className="bg-white rounded-2xl p-8 sm:p-10 shadow-lg">
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Email Input */}
+              <div className="space-y-4">
+                <label className="form-label">Email Address *</label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  placeholder="Enter your email address"
+                  className="form-input h-12 w-full"
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Password Input */}
+              <div className="space-y-4">
+                <label className="form-label">Password *</label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  placeholder="Enter your password"
+                  className="form-input h-12 w-full"
+                  disabled={isLoading}
+                />
+              </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                  <span className="text-red-700 font-bold">{error}</span>
+                </div>
+              )}
+
+              {/* Login Button */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="btn-primary w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Signing In...' : 'Sign In'}
+              </button>
+            </form>
+
+            {/* Links */}
+            <div className="text-center mt-8 space-y-4">
+              <Link 
+                to="/forgot-password"
+                className="text-blue-600 hover:text-blue-800 font-bold transition-colors duration-200 block"
+              >
+                Forgot your password?
+              </Link>
+              
+              <p className="text-gray-600 font-bold">
+                Don't have an account?{' '}
+                <Link 
+                  to="/signup" 
+                  className="text-blue-600 hover:text-blue-800 font-bold transition-colors duration-200"
+                >
+                  Sign up here
+                </Link>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Login;
