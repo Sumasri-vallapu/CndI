@@ -61,12 +61,12 @@ const Login: React.FC = () => {
       <nav className="bg-white border-b-2 border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
+            <Link to="/" className="text-2xl md:text-3xl font-bold text-[#49a741]">
               ClearMyFile
             </Link>
             <Link 
               to="/signup"
-              className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium transition-colors duration-200"
+              className="bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
               Sign Up
             </Link>
@@ -78,7 +78,7 @@ const Login: React.FC = () => {
         <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6">
+            <h1 className="text-3xl sm:text-4xl font-semibold text-[#49a741] mb-6">
               Welcome Back
             </h1>
             <p className="text-lg text-gray-600 font-bold">
@@ -91,26 +91,26 @@ const Login: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Email Input */}
               <div className="space-y-4">
-                <label className="block text-lg font-medium text-black mb-2">Email Address *</label>
+                <label className="block text-lg font-medium text-gray-700 mb-2">Email Address *</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="Enter your email address"
-                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741] transition-colors duration-200 text-base"
                   disabled={isLoading}
                 />
               </div>
 
               {/* Password Input */}
               <div className="space-y-4">
-                <label className="block text-lg font-medium text-black mb-2">Password *</label>
+                <label className="block text-lg font-medium text-gray-700 mb-2">Password *</label>
                 <input
                   type="password"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   placeholder="Enter your password"
-                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741] transition-colors duration-200 text-base"
                   disabled={isLoading}
                 />
               </div>
@@ -126,7 +126,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-12 bg-primaryGreen text-white rounded-lg font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 bg-[#49a741] text-white rounded-lg font-medium hover:bg-[#3e9238] focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </button>
@@ -136,7 +136,7 @@ const Login: React.FC = () => {
             <div className="text-center mt-8 space-y-4">
               <Link 
                 to="/forgot-password"
-                className="text-primaryGreen hover:text-hoverGreen font-bold transition-colors duration-200 block"
+                className="text-[#49a741] hover:text-[#3e9238] font-bold transition-colors duration-200 block"
               >
                 Forgot your password?
               </Link>
@@ -145,7 +145,7 @@ const Login: React.FC = () => {
                 Don't have an account?{' '}
                 <Link 
                   to="/signup" 
-                  className="text-primaryGreen hover:text-hoverGreen font-bold transition-colors duration-200"
+                  className="text-[#49a741] hover:text-[#3e9238] font-bold transition-colors duration-200"
                 >
                   Sign up here
                 </Link>

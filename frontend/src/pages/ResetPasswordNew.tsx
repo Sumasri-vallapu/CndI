@@ -109,12 +109,12 @@ const ResetPasswordNew: React.FC = () => {
       <nav className="bg-white border-b-2 border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
+            <Link to="/" className="text-2xl md:text-3xl font-bold text-[#49a741]">
               ClearMyFile
             </Link>
             <Link 
               to="/login"
-              className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium transition-colors duration-200"
+              className="bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
               Back to Login
             </Link>
@@ -126,11 +126,11 @@ const ResetPasswordNew: React.FC = () => {
         <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6">
+            <h1 className="text-3xl sm:text-4xl font-semibold text-[#49a741] mb-6">
               Create New Password
             </h1>
             <p className="text-lg text-gray-600 font-bold">
-              Enter your new password for <span className="text-primaryGreen font-bold">{email}</span>
+              Enter your new password for <span className="text-[#49a741] font-bold">{email}</span>
             </p>
           </div>
 
@@ -140,13 +140,13 @@ const ResetPasswordNew: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-8">
                 {/* New Password */}
                 <div className="space-y-4">
-                  <label className="block text-lg font-medium text-black mb-2">New Password *</label>
+                  <label className="block text-lg font-medium text-gray-700 mb-2">New Password *</label>
                   <input
                     type="password"
                     value={formData.newPassword}
                     onChange={(e) => handleInputChange('newPassword', e.target.value)}
                     placeholder="Create a strong password"
-                    className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+                    className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741] transition-colors duration-200 text-base"
                     disabled={isLoading}
                   />
                   {formData.newPassword && (
@@ -175,13 +175,13 @@ const ResetPasswordNew: React.FC = () => {
 
                 {/* Confirm Password */}
                 <div className="space-y-4">
-                  <label className="block text-lg font-medium text-black mb-2">Confirm New Password *</label>
+                  <label className="block text-lg font-medium text-gray-700 mb-2">Confirm New Password *</label>
                   <input
                     type="password"
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                     placeholder="Re-enter your new password"
-                    className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+                    className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741] transition-colors duration-200 text-base"
                     disabled={isLoading}
                   />
                   {formData.confirmPassword && !passwordMatch && (
@@ -202,7 +202,7 @@ const ResetPasswordNew: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading || !passwordMatch || passwordStrength.score < 60}
-                  className="w-full h-12 bg-primaryGreen text-white rounded-lg font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-12 bg-[#49a741] text-white rounded-lg font-medium hover:bg-[#3e9238] focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Resetting Password...' : 'Reset Password'}
                 </button>

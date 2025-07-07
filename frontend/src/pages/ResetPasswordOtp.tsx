@@ -85,12 +85,12 @@ const ResetPasswordOtp: React.FC = () => {
       <nav className="bg-white border-b-2 border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
+            <Link to="/" className="text-2xl md:text-3xl font-bold text-[#49a741]">
               ClearMyFile
             </Link>
             <Link 
               to="/login"
-              className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium transition-colors duration-200"
+              className="bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
               Back to Login
             </Link>
@@ -102,11 +102,11 @@ const ResetPasswordOtp: React.FC = () => {
         <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6">
+            <h1 className="text-3xl sm:text-4xl font-semibold text-[#49a741] mb-6">
               Enter Reset Code
             </h1>
             <p className="text-lg text-gray-600 font-bold">
-              We've sent a 4-digit code to <span className="text-primaryGreen font-bold">{email}</span>
+              We've sent a 4-digit code to <span className="text-[#49a741] font-bold">{email}</span>
             </p>
           </div>
 
@@ -115,7 +115,7 @@ const ResetPasswordOtp: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* OTP Input */}
               <div className="space-y-4">
-                <label className="block text-lg font-medium text-black mb-2">Reset Code *</label>
+                <label className="block text-lg font-medium text-gray-700 mb-2">Reset Code *</label>
                 <input
                   type="text"
                   value={otp}
@@ -126,7 +126,7 @@ const ResetPasswordOtp: React.FC = () => {
                   }}
                   placeholder="Enter 4-digit code"
                   maxLength={4}
-                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-center font-mono tracking-wider text-xl"
+                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741] transition-colors duration-200 text-center font-mono tracking-wider text-xl"
                   disabled={isLoading}
                 />
                 <p className="text-sm text-gray-500 text-center">
@@ -145,7 +145,7 @@ const ResetPasswordOtp: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || otp.length !== 4}
-                className="w-full h-12 bg-primaryGreen text-white rounded-lg font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 bg-[#49a741] text-white rounded-lg font-medium hover:bg-[#3e9238] focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Verifying...' : 'Verify Code'}
               </button>
@@ -159,7 +159,7 @@ const ResetPasswordOtp: React.FC = () => {
                   type="button"
                   onClick={handleResendCode}
                   disabled={isResending}
-                  className="text-primaryGreen hover:text-hoverGreen font-bold transition-colors duration-200 disabled:opacity-50"
+                  className="text-[#49a741] hover:text-[#3e9238] font-bold transition-colors duration-200 disabled:opacity-50"
                 >
                   {isResending ? 'Sending...' : 'Resend Code'}
                 </button>

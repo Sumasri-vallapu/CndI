@@ -54,7 +54,7 @@ const Welcome: React.FC = () => {
       <nav className="bg-white border-b-2 border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
+            <Link to="/" className="text-2xl md:text-3xl font-bold text-[#49a741]">
               ClearMyFile
             </Link>
             <div className="flex items-center gap-4">
@@ -63,7 +63,7 @@ const Welcome: React.FC = () => {
               </span>
               <button 
                 onClick={handleLogout}
-                className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium transition-colors duration-200"
+                className="bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
               >
                 Sign Out
               </button>
@@ -77,7 +77,7 @@ const Welcome: React.FC = () => {
           {/* Welcome Message */}
           <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-lg">
             <div className="mb-8">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-black mb-6">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-semibold text-[#49a741] mb-6">
                 Welcome to ClearMyFile
               </h1>
               
@@ -111,10 +111,10 @@ const Welcome: React.FC = () => {
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-              <button className="bg-primaryGreen text-white rounded-lg px-8 py-3 font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200">
+              <button className="bg-[#49a741] text-white rounded-lg px-8 py-3 font-medium hover:bg-[#3e9238] focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:ring-offset-2 transition-colors duration-200">
                 Get Started
               </button>
-              <button className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-8 py-3 font-medium transition-colors duration-200">
+              <button className="bg-white text-[#49a741] border-2 border-[#49a741] hover:bg-[#49a741] hover:text-white rounded-lg px-8 py-3 font-medium transition-colors duration-200">
                 View Profile
               </button>
             </div>

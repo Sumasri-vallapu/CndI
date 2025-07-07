@@ -253,27 +253,27 @@ const UnifiedSignup: React.FC = () => {
   const renderStep1 = () => (
     <div className="space-y-8">
       <div className="text-center mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-black mb-4">Email Verification & Password</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold text-[#49a741] mb-4">Email Verification & Password</h2>
         <p className="text-lg text-gray-600 font-bold">Let's start by verifying your email</p>
       </div>
 
       {/* Email Input */}
       <div className="space-y-3">
-        <label className="block text-lg font-medium text-black mb-2">Email Address *</label>
+        <label className="block text-lg font-medium text-gray-700 mb-2">Email Address *</label>
         <div className="flex gap-4">
           <input
             type="email"
             value={formData.email}
             onChange={(e) => handleInputChange('email', e.target.value)}
             placeholder="Enter your email address"
-            className="w-full flex-1 h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+            className="w-full flex-1 h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741] transition-colors duration-200 text-base"
             disabled={otpSent}
           />
           {!otpSent && (
             <button
               onClick={sendOtp}
               disabled={isLoading || !formData.email}
-              className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-6 h-14 font-medium transition-colors duration-200 disabled:opacity-50 whitespace-nowrap"
+              className="bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition rounded px-6 h-14 disabled:opacity-50 whitespace-nowrap"
             >
               {isLoading ? 'Sending...' : 'Send OTP'}
             </button>
@@ -296,12 +296,12 @@ const UnifiedSignup: React.FC = () => {
               onChange={(e) => handleInputChange('otp', e.target.value)}
               placeholder="Enter 6-digit code"
               maxLength={6}
-              className="w-full flex-1 h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-center font-mono tracking-wider text-base"
+              className="w-full flex-1 h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741] transition-colors duration-200 text-center font-mono tracking-wider text-base"
             />
             <button
               onClick={verifyOtp}
               disabled={isLoading || !formData.otp}
-              className="bg-primaryGreen text-white rounded-lg px-6 h-14 font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 whitespace-nowrap"
+              className="bg-[#49a741] text-white rounded-lg px-6 h-14 font-medium hover:bg-[#3e9238] focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 whitespace-nowrap"
             >
               {isLoading ? 'Verifying...' : 'Verify'}
             </button>
@@ -313,7 +313,7 @@ const UnifiedSignup: React.FC = () => {
       {emailVerified && (
         <div className="space-y-6">
           <div className="space-y-3">
-            <label className="block text-lg font-medium text-black mb-2">Password *</label>
+            <label className="block text-lg font-medium text-gray-700 mb-2">Password *</label>
             <input
               type="password"
               value={formData.password}
@@ -344,7 +344,7 @@ const UnifiedSignup: React.FC = () => {
           </div>
 
           <div className="space-y-3">
-            <label className="block text-lg font-medium text-black mb-2">Confirm Password *</label>
+            <label className="block text-lg font-medium text-gray-700 mb-2">Confirm Password *</label>
             <input
               type="password"
               value={formData.confirmPassword}
@@ -366,13 +366,13 @@ const UnifiedSignup: React.FC = () => {
   const renderStep2 = () => (
     <div className="space-y-8">
       <div className="text-center mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-black mb-4">Personal Information</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold text-[#49a741] mb-4">Personal Information</h2>
         <p className="text-lg text-gray-600 font-bold">Tell us about yourself</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">First Name *</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">First Name *</label>
           <input
             value={formData.firstName}
             onChange={(e) => handleInputChange('firstName', e.target.value)}
@@ -382,7 +382,7 @@ const UnifiedSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">Last Name *</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Last Name *</label>
           <input
             value={formData.lastName}
             onChange={(e) => handleInputChange('lastName', e.target.value)}
@@ -392,7 +392,7 @@ const UnifiedSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">Date of Birth *</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Date of Birth *</label>
           <input
             type="date"
             value={formData.dateOfBirth}
@@ -402,21 +402,21 @@ const UnifiedSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">Gender</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Gender</label>
           <Select value={formData.gender} onValueChange={(v) => handleInputChange('gender', v)}>
             <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base bg-white">
               <SelectValue placeholder="Select gender" />
             </SelectTrigger>
             <SelectContent className="bg-white border-2 border-gray-300 rounded-xl shadow-lg">
-              <SelectItem value="male" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Male</SelectItem>
-              <SelectItem value="female" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Female</SelectItem>
-              <SelectItem value="other" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Other</SelectItem>
+              <SelectItem value="male" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Male</SelectItem>
+              <SelectItem value="female" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Female</SelectItem>
+              <SelectItem value="other" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">Phone Number</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Phone Number</label>
           <input
             value={formData.phone}
             onChange={(e) => handleInputChange('phone', e.target.value)}
@@ -426,7 +426,7 @@ const UnifiedSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">Occupation</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Occupation</label>
           <input
             value={formData.occupation}
             onChange={(e) => handleInputChange('occupation', e.target.value)}
@@ -436,19 +436,19 @@ const UnifiedSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3 sm:col-span-2">
-          <label className="block text-lg font-medium text-black mb-2">Highest Qualification</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Highest Qualification</label>
           <Select value={formData.qualification} onValueChange={(v) => handleInputChange('qualification', v)}>
             <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base bg-white">
               <SelectValue placeholder="Select qualification" />
             </SelectTrigger>
             <SelectContent className="bg-white border-2 border-gray-300 rounded-xl shadow-lg">
-              <SelectItem value="no-formal-education" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">No Formal Education</SelectItem>
-              <SelectItem value="10th" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">10th Grade</SelectItem>
-              <SelectItem value="12th" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">12th Grade</SelectItem>
-              <SelectItem value="diploma" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Diploma</SelectItem>
-              <SelectItem value="bachelor" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Bachelor's Degree</SelectItem>
-              <SelectItem value="master" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Master's Degree</SelectItem>
-              <SelectItem value="phd" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">PhD</SelectItem>
+              <SelectItem value="no-formal-education" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">No Formal Education</SelectItem>
+              <SelectItem value="10th" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">10th Grade</SelectItem>
+              <SelectItem value="12th" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">12th Grade</SelectItem>
+              <SelectItem value="diploma" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Diploma</SelectItem>
+              <SelectItem value="bachelor" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Bachelor's Degree</SelectItem>
+              <SelectItem value="master" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Master's Degree</SelectItem>
+              <SelectItem value="phd" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">PhD</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -459,20 +459,20 @@ const UnifiedSignup: React.FC = () => {
   const renderStep3 = () => (
     <div className="space-y-8">
       <div className="text-center mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-black mb-4">Address Information</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold text-[#49a741] mb-4">Address Information</h2>
         <p className="text-lg text-gray-600 font-bold">Help us know where you're located</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">District *</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">District *</label>
           <Select value={formData.district} onValueChange={(v) => handleInputChange('district', v)}>
             <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base bg-white">
               <SelectValue placeholder="Select your district" />
             </SelectTrigger>
             <SelectContent className="max-h-60 bg-white border-2 border-gray-300 rounded-xl shadow-lg">
               {locationData.districts.map(district => (
-                <SelectItem key={district.id} value={district.id} className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">
+                <SelectItem key={district.id} value={district.id} className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">
                   {district.name}
                 </SelectItem>
               ))}
@@ -481,14 +481,14 @@ const UnifiedSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">Mandal</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Mandal</label>
           <Select value={formData.mandal} onValueChange={(v) => handleInputChange('mandal', v)} disabled={!formData.district}>
             <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base bg-white disabled:opacity-50 disabled:cursor-not-allowed">
               <SelectValue placeholder="Select your mandal" />
             </SelectTrigger>
             <SelectContent className="max-h-60 bg-white border-2 border-gray-300 rounded-xl shadow-lg">
               {locationData.mandals.map(mandal => (
-                <SelectItem key={mandal.id} value={mandal.id} className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">
+                <SelectItem key={mandal.id} value={mandal.id} className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">
                   {mandal.name}
                 </SelectItem>
               ))}
@@ -497,14 +497,14 @@ const UnifiedSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">Gram Panchayat</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">Gram Panchayat</label>
           <Select value={formData.panchayath} onValueChange={(v) => handleInputChange('panchayath', v)} disabled={!formData.mandal}>
             <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base bg-white disabled:opacity-50 disabled:cursor-not-allowed">
               <SelectValue placeholder="Select your gram panchayat" />
             </SelectTrigger>
             <SelectContent className="max-h-60 bg-white border-2 border-gray-300 rounded-xl shadow-lg">
               {locationData.grampanchayats.map(gp => (
-                <SelectItem key={gp.id} value={gp.id} className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">
+                <SelectItem key={gp.id} value={gp.id} className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">
                   {gp.name}
                 </SelectItem>
               ))}
@@ -518,25 +518,25 @@ const UnifiedSignup: React.FC = () => {
   const renderStep4 = () => (
     <div className="space-y-8">
       <div className="text-center mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold text-black mb-4">Final Details</h2>
+        <h2 className="text-2xl sm:text-3xl font-semibold text-[#49a741] mb-4">Final Details</h2>
         <p className="text-lg text-gray-600 font-bold">Help us understand you better</p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-black mb-2">How did you hear about us?</label>
+          <label className="block text-lg font-medium text-gray-700 mb-2">How did you hear about us?</label>
           <Select value={formData.referralSource} onValueChange={(v) => handleInputChange('referralSource', v)}>
             <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base bg-white">
               <SelectValue placeholder="Select how you heard about us" />
             </SelectTrigger>
             <SelectContent className="bg-white border-2 border-gray-300 rounded-xl shadow-lg">
-              <SelectItem value="social-media" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Social Media</SelectItem>
-              <SelectItem value="friend-family" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Friend/Family</SelectItem>
-              <SelectItem value="google-search" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Google Search</SelectItem>
-              <SelectItem value="advertisement" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Advertisement</SelectItem>
-              <SelectItem value="news-article" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">News Article</SelectItem>
-              <SelectItem value="government-office" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Government Office</SelectItem>
-              <SelectItem value="other" className="text-black hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Other</SelectItem>
+              <SelectItem value="social-media" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Social Media</SelectItem>
+              <SelectItem value="friend-family" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Friend/Family</SelectItem>
+              <SelectItem value="google-search" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Google Search</SelectItem>
+              <SelectItem value="advertisement" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Advertisement</SelectItem>
+              <SelectItem value="news-article" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">News Article</SelectItem>
+              <SelectItem value="government-office" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Government Office</SelectItem>
+              <SelectItem value="other" className="text-gray-700 hover:bg-green-50 focus:bg-green-50 rounded m-1 py-3">Other</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -557,12 +557,12 @@ const UnifiedSignup: React.FC = () => {
       <nav className="bg-white border-b-2 border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
+            <Link to="/" className="text-2xl md:text-3xl font-bold text-[#49a741]">
               ClearMyFile
             </Link>
             <button
               onClick={() => navigate('/login')}
-              className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium transition-colors duration-200"
+              className="bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
               Sign In
             </button>
@@ -574,7 +574,7 @@ const UnifiedSignup: React.FC = () => {
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12 sm:mb-16">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-black mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-[#49a741] mb-6">
               Create Your Account
             </h1>
             <p className="text-lg sm:text-xl text-gray-600 font-bold max-w-2xl mx-auto">
@@ -585,13 +585,13 @@ const UnifiedSignup: React.FC = () => {
           {/* Progress Bar */}
           <div className="mb-12 sm:mb-16">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
-              <span className="text-lg font-bold text-black">
+              <span className="text-lg font-bold text-[#49a741]">
                 Step {currentStep} of 4
               </span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-progressGreen h-3 rounded-full transition-all duration-500"
+                className="bg-[#4caf50] h-3 rounded-full transition-all duration-500"
                 style={{ width: `${(currentStep / 4) * 100}%` }}
               />
             </div>
@@ -610,7 +610,7 @@ const UnifiedSignup: React.FC = () => {
             <button
               onClick={handlePrevious}
               disabled={currentStep === 1}
-              className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1 flex-1 sm:flex-none sm:min-w-[140px] h-14"
+              className="bg-white text-[#49a741] border-2 border-[#49a741] hover:bg-[#49a741] hover:text-white rounded-lg font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-2 sm:order-1 flex-1 sm:flex-none sm:min-w-[140px] h-14"
             >
               Previous
             </button>
@@ -618,7 +618,7 @@ const UnifiedSignup: React.FC = () => {
             {currentStep < 4 ? (
               <button
                 onClick={handleNext}
-                className="bg-primaryGreen text-white rounded-lg font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200 order-1 sm:order-2 flex-1 sm:flex-none sm:min-w-[140px] h-14"
+                className="bg-[#49a741] text-white rounded-lg font-medium hover:bg-[#3e9238] focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:ring-offset-2 transition-colors duration-200 order-1 sm:order-2 flex-1 sm:flex-none sm:min-w-[140px] h-14"
               >
                 Next Step
               </button>
@@ -626,7 +626,7 @@ const UnifiedSignup: React.FC = () => {
               <button
                 onClick={handleFinalSubmit}
                 disabled={isLoading}
-                className="bg-primaryGreen text-white rounded-lg font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 flex-1 sm:flex-none sm:min-w-[180px] h-14"
+                className="bg-[#49a741] text-white rounded-lg font-medium hover:bg-[#3e9238] focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 flex-1 sm:flex-none sm:min-w-[180px] h-14"
               >
                 {isLoading ? 'Creating Account...' : 'Create Account'}
               </button>
@@ -639,7 +639,7 @@ const UnifiedSignup: React.FC = () => {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="text-primaryGreen hover:text-hoverGreen font-bold transition-colors duration-200"
+                className="text-[#49a741] hover:text-[#3e9238] font-bold transition-colors duration-200"
               >
                 Sign in here
               </Link>
