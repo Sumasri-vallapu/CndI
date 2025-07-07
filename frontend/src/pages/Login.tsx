@@ -59,14 +59,14 @@ const Login: React.FC = () => {
     <div className="min-h-screen bg-[#f7fafc] flex flex-col">
       {/* Navigation */}
       <nav className="bg-white border-b-2 border-gray-100">
-        <div className="container-main">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
               ClearMyFile
             </Link>
             <Link 
               to="/signup"
-              className="btn-secondary px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
+              className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium transition-colors duration-200"
             >
               Sign Up
             </Link>
@@ -75,7 +75,7 @@ const Login: React.FC = () => {
       </nav>
 
       <div className="flex-1 py-8 sm:py-12 flex items-center justify-center">
-        <div className="container-main max-w-md">
+        <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-3xl sm:text-4xl font-bold text-black mb-6">
@@ -91,26 +91,26 @@ const Login: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Email Input */}
               <div className="space-y-4">
-                <label className="form-label">Email Address *</label>
+                <label className="block text-lg font-medium text-black mb-2">Email Address *</label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="Enter your email address"
-                  className="form-input h-12 w-full"
+                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
                   disabled={isLoading}
                 />
               </div>
 
               {/* Password Input */}
               <div className="space-y-4">
-                <label className="form-label">Password *</label>
+                <label className="block text-lg font-medium text-black mb-2">Password *</label>
                 <input
                   type="password"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   placeholder="Enter your password"
-                  className="form-input h-12 w-full"
+                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
                   disabled={isLoading}
                 />
               </div>
@@ -126,7 +126,7 @@ const Login: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="btn-primary w-full h-12 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 bg-primaryGreen text-white rounded-lg font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </button>
@@ -136,7 +136,7 @@ const Login: React.FC = () => {
             <div className="text-center mt-8 space-y-4">
               <Link 
                 to="/forgot-password"
-                className="text-blue-600 hover:text-blue-800 font-bold transition-colors duration-200 block"
+                className="text-primaryGreen hover:text-hoverGreen font-bold transition-colors duration-200 block"
               >
                 Forgot your password?
               </Link>
@@ -145,7 +145,7 @@ const Login: React.FC = () => {
                 Don't have an account?{' '}
                 <Link 
                   to="/signup" 
-                  className="text-blue-600 hover:text-blue-800 font-bold transition-colors duration-200"
+                  className="text-primaryGreen hover:text-hoverGreen font-bold transition-colors duration-200"
                 >
                   Sign up here
                 </Link>

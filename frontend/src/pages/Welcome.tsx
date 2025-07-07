@@ -41,7 +41,7 @@ const Welcome: React.FC = () => {
     return (
       <div className="min-h-screen bg-[#f7fafc] flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primaryGreen mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -52,7 +52,7 @@ const Welcome: React.FC = () => {
     <div className="min-h-screen bg-[#f7fafc] flex flex-col">
       {/* Navigation */}
       <nav className="bg-white border-b-2 border-gray-100">
-        <div className="container-main">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link to="/" className="text-2xl md:text-3xl font-bold text-black">
               ClearMyFile
@@ -63,7 +63,7 @@ const Welcome: React.FC = () => {
               </span>
               <button 
                 onClick={handleLogout}
-                className="btn-secondary px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
+                className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base font-medium transition-colors duration-200"
               >
                 Sign Out
               </button>
@@ -73,7 +73,7 @@ const Welcome: React.FC = () => {
       </nav>
 
       <div className="flex-1 flex items-center justify-center py-8 sm:py-12">
-        <div className="container-main max-w-4xl text-center">
+        <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Welcome Message */}
           <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-lg">
             <div className="mb-8">
@@ -93,9 +93,9 @@ const Welcome: React.FC = () => {
 
             {/* Action Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 mt-12">
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-blue-800 mb-2">Document Services</h3>
-                <p className="text-blue-700">Upload and verify your important documents securely</p>
+              <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-green-800 mb-2">Document Services</h3>
+                <p className="text-green-700">Upload and verify your important documents securely</p>
               </div>
 
               <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
@@ -103,18 +103,18 @@ const Welcome: React.FC = () => {
                 <p className="text-green-700">Your data is protected with enterprise-grade security</p>
               </div>
 
-              <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-purple-800 mb-2">24/7 Support</h3>
-                <p className="text-purple-700">Get help whenever you need it from our support team</p>
+              <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-green-800 mb-2">24/7 Support</h3>
+                <p className="text-green-700">Get help whenever you need it from our support team</p>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mt-12">
-              <button className="btn-primary px-8 py-3">
+              <button className="bg-primaryGreen text-white rounded-lg px-8 py-3 font-medium hover:bg-hoverGreen focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:ring-offset-2 transition-colors duration-200">
                 Get Started
               </button>
-              <button className="btn-secondary px-8 py-3">
+              <button className="bg-white text-primaryGreen border-2 border-primaryGreen hover:bg-primaryGreen hover:text-white rounded-lg px-8 py-3 font-medium transition-colors duration-200">
                 View Profile
               </button>
             </div>
