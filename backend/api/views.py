@@ -37,18 +37,27 @@ def send_otp(request):
     }
 
     # HTML email template from emailtemplate.txt
-    email_subject = "Verify Your Email - ClearMyFile"
+    email_subject = "OTP - ClearMyFile"
     html_message = f"""<!DOCTYPE html>
 <html>
-  <body style="font-family: Arial, sans-serif; background: #f9f9f9; padding: 20px; text-align: center;">
+  <body style="font-family: Arial, sans-serif; background: #fff; padding: 20px; text-align: center;">
     <div style="max-width: 500px; background: #fff; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-      <h2 style="color: #333;">Welcome to <span style="color: #1D4ED8;">ClearMyFile</span>!</h2>
-      <p style="font-size: 16px; color: #555;">To verify your email address, please use the code below:</p>
-      <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: #2563EB;">{otp}</div>
-      <p style="font-size: 12px; color: #999; margin-top: 20px;">This code is valid for 10 minutes. If you didn't create an account, please ignore this email.</p>
+      <h2 style="color: #333;">
+        Welcome to <span style="color: #49a741;">ClearMyFile</span>!
+      </h2>
+      <p style="font-size: 16px; color: #555;">
+        To verify your email address, please use the code below:
+      </p>
+      <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: #49a741;">
+        {otp}
+      </div>
+      <p style="font-size: 12px; color: #999; margin-top: 20px;">
+        If you didn’t create an account, please ignore this email.
+      </p>
     </div>
   </body>
-</html>"""
+</html>
+"""
 
     try:
         from django.core.mail import EmailMultiAlternatives
@@ -237,6 +246,22 @@ def login(request):
             
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
+
+@api_view(['POST'])
+def check_email_exists(request):
+    """Check if email already exists in the system"""
+    email = request.data.get('email')
+    
+    if not email:
+        return Response({"error": "Email is required"}, status=400)
+    
+    # Check if user with this email already exists
+    exists = User.objects.filter(email=email).exists()
+    
+    return Response({
+        "exists": exists,
+        "email": email
+    })
 
 @api_view(['POST'])
 def verify_otp(request):
