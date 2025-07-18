@@ -29,7 +29,8 @@
       "Bash(yarn add:*)",
       "Bash(tar:*)",
       "Bash(mkdir:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(timeout 10s npm run dev)"
     ],
     "deny": []
   }

@@ -1,166 +1,253 @@
-# CLAUDE.md
+CLAUDE.md
+This file provides guidance to Claude Code (claude.ai/code) and all developers working with code in this repository.
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
-## Project Structure
-
+Project Structure
 This is a full-stack web application with separate frontend and backend directories:
 
-- **Frontend**: React 19 + TypeScript + Vite + Tailwind CSS 4 mobile-first application
-- **Backend**: Django REST API with SQLite database
-- **Production**: Deployed with nginx + gunicorn on AWS/server infrastructure
+Frontend: React 19 + TypeScript + Vite + Tailwind CSS 4 (mobile-first)
 
-## Development Commands
+Backend: Django REST API with SQLite database
 
-### Frontend (React + Vite)
-```bash
+Production: Deployed with nginx + gunicorn on AWS/server infrastructure
+
+Development Commands
+Frontend (React + Vite)
+bash
 cd frontend
 npm install           # Install dependencies
-npm run dev          # Start development server (localhost:5173)
-npm run build        # Build for production
-npm run lint         # Run ESLint
-npm run preview      # Preview production build
-```
-
-### Backend (Django)
-```bash
+npm run dev           # Start development server (localhost:5173)
+npm run build         # Build for production
+npm run lint          # Run ESLint
+npm run preview       # Preview production build
+Backend (Django)
+bash
 cd backend
 python -m venv venv                    # Create virtual environment
-source venv/bin/activate              # Activate virtual environment (Linux/Mac)
-pip install -r requirements.txt       # Install dependencies
-python manage.py runserver            # Start development server (localhost:8000)
-python manage.py migrate              # Run database migrations
-python manage.py createsuperuser      # Create admin user
-python manage.py collectstatic        # Collect static files
-```
+source venv/bin/activate               # Activate virtual environment (Linux/Mac)
+pip install -r requirements.txt        # Install dependencies
+python manage.py runserver             # Start development server (localhost:8000)
+python manage.py migrate               # Run database migrations
+python manage.py createsuperuser       # Create admin user
+python manage.py collectstatic         # Collect static files
+Architecture Overview
+Frontend Architecture
+Modern UI/UX Design: Professional, clean, mobile-first, and responsive
 
-## Architecture Overview
+Component structure: Reusable UI components in src/components/, page components in src/pages/
 
-### Frontend Architecture
-- **Modern UI/UX Design**: Professional, clean design with emphasis on modularity, responsiveness, maintainability, and performance
-- **Mobile-first design** with responsive layouts using Tailwind CSS 4
-- **Component structure**: Reusable UI components in `src/components/`, page components in `src/pages/`
-- **UI Library**: ShadCN UI + Radix UI components
-- **State Management**: React hooks and context
-- **API Integration**: Centralized API configuration in `src/utils/api.ts`
-- **Routing**: React Router DOM for client-side routing
-- **Form Handling**: React Hook Form with Zod validation
-- **Performance Optimization**: Lazy loading, code splitting, and optimized rendering patterns
-- **Scalable Architecture**: Modular component design with clear separation of concerns
-- **Design System**: Clean, professional interface with consistent gradient backgrounds and glass morphism effects
-- **Responsive Design**: Fully adaptive UI with proper breakpoints for mobile, tablet, and desktop
-- **CSS Strategy**: Inline Tailwind CSS for consistency and maintainability
+UI Library: ShadCN UI + Radix UI components
 
-### Backend Architecture  
-- **Django REST Framework** for API endpoints
-- **JWT Authentication** via `djangorestframework_simplejwt`
-- **CORS Configuration** for frontend integration
-- **AWS S3 Integration** via `django-storages` for file uploads
-- **PostgreSQL** for production, SQLite for development
+State Management: React hooks and context
 
-### Key Integration Points
-- **API Base URL**: `https://clearmyfile.com/api` (production), `http://localhost:8000/api` (development)
-- **CORS Setup**: Frontend runs on port 5173, backend on port 8000
-- **Authentication Flow**: OTP-based login with JWT tokens
-- **File Uploads**: Profile photos and documents handled via S3
+API Integration: Centralized in src/utils/api.ts
 
-## Production Deployment
+Routing: React Router DOM
 
-The application is deployed using:
-- **nginx** as reverse proxy serving static files and routing API requests
-- **gunicorn** as WSGI server for Django backend
-- **SSL/TLS** certificates managed via certbot
-- **Process management** via systemctl
+Form Handling: React Hook Form + Zod validation
 
-Common production commands are documented in `backend_common_commands.txt`.
+Performance: Lazy loading, code splitting, optimized rendering
 
-## Code Conventions
+Design System: Consistent green palette, modern, accessible
 
-Frontend
-Use functional components with hooks (no class components).
+CSS Strategy: Only inline Tailwind CSS. No custom CSS classes for UI (except for global resets).
 
-Follow Tailwind CSS v4 conventions with mobile-first design using inline classes only.
+Backend Architecture
+Django REST Framework for APIs
 
-Typography:
+JWT Authentication via djangorestframework_simplejwt
 
-Font: Use Roboto ('Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif) loaded via Google Fonts.
+CORS: Frontend on 5173, backend on 8000
 
-Weights:
+AWS S3 for file uploads (via django-storages)
 
-Headings: font-black (900) to simulate Netflix Sans Black.
+PostgreSQL for production, SQLite for development
 
-Body text: font-normal (400) for readability.
+Color Palette
+Purpose	Color	Tailwind Example
+Primary Green	#49a741	bg-[#49a741] text-[#49a741]
+Hover Green	#3e9238	hover:bg-[#3e9238]
+Progress Green	#4caf50	bg-[#4caf50]
+Background	#fff	bg-white
+Black Text	#000	text-black
+Gray	#d1d5db	border-gray-300
+Secondary Text	#6b7280	text-gray-600
+UI/UX Guidelines
+General Principles
+Mobile-first: All UI and forms must be designed for mobile by default, scaling up responsively.
 
-Buttons: font-medium (500) for emphasis.
+Only inline Tailwind CSS: No custom CSS classes for UI, buttons, forms, or layout.
 
-Color Palette:
+Adaptive Sizing: Use responsive Tailwind classes (sm:, md:, etc.) for widths, paddings, and font sizes.
 
-Background: #f7fafc (bg-[#f7fafc]) for main container and body.
+Accessible: Use semantic HTML, proper labels, and visible focus states.
 
-Heading text: #121212
+Consistent Spacing: Use space-y-*, mb-*, p-*, and responsive spacing utilities.
 
-Body text: #23234c
+Form Elements
+Input Boxes
+jsx
+<input
+  type="text"
+  className="
+    w-full
+    rounded
+    px-3 py-2
+    border border-gray-300
+    text-base
+    focus:outline-none
+    focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
+    transition
+    placeholder:text-gray-400
+    sm:text-lg
+  "
+  placeholder="Type here..."
+/>
+Dropdowns (Select)
+jsx
+<select
+  className="
+    w-full
+    rounded
+    px-3 py-2
+    border border-gray-300
+    text-base
+    focus:outline-none
+    focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
+    transition
+    sm:text-lg
+  "
+>
+  <option value="">Choose an option</option>
+  <!-- More options -->
+</select>
+Buttons
+jsx
+<button
+  className="
+    w-full
+    py-2
+    rounded
+    bg-[#49a741]
+    text-white
+    font-medium
+    shadow
+    hover:bg-[#3e9238]
+    transition
+  "
+>
+  Submit
+</button>
+Form Layout
+Use space-y-4 or space-y-6 between fields.
 
-Buttons:
+Wrap forms in max-w-md w-full mx-auto containers.
 
-Primary: #243c80 → hover #1a2b5d
+Use p-4 sm:p-6 for adaptive padding.
 
-Secondary: #0770E3 → hover #0665c0
+jsx
+<form className="space-y-4 max-w-md w-full mx-auto p-4 sm:p-6">
+  {/* form fields */}
+</form>
+Example: Mobile-First, Adaptive Form
+jsx
+<div className="min-h-screen flex items-center justify-center bg-white p-4">
+  <form className="bg-white border border-gray-300 p-4 rounded-lg shadow space-y-4 max-w-md w-full">
+    <div>
+      <label className="block text-sm font-medium mb-1 text-[#49a741]">Email</label>
+      <input
+        type="email"
+        placeholder="your.email@example.com"
+        className="
+          w-full rounded px-3 py-2 border border-gray-300 text-base
+          focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
+          transition placeholder:text-gray-400 sm:text-lg
+        "
+      />
+    </div>
+    <div>
+      <label className="block text-sm font-medium mb-1 text-[#49a741]">Password</label>
+      <input
+        type="password"
+        placeholder="Enter password"
+        className="
+          w-full rounded px-3 py-2 border border-gray-300 text-base
+          focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
+          transition placeholder:text-gray-400 sm:text-lg
+        "
+      />
+    </div>
+    <button
+      type="submit"
+      className="w-full py-2 rounded bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition"
+    >
+      Create Account
+    </button>
+  </form>
+</div>
+Typography
+Font: Use Roboto ('Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif)
 
-UI Components:
+Headings: Use font-black (900) for headings.
 
-Container: Rounded card (rounded-lg), padding (p-12), shadow (shadow-lg), max width (max-w-md).
+Body text: Use font-normal (400).
 
-Heading: Large (text-5xl), bold, proper color.
+Buttons: Use font-medium (500).
 
-Body text: Medium size (text-xl), readable color.
+Responsive sizes: Use text-base sm:text-lg for inputs and body, text-2xl or larger for headings.
 
-Buttons:
+Accessibility
+All inputs must have associated <label>.
 
-Use px-8 py-3, rounded-lg, shadow, smooth transition (transition duration-200), hover states.
+Use clear focus states (focus:ring-2, focus:border-[#49a741]).
 
-Text white on buttons for contrast.
+Buttons must be keyboard accessible with visible focus.
 
-Design Principles:
+Maintain sufficient color contrast.
 
-Clean, modern, minimal UI with strong visual hierarchy.
+Code Standards
+Components: Use functional components with hooks.
 
-Responsive design: ensure proper scaling on mobile, tablet, and desktop.
+Naming: PascalCase for components, camelCase for variables/functions.
+
+TypeScript: Strict mode enabled.
+
+Styling: Only inline Tailwind CSS. No custom CSS except for global resets.
+
+No class components.
+
+No external CSS frameworks beyond Tailwind and Roboto font.
+
+Git & Workflow
+Use dev and main branches.
+
+Write clear, descriptive commit messages.
+
+Maintain a clean, readable codebase.
+
+Design Principles
+Clean, modern, minimal UI.
+
+Strong visual hierarchy.
+
+Responsive design for mobile, tablet, and desktop.
 
 Smooth hover and focus transitions for interactive elements.
 
-Code Standards:
+Professional, civic-focused, empowering user experience.
 
-Use PascalCase for component names, camelCase for variables/functions.
+Quick Checklist
+ Use only inline Tailwind CSS for all UI.
 
-TypeScript strict mode enabled.
+ Use the green palette for all primary actions.
 
-Use inline Tailwind classes only; no external CSS except font and base resets.
+ Inputs and selects are always w-full and adaptive.
 
-Accessibility:
+ Forms use max-w-md w-full mx-auto containers.
 
-Ensure WCAG 2.1 AA compliance.
+ No custom CSS classes for UI elements.
 
-Maintain contrast ratios on text/buttons.
+ All UI is mobile-first and responsive.
 
-Buttons must be keyboard accessible with visible focus states.
+ Accessibility and contrast are always considered.
 
-Backend
-Follow Django best practices: models, serializers, views properly separated.
-
-RESTful API with consistent response structures.
-
-Use environment-based configuration for dev, staging, production.
-
-Implement meaningful error handling with correct HTTP status codes.
-
-Important Notes
-The UI style is designed for ClearMyFile India platform: clean, civic-focused, professional.
-
-Design aims to empower users while keeping experience simple and direct.
-
-No class components or external CSS frameworks beyond Tailwind + Roboto.
-
-Maintain git flow: use dev and main branches with clear commit messages.
-
-Use only inline tailwind css
+If any input, select, or button looks abnormal or is not adaptive, check for missing w-full, padding, or responsive classes. Always use the examples above as a reference for new UI work.
