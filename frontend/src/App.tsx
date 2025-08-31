@@ -6,6 +6,9 @@ import Welcome from './pages/Welcome';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPasswordOtp from './pages/ResetPasswordOtp';
 import ResetPasswordNew from './pages/ResetPasswordNew';
+import FindSpeaker from './pages/FindSpeaker';
+import EventDetails from './pages/EventDetails';
+import OrganizerInfo from './pages/OrganizerInfo';
 
 // Simple Protected component for testing
 const Protected = () => {
@@ -30,6 +33,9 @@ export default function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password-otp" element={<ResetPasswordOtp />} />
         <Route path="/reset-password-new" element={<ResetPasswordNew />} />
+        <Route path="/find-speaker" element={<FindSpeaker />} />
+        <Route path="/event-details/:speakerId" element={<EventDetails />} />
+        <Route path="/organizer-info/:speakerId" element={<OrganizerInfo />} />
         <Route path="/protected" element={<Protected />} />
       </Routes>
     </BrowserRouter>

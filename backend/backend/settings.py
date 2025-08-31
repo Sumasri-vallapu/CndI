@@ -1,33 +1,21 @@
-from pathlib import Path
 import os
+from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'your-clearmyfile-secret-key'  # Change before production
-DEBUG = True
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'your-new-project-secret-key-change-this-for-production'
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "clearmyfile.org", "www.clearmyfile.org", "https://clearmyfile.org",]
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True  # Change to False for production
 
-# CORS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://clearmyfile.org",
-    "https://www.clearmyfile.org"
-]
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True  # or specify your frontend URL
-CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-CORS_ALLOW_HEADERS = [
-    "accept", "accept-encoding", "authorization", "content-type", "dnt",
-    "origin", "user-agent", "x-csrftoken", "x-requested-with"
-]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "https://clearmyfile.org",
-    "https://www.clearmyfile.org"
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "13.53.36.126"  # Your EC2 IP
 ]
 
-# Installed apps
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,10 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'storages',
     'api',
     'rest_framework_simplejwt',
-
 ]
 
 MIDDLEWARE = [
@@ -74,15 +60,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# PostgreSQL DB (replace values accordingly)
+# Database - Simple SQLite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-        # 'USER': 'your_db_user',
-        # 'PASSWORD': 'your_db_password',
-        # 'HOST': 'your-db-host.amazonaws.com',
-        # 'PORT': '5432',
     }
 }
 
@@ -94,59 +76,38 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# File upload settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
 
-STATIC_URL = '/static/'
+# CORS settings for frontend
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://13.53.36.126",
+    "http://13.53.36.126:3000"
+]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# Email Configuration
-# For development: use console backend to see OTP in terminal
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True  # For development - restrict in production
 
-# For production: SMTP settings configured
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'clearmyfile.org@gmail.com'
-EMAIL_HOST_PASSWORD = 'vdnl xmcv pmih jwks'
+# Email Configuration (optional - can be disabled)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console
 
-# S3 Storage
-# AWS_ACCESS_KEY_ID = 'your-clearmyfile-access-key'
-# AWS_SECRET_ACCESS_KEY = 'your-clearmyfile-secret'
-# AWS_STORAGE_BUCKET_NAME = 'clearmyfile-s3-bucket'
-# AWS_S3_REGION_NAME = 'ap-south-1'
-# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
-
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-# Logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {'class': 'logging.StreamHandler', 'formatter': 'verbose'},
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-    },
-}
+# Security settings (for production, set DEBUG=False and uncomment these)
+# SECURE_SSL_REDIRECT = True
+# SECURE_BROWSER_XSS_FILTER = True
+# SECURE_CONTENT_TYPE_NOSNIFF = True

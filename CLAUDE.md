@@ -63,17 +63,18 @@ AWS S3 for file uploads (via django-storages)
 PostgreSQL for production, SQLite for development
 
 Color Palette
-Purpose	Color	Tailwind Example
-Primary Green	#49a741	bg-[#49a741] text-[#49a741]
-Hover Green	#3e9238	hover:bg-[#3e9238]
-Progress Green	#4caf50	bg-[#4caf50]
-Background	#fff	bg-white
-Black Text	#000	text-black
-Gray	#d1d5db	border-gray-300
-Secondary Text	#6b7280	text-gray-600
+✅ Background: #27465C
+
+✅ Button background: white (bg-white)
+
+✅ Button text: black (text-black)
+
+✅ Other text: white (text-white)
+
+✅ Hover on button: optional — light gray on hover added
 UI/UX Guidelines
 General Principles
-Mobile-first: All UI and forms must be designed for mobile by default, scaling up responsively.
+Desktop-First: All UI and forms must be designed for mobile by default, scaling up responsively.
 
 Only inline Tailwind CSS: No custom CSS classes for UI, buttons, forms, or layout.
 
@@ -83,107 +84,6 @@ Accessible: Use semantic HTML, proper labels, and visible focus states.
 
 Consistent Spacing: Use space-y-*, mb-*, p-*, and responsive spacing utilities.
 
-Form Elements
-Input Boxes
-jsx
-<input
-  type="text"
-  className="
-    w-full
-    rounded
-    px-3 py-2
-    border border-gray-300
-    text-base
-    focus:outline-none
-    focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
-    transition
-    placeholder:text-gray-400
-    sm:text-lg
-  "
-  placeholder="Type here..."
-/>
-Dropdowns (Select)
-jsx
-<select
-  className="
-    w-full
-    rounded
-    px-3 py-2
-    border border-gray-300
-    text-base
-    focus:outline-none
-    focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
-    transition
-    sm:text-lg
-  "
->
-  <option value="">Choose an option</option>
-  <!-- More options -->
-</select>
-Buttons
-jsx
-<button
-  className="
-    w-full
-    py-2
-    rounded
-    bg-[#49a741]
-    text-white
-    font-medium
-    shadow
-    hover:bg-[#3e9238]
-    transition
-  "
->
-  Submit
-</button>
-Form Layout
-Use space-y-4 or space-y-6 between fields.
-
-Wrap forms in max-w-md w-full mx-auto containers.
-
-Use p-4 sm:p-6 for adaptive padding.
-
-jsx
-<form className="space-y-4 max-w-md w-full mx-auto p-4 sm:p-6">
-  {/* form fields */}
-</form>
-Example: Mobile-First, Adaptive Form
-jsx
-<div className="min-h-screen flex items-center justify-center bg-white p-4">
-  <form className="bg-white border border-gray-300 p-4 rounded-lg shadow space-y-4 max-w-md w-full">
-    <div>
-      <label className="block text-sm font-medium mb-1 text-[#49a741]">Email</label>
-      <input
-        type="email"
-        placeholder="your.email@example.com"
-        className="
-          w-full rounded px-3 py-2 border border-gray-300 text-base
-          focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
-          transition placeholder:text-gray-400 sm:text-lg
-        "
-      />
-    </div>
-    <div>
-      <label className="block text-sm font-medium mb-1 text-[#49a741]">Password</label>
-      <input
-        type="password"
-        placeholder="Enter password"
-        className="
-          w-full rounded px-3 py-2 border border-gray-300 text-base
-          focus:outline-none focus:ring-2 focus:ring-[#49a741] focus:border-[#49a741]
-          transition placeholder:text-gray-400 sm:text-lg
-        "
-      />
-    </div>
-    <button
-      type="submit"
-      className="w-full py-2 rounded bg-[#49a741] text-white font-medium shadow hover:bg-[#3e9238] transition"
-    >
-      Create Account
-    </button>
-  </form>
-</div>
 Typography
 Font: Use Roboto ('Roboto', 'Helvetica Neue', Helvetica, Arial, sans-serif)
 
@@ -198,7 +98,6 @@ Responsive sizes: Use text-base sm:text-lg for inputs and body, text-2xl or larg
 Accessibility
 All inputs must have associated <label>.
 
-Use clear focus states (focus:ring-2, focus:border-[#49a741]).
 
 Buttons must be keyboard accessible with visible focus.
 
