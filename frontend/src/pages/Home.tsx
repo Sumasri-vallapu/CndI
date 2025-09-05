@@ -23,8 +23,8 @@ export default function Home() {
             <div className="text-white text-sm">Connect and Inspire</div>
           </div>
           <div className="flex items-center gap-8">
-            <a href="#" className="text-white hover:opacity-80">Home</a>
-            <a href="#" className="text-white hover:opacity-80">About Us</a>
+            <button onClick={() => navigate('/home')} className="text-white hover:opacity-80">Home</button>
+            <button onClick={() => navigate('/about')} className="text-white hover:opacity-80">About Us</button>
             <a href="#" className="text-white hover:opacity-80">Contact us</a>
             <button 
               onClick={() => navigate('/login')}

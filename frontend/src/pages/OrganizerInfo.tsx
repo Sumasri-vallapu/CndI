@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const speakers = [
   {
@@ -42,12 +43,15 @@ export default function OrganizerInfo() {
     organizerName: 'Mukundh Guptha',
     emailAddress: 'mukundhguptha@gmail.com',
     phoneNumber: '',
-    location: '',
-    mode: '',
-    audienceSize: '',
-    targetAudience: '',
-    sessionStartTime: '',
-    sessionEndTime: ''
+    organizationName: '',
+    organizationType: '',
+    websiteUrl: '',
+    socialMediaHandles: '',
+    organizationAddress: '',
+    taxId: '',
+    organizationSize: '',
+    previousEvents: '',
+    marketingBudget: ''
   });
 
   const speaker = speakers.find(s => s.id === parseInt(speakerId || '1'));
@@ -61,10 +65,8 @@ export default function OrganizerInfo() {
     }));
   };
 
-  const handleBookSpeaker = () => {
-    // For now, just show an alert confirming the booking
-    alert(`Booking request sent for ${speaker?.name || "the speaker"}! You will receive a confirmation email shortly.`);
-    navigate('/');
+  const handleNext = () => {
+    navigate(`/speaker-requirements/${speakerId}`);
   };
 
   return (
@@ -81,7 +83,7 @@ export default function OrganizerInfo() {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 pb-8">
-        <h1 className="text-white text-2xl font-bold mb-8">Book Speaker Organizer Info</h1>
+        <h1 className="text-white text-2xl font-bold mb-8">Book Speaker - {activeTab}</h1>
 
         {/* Speaker Info */}
         <div className="flex items-center justify-center mb-8">
@@ -99,22 +101,28 @@ export default function OrganizerInfo() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Status Bar */}
         <div className="bg-white rounded-t-2xl p-2 mb-0 shadow-lg">
           <div className="flex overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
-                  activeTab === tab
-                    ? 'bg-[#27465C] text-white'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+            {tabs.map((tab, index) => {
+              const isCompleted = tabs.indexOf(activeTab) > index;
+              const isCurrent = activeTab === tab;
+              
+              return (
+                <div
+                  key={tab}
+                  className={`px-6 py-3 text-sm font-medium whitespace-nowrap ${
+                    isCompleted
+                      ? 'text-black'
+                      : isCurrent
+                      ? 'text-black'
+                      : 'text-gray-400'
+                  }`}
+                >
+                  {tab}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -132,34 +140,6 @@ export default function OrganizerInfo() {
               />
             </div>
 
-            {/* Location */}
-            <div className="md:col-span-1">
-              <label className="block text-black font-medium mb-2">Location</label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => handleInputChange('location', e.target.value)}
-                placeholder="Search / Locate on Map"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20"
-              />
-            </div>
-
-            {/* Target Audience */}
-            <div className="md:col-span-1">
-              <label className="block text-black font-medium mb-2">Target Audience</label>
-              <select
-                value={formData.targetAudience}
-                onChange={(e) => handleInputChange('targetAudience', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 bg-white"
-              >
-                <option value="">Select audience</option>
-                <option value="students">Students</option>
-                <option value="professionals">Professionals</option>
-                <option value="entrepreneurs">Entrepreneurs</option>
-                <option value="general">General Public</option>
-              </select>
-            </div>
-
             {/* Email Address */}
             <div className="md:col-span-1">
               <label className="block text-black font-medium mb-2">Email Address</label>
@@ -168,32 +148,6 @@ export default function OrganizerInfo() {
                 value={formData.emailAddress}
                 onChange={(e) => handleInputChange('emailAddress', e.target.value)}
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 bg-gray-100"
-              />
-            </div>
-
-            {/* Mode */}
-            <div className="md:col-span-1">
-              <label className="block text-black font-medium mb-2">Mode</label>
-              <select
-                value={formData.mode}
-                onChange={(e) => handleInputChange('mode', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 bg-white"
-              >
-                <option value="">Select mode</option>
-                <option value="in-person">In Person</option>
-                <option value="virtual">Virtual</option>
-                <option value="hybrid">Hybrid</option>
-              </select>
-            </div>
-
-            {/* Session Start Time */}
-            <div className="md:col-span-1">
-              <label className="block text-black font-medium mb-2">Session Start Time</label>
-              <input
-                type="time"
-                value={formData.sessionStartTime}
-                onChange={(e) => handleInputChange('sessionStartTime', e.target.value)}
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20"
               />
             </div>
 
@@ -209,38 +163,144 @@ export default function OrganizerInfo() {
               />
             </div>
 
-            {/* Audience Size */}
+            {/* Organization Name */}
             <div className="md:col-span-1">
-              <label className="block text-black font-medium mb-2">Audience Size</label>
+              <label className="block text-black font-medium mb-2">Organization Name</label>
               <input
                 type="text"
-                value={formData.audienceSize}
-                onChange={(e) => handleInputChange('audienceSize', e.target.value)}
-                placeholder="Expected attendees"
+                value={formData.organizationName}
+                onChange={(e) => handleInputChange('organizationName', e.target.value)}
+                placeholder="Enter organization name"
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20"
               />
             </div>
 
-            {/* Session End Time */}
+            {/* Organization Type */}
             <div className="md:col-span-1">
-              <label className="block text-black font-medium mb-2">Session End Time</label>
+              <label className="block text-black font-medium mb-2">Organization Type</label>
+              <select
+                value={formData.organizationType}
+                onChange={(e) => handleInputChange('organizationType', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 bg-white"
+              >
+                <option value="">Select type</option>
+                <option value="corporation">Corporation</option>
+                <option value="non-profit">Non-Profit Organization</option>
+                <option value="educational">Educational Institution</option>
+                <option value="government">Government Agency</option>
+                <option value="startup">Startup</option>
+                <option value="association">Professional Association</option>
+                <option value="foundation">Foundation</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            {/* Organization Size */}
+            <div className="md:col-span-1">
+              <label className="block text-black font-medium mb-2">Organization Size</label>
+              <select
+                value={formData.organizationSize}
+                onChange={(e) => handleInputChange('organizationSize', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 bg-white"
+              >
+                <option value="">Select size</option>
+                <option value="1-10">1-10 employees</option>
+                <option value="11-50">11-50 employees</option>
+                <option value="51-200">51-200 employees</option>
+                <option value="201-500">201-500 employees</option>
+                <option value="501-1000">501-1000 employees</option>
+                <option value="1000+">1000+ employees</option>
+              </select>
+            </div>
+
+            {/* Website URL */}
+            <div className="md:col-span-1">
+              <label className="block text-black font-medium mb-2">Website URL</label>
               <input
-                type="time"
-                value={formData.sessionEndTime}
-                onChange={(e) => handleInputChange('sessionEndTime', e.target.value)}
+                type="url"
+                value={formData.websiteUrl}
+                onChange={(e) => handleInputChange('websiteUrl', e.target.value)}
+                placeholder="https://example.com"
                 className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20"
+              />
+            </div>
+
+            {/* Tax ID/EIN */}
+            <div className="md:col-span-1">
+              <label className="block text-black font-medium mb-2">Tax ID / EIN</label>
+              <input
+                type="text"
+                value={formData.taxId}
+                onChange={(e) => handleInputChange('taxId', e.target.value)}
+                placeholder="Tax identification number"
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20"
+              />
+            </div>
+
+            {/* Marketing Budget */}
+            <div className="md:col-span-1">
+              <label className="block text-black font-medium mb-2">Marketing Budget</label>
+              <select
+                value={formData.marketingBudget}
+                onChange={(e) => handleInputChange('marketingBudget', e.target.value)}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 bg-white"
+              >
+                <option value="">Select budget range</option>
+                <option value="under-5k">Under $5,000</option>
+                <option value="5k-15k">$5,000 - $15,000</option>
+                <option value="15k-50k">$15,000 - $50,000</option>
+                <option value="50k-100k">$50,000 - $100,000</option>
+                <option value="100k+">$100,000+</option>
+              </select>
+            </div>
+
+            {/* Organization Address */}
+            <div className="md:col-span-2">
+              <label className="block text-black font-medium mb-2">Organization Address</label>
+              <textarea
+                value={formData.organizationAddress}
+                onChange={(e) => handleInputChange('organizationAddress', e.target.value)}
+                placeholder="Complete address including city, state, and zip code"
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 resize-none"
+              />
+            </div>
+
+            {/* Social Media Handles */}
+            <div className="md:col-span-1">
+              <label className="block text-black font-medium mb-2">Social Media</label>
+              <textarea
+                value={formData.socialMediaHandles}
+                onChange={(e) => handleInputChange('socialMediaHandles', e.target.value)}
+                placeholder="LinkedIn, Twitter, Facebook, Instagram handles"
+                rows={3}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 resize-none"
+              />
+            </div>
+
+            {/* Previous Events Experience */}
+            <div className="md:col-span-3">
+              <label className="block text-black font-medium mb-2">Previous Events Experience</label>
+              <textarea
+                value={formData.previousEvents}
+                onChange={(e) => handleInputChange('previousEvents', e.target.value)}
+                placeholder="Describe previous events organized, speaker experiences, event sizes, etc."
+                rows={4}
+                className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#27465C]/20 resize-none"
               />
             </div>
           </div>
 
           {/* Book Speaker Button */}
           <div className="flex justify-center mt-8">
-            <button
-              onClick={handleBookSpeaker}
-              className="bg-[#27465C] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#1e3a4a] transition-colors shadow-lg"
+            <Button
+              onClick={handleNext}
+              variant="dark"
+              size="lg"
+              className="px-8 py-3 font-medium"
             >
-              Book Speaker
-            </button>
+              Next: Speaker Requirements
+            </Button>
           </div>
         </div>
       </div>

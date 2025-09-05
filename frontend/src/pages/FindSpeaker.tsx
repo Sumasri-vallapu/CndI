@@ -191,10 +191,10 @@ export default function FindSpeaker() {
             <div
               key={speaker.id}
               onClick={() => handleSpeakerSelect(speaker.id)}
-              className="bg-white rounded-2xl p-6 shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+              className="bg-white rounded-2xl p-6 shadow-xl cursor-pointer hover:shadow-2xl transition-all transform hover:-translate-y-1"
             >
               <div className="flex flex-col items-center text-center">
-                <div className="w-20 h-20 rounded-full overflow-hidden mb-4 shadow-md">
+                <div className="w-24 h-24 rounded-full overflow-hidden mb-4 shadow-lg">
                   <img 
                     src={speaker.image} 
                     alt={speaker.name}
@@ -202,12 +202,33 @@ export default function FindSpeaker() {
                   />
                 </div>
                 
-                <div className="mb-2">
-                  <div className="text-black font-medium text-sm mb-1">{speaker.title}</div>
-                  <div className="text-black font-medium text-sm">{speaker.subtitle}</div>
+                <h3 className="text-black font-bold text-lg mb-2">{speaker.name}</h3>
+                
+                <div className="mb-3">
+                  <div className="text-gray-600 font-medium text-sm mb-1">{speaker.title}</div>
+                  <div className="text-gray-600 font-medium text-sm">{speaker.subtitle}</div>
                 </div>
                 
-                <p className="text-black text-xs leading-relaxed">
+                <div className="mb-3 flex flex-wrap gap-2">
+                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{speaker.industry}</span>
+                  <span className="bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">{speaker.language}</span>
+                </div>
+                
+                <div className="mb-3 text-gray-500 text-sm">
+                  📍 {speaker.location}
+                </div>
+                
+                <div className="mb-3">
+                  <span className={`text-xs px-3 py-1 rounded-full ${
+                    speaker.availability === 'Available' 
+                      ? 'bg-green-100 text-green-800' 
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {speaker.availability}
+                  </span>
+                </div>
+                
+                <p className="text-gray-700 text-xs leading-relaxed">
                   {speaker.description}
                 </p>
               </div>

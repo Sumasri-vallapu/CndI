@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ENDPOINTS } from '../utils/api';
 
-const Login: React.FC = () => {
+const HostLogin: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     email: '',
@@ -13,7 +13,7 @@ const Login: React.FC = () => {
 
   const handleInputChange = (field: 'email' | 'password', value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    if (error) setError(''); // Clear error when user starts typing
+    if (error) setError('');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,7 +32,8 @@ const Login: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          userType: 'host'
         })
       });
 
@@ -41,9 +42,9 @@ const Login: React.FC = () => {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('userType', 'host');
         
-        // Redirect to welcome page
-        navigate('/welcome');
+        navigate('/find-speaker');
       } else {
         const err = await res.json();
         setError(err.error || 'Login failed. Please check your credentials.');
@@ -65,10 +66,10 @@ const Login: React.FC = () => {
               C&I
             </Link>
             <Link 
-              to="/signup"
+              to="/host-signup"
               className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
-              Sign Up
+              Sign Up as Host
             </Link>
           </div>
         </div>
@@ -79,10 +80,10 @@ const Login: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-3xl sm:text-4xl font-black text-white mb-6">
-              Welcome Back
+              Host Login
             </h1>
             <p className="text-lg text-white font-normal">
-              Sign in to your C&I account
+              Sign in to find and book speakers for your events
             </p>
           </div>
 
@@ -128,7 +129,7 @@ const Login: React.FC = () => {
                 disabled={isLoading}
                 className="w-full h-12 bg-white text-black font-medium rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#27465C] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Signing In...' : 'Sign In'}
+                {isLoading ? 'Signing In...' : 'Sign In as Host'}
               </button>
             </form>
 
@@ -144,31 +145,23 @@ const Login: React.FC = () => {
               <p className="text-white font-normal">
                 Don't have an account?{' '}
                 <Link 
-                  to="/signup" 
+                  to="/host-signup" 
                   className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
                 >
                   Sign up here
                 </Link>
               </p>
-
+              
               <div className="border-t border-white/20 pt-4 mt-6">
                 <p className="text-white/70 font-normal text-sm mb-3">
-                  Choose your account type:
+                  Are you a speaker looking to join events?
                 </p>
-                <div className="flex flex-col gap-2">
-                  <Link 
-                    to="/host-login" 
-                    className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
-                  >
-                    Sign in as Host/Organizer
-                  </Link>
-                  <Link 
-                    to="/speaker-login" 
-                    className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
-                  >
-                    Sign in as Speaker
-                  </Link>
-                </div>
+                <Link 
+                  to="/speaker-login" 
+                  className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
+                >
+                  Sign in as Speaker
+                </Link>
               </div>
             </div>
           </div>
@@ -178,4 +171,4 @@ const Login: React.FC = () => {
   );
 };
 
-export default Login;
+export default HostLogin;

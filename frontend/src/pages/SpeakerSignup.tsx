@@ -1,35 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { ENDPOINTS } from '../utils/api';
-import { useLocationData } from '../hooks/useLocationData';
 
-interface FormData {
-  // Step 1: Email & Password
+interface SpeakerFormData {
   email: string;
   otp: string;
   password: string;
   confirmPassword: string;
-
-  // Step 2: Personal Info
   firstName: string;
   lastName: string;
-  dateOfBirth: string;
-  gender: string;
-  occupation: string;
-  qualification: string;
   phone: string;
-
-  // Step 3: Address
-  district: string;
-  mandal: string;
-  panchayath: string;
-
-  // Step 4: Referral
-  referralSource: string;
+  expertise: string;
+  experience: string;
+  bio: string;
+  location: string;
+  website: string;
+  linkedin: string;
 }
 
-const UnifiedSignup: React.FC = () => {
+const SpeakerSignup: React.FC = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -37,15 +26,12 @@ const UnifiedSignup: React.FC = () => {
   const [emailVerified, setEmailVerified] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: '' });
   const [passwordMatch, setPasswordMatch] = useState(true);
+  const [error, setError] = useState('');
 
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<SpeakerFormData>({
     email: '', otp: '', password: '', confirmPassword: '',
-    firstName: '', lastName: '', dateOfBirth: '', gender: '', occupation: '', qualification: '', phone: '',
-    district: '', mandal: '', panchayath: '',
-    referralSource: ''
+    firstName: '', lastName: '', phone: '', expertise: '', experience: '', bio: '', location: '', website: '', linkedin: ''
   });
-
-  const { locationData, fetchMandals, fetchGrampanchayats } = useLocationData();
 
   const validatePassword = (password: string) => {
     let score = 0;
@@ -60,32 +46,23 @@ const UnifiedSignup: React.FC = () => {
     });
   };
 
-  const handleInputChange = (field: keyof FormData, value: string) => {
+  const handleInputChange = (field: keyof SpeakerFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (error) setError('');
 
     if (field === 'password') validatePassword(value);
     if (field === 'confirmPassword') setPasswordMatch(value === formData.password);
-
-    // Location cascade
-    if (field === 'district') {
-      setFormData(prev => ({ ...prev, mandal: '', panchayath: '' }));
-      if (value) fetchMandals(value);
-    }
-    if (field === 'mandal') {
-      setFormData(prev => ({ ...prev, panchayath: '' }));
-      if (value) fetchGrampanchayats(value);
-    }
   };
 
   const sendOtp = async () => {
     if (!formData.email) {
-      alert('Please enter your email address');
+      setError('Please enter your email address');
       return;
     }
 
     setIsLoading(true);
+    setError('');
     try {
-      // First check if email already exists
       const checkRes = await fetch(`${ENDPOINTS.CHECK_EMAIL_EXISTS}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -95,31 +72,30 @@ const UnifiedSignup: React.FC = () => {
       if (checkRes.ok) {
         const checkData = await checkRes.json();
         if (checkData.exists) {
-          alert('This email address is already registered. Please use a different email or sign in.');
+          setError('This email address is already registered. Please use a different email or sign in.');
           setIsLoading(false);
           return;
         }
       }
 
-      // If email doesn't exist, proceed with sending OTP
       const res = await fetch(ENDPOINTS.SEND_OTP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          name: 'User' // Will be updated with actual name later
+          name: 'Speaker User'
         })
       });
 
       if (res.ok) {
-        alert('OTP sent to your email!');
         setOtpSent(true);
+        setError('');
       } else {
         const err = await res.json();
-        alert(err.error || 'Failed to send OTP');
+        setError(err.error || 'Failed to send OTP');
       }
     } catch {
-      alert('Failed to send OTP');
+      setError('Failed to send OTP');
     } finally {
       setIsLoading(false);
     }
@@ -127,11 +103,12 @@ const UnifiedSignup: React.FC = () => {
 
   const verifyOtp = async () => {
     if (!formData.otp) {
-      alert('Please enter the OTP');
+      setError('Please enter the OTP');
       return;
     }
 
     setIsLoading(true);
+    setError('');
     try {
       const res = await fetch(ENDPOINTS.VERIFY_OTP, {
         method: 'POST',
@@ -143,14 +120,14 @@ const UnifiedSignup: React.FC = () => {
       });
 
       if (res.ok) {
-        alert('Email verified successfully!');
         setEmailVerified(true);
+        setError('');
       } else {
         const err = await res.json();
-        alert(err.error || 'Invalid OTP');
+        setError(err.error || 'Invalid OTP');
       }
     } catch {
-      alert('Failed to verify OTP');
+      setError('Failed to verify OTP');
     } finally {
       setIsLoading(false);
     }
@@ -159,33 +136,26 @@ const UnifiedSignup: React.FC = () => {
   const handleStepValidation = () => {
     if (currentStep === 1) {
       if (!emailVerified) {
-        alert('Please verify your email first');
+        setError('Please verify your email first');
         return false;
       }
       if (!formData.password || !formData.confirmPassword) {
-        alert('Please set your password');
+        setError('Please set your password');
         return false;
       }
       if (!passwordMatch) {
-        alert('Passwords do not match');
+        setError('Passwords do not match');
         return false;
       }
       if (passwordStrength.score < 60) {
-        alert('Please use a stronger password');
+        setError('Please use a stronger password');
         return false;
       }
     }
 
     if (currentStep === 2) {
-      if (!formData.firstName || !formData.lastName || !formData.dateOfBirth) {
-        alert('Please fill in all required fields');
-        return false;
-      }
-    }
-
-    if (currentStep === 3) {
-      if (!formData.district) {
-        alert('Please select a district');
+      if (!formData.firstName || !formData.lastName) {
+        setError('Please fill in all required fields');
         return false;
       }
     }
@@ -195,18 +165,21 @@ const UnifiedSignup: React.FC = () => {
 
   const handleNext = () => {
     if (handleStepValidation()) {
-      setCurrentStep(prev => Math.min(4, prev + 1));
+      setCurrentStep(prev => Math.min(3, prev + 1));
+      setError('');
     }
   };
 
   const handlePrevious = () => {
     setCurrentStep(prev => Math.max(1, prev - 1));
+    setError('');
   };
 
   const handleFinalSubmit = async () => {
     if (!handleStepValidation()) return;
 
     setIsLoading(true);
+    setError('');
     try {
       const res = await fetch(ENDPOINTS.SIGNUP, {
         method: 'POST',
@@ -217,16 +190,14 @@ const UnifiedSignup: React.FC = () => {
           firstName: formData.firstName,
           lastName: formData.lastName,
           name: `${formData.firstName} ${formData.lastName}`.trim(),
-          dateOfBirth: formData.dateOfBirth,
-          gender: formData.gender,
           phone: formData.phone,
-          occupation: formData.occupation,
-          qualification: formData.qualification,
-          state: 'Telangana',
-          district: locationData.districts.find(d => d.id === formData.district)?.name || formData.district,
-          mandal: locationData.mandals.find(m => m.id === formData.mandal)?.name || formData.mandal,
-          panchayath: locationData.grampanchayats.find(g => g.id === formData.panchayath)?.name || formData.panchayath,
-          referralSource: formData.referralSource,
+          expertise: formData.expertise,
+          experience: formData.experience,
+          bio: formData.bio,
+          location: formData.location,
+          website: formData.website,
+          linkedin: formData.linkedin,
+          userType: 'speaker',
           otp: formData.otp
         })
       });
@@ -235,20 +206,19 @@ const UnifiedSignup: React.FC = () => {
         const data = await res.json();
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
-        alert('Account created successfully! Welcome to SpeakEasy!');
-        navigate('/protected');
+        localStorage.setItem('user', JSON.stringify(data.user));
+        localStorage.setItem('userType', 'speaker');
+        navigate('/speaker-dashboard');
       } else {
         const err = await res.json();
-        alert(err.error || 'Failed to create account');
+        setError(err.error || 'Failed to create account');
       }
     } catch {
-      alert('Failed to create account');
+      setError('Failed to create account');
     } finally {
       setIsLoading(false);
     }
   };
-
-
 
   const renderStep1 = () => (
     <div className="space-y-8">
@@ -376,7 +346,7 @@ const UnifiedSignup: React.FC = () => {
           <input
             value={formData.firstName}
             onChange={(e) => handleInputChange('firstName', e.target.value)}
-            className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
             placeholder="Enter your first name"
           />
         </div>
@@ -386,33 +356,9 @@ const UnifiedSignup: React.FC = () => {
           <input
             value={formData.lastName}
             onChange={(e) => handleInputChange('lastName', e.target.value)}
-            className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
             placeholder="Enter your last name"
           />
-        </div>
-
-        <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">Date of Birth *</label>
-          <input
-            type="date"
-            value={formData.dateOfBirth}
-            onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-            className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
-          />
-        </div>
-
-        <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">Gender</label>
-          <Select value={formData.gender} onValueChange={(v) => handleInputChange('gender', v)}>
-            <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white">
-              <SelectValue placeholder="Select gender" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#27465C] border-2 border-white/30 rounded-xl shadow-lg">
-              <SelectItem value="male" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Male</SelectItem>
-              <SelectItem value="female" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Female</SelectItem>
-              <SelectItem value="other" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Other</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         <div className="space-y-3">
@@ -420,37 +366,29 @@ const UnifiedSignup: React.FC = () => {
           <input
             value={formData.phone}
             onChange={(e) => handleInputChange('phone', e.target.value)}
-            className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
             placeholder="+91 98765 43210"
           />
         </div>
 
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">Occupation</label>
+          <label className="block text-lg font-medium text-white mb-2">Location</label>
           <input
-            value={formData.occupation}
-            onChange={(e) => handleInputChange('occupation', e.target.value)}
-            className="w-full h-14 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primaryGreen focus:border-primaryGreen transition-colors duration-200 text-base"
-            placeholder="Your current occupation"
+            value={formData.location}
+            onChange={(e) => handleInputChange('location', e.target.value)}
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
+            placeholder="City, Country"
           />
         </div>
 
         <div className="space-y-3 sm:col-span-2">
-          <label className="block text-lg font-medium text-white mb-2">Highest Qualification</label>
-          <Select value={formData.qualification} onValueChange={(v) => handleInputChange('qualification', v)}>
-            <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white">
-              <SelectValue placeholder="Select qualification" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#27465C] border-2 border-white/30 rounded-xl shadow-lg">
-              <SelectItem value="no-formal-education" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">No Formal Education</SelectItem>
-              <SelectItem value="10th" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">10th Grade</SelectItem>
-              <SelectItem value="12th" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">12th Grade</SelectItem>
-              <SelectItem value="diploma" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Diploma</SelectItem>
-              <SelectItem value="bachelor" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Bachelor's Degree</SelectItem>
-              <SelectItem value="master" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Master's Degree</SelectItem>
-              <SelectItem value="phd" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">PhD</SelectItem>
-            </SelectContent>
-          </Select>
+          <label className="block text-lg font-medium text-white mb-2">Areas of Expertise</label>
+          <input
+            value={formData.expertise}
+            onChange={(e) => handleInputChange('expertise', e.target.value)}
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
+            placeholder="Technology, Business, Marketing, etc."
+          />
         </div>
       </div>
     </div>
@@ -459,92 +397,62 @@ const UnifiedSignup: React.FC = () => {
   const renderStep3 = () => (
     <div className="space-y-8">
       <div className="text-center mb-8">
-        <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Address Information</h2>
-        <p className="text-lg text-white font-normal">Help us know where you're located</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-        <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">District *</label>
-          <Select value={formData.district} onValueChange={(v) => handleInputChange('district', v)}>
-            <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white">
-              <SelectValue placeholder="Select your district" />
-            </SelectTrigger>
-            <SelectContent className="max-h-60 bg-[#27465C] border-2 border-white/30 rounded-xl shadow-lg">
-              {locationData.districts.map(district => (
-                <SelectItem key={district.id} value={district.id} className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">
-                  {district.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">Mandal</label>
-          <Select value={formData.mandal} onValueChange={(v) => handleInputChange('mandal', v)} disabled={!formData.district}>
-            <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white disabled:opacity-50 disabled:cursor-not-allowed">
-              <SelectValue placeholder="Select your mandal" />
-            </SelectTrigger>
-            <SelectContent className="max-h-60 bg-[#27465C] border-2 border-white/30 rounded-xl shadow-lg">
-              {locationData.mandals.map(mandal => (
-                <SelectItem key={mandal.id} value={mandal.id} className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">
-                  {mandal.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">Gram Panchayat</label>
-          <Select value={formData.panchayath} onValueChange={(v) => handleInputChange('panchayath', v)} disabled={!formData.mandal}>
-            <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white disabled:opacity-50 disabled:cursor-not-allowed">
-              <SelectValue placeholder="Select your gram panchayat" />
-            </SelectTrigger>
-            <SelectContent className="max-h-60 bg-[#27465C] border-2 border-white/30 rounded-xl shadow-lg">
-              {locationData.grampanchayats.map(gp => (
-                <SelectItem key={gp.id} value={gp.id} className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">
-                  {gp.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderStep4 = () => (
-    <div className="space-y-8">
-      <div className="text-center mb-8">
-        <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Final Details</h2>
-        <p className="text-lg text-white font-normal">Help us understand you better</p>
+        <h2 className="text-2xl sm:text-3xl font-black text-white mb-4">Professional Profile</h2>
+        <p className="text-lg text-white font-normal">Complete your speaker profile</p>
       </div>
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">How did you hear about us?</label>
-          <Select value={formData.referralSource} onValueChange={(v) => handleInputChange('referralSource', v)}>
-            <SelectTrigger className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white">
-              <SelectValue placeholder="Select how you heard about us" />
-            </SelectTrigger>
-            <SelectContent className="bg-[#27465C] border-2 border-white/30 rounded-xl shadow-lg">
-              <SelectItem value="social-media" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Social Media</SelectItem>
-              <SelectItem value="friend-family" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Friend/Family</SelectItem>
-              <SelectItem value="google-search" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Google Search</SelectItem>
-              <SelectItem value="advertisement" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Advertisement</SelectItem>
-              <SelectItem value="news-article" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">News Article</SelectItem>
-              <SelectItem value="government-office" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Government Office</SelectItem>
-              <SelectItem value="other" className="text-white hover:bg-white/20 focus:bg-white/20 rounded m-1 py-3">Other</SelectItem>
-            </SelectContent>
-          </Select>
+          <label className="block text-lg font-medium text-white mb-2">Years of Experience</label>
+          <select
+            value={formData.experience}
+            onChange={(e) => handleInputChange('experience', e.target.value)}
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white"
+          >
+            <option value="" className="text-black">Select experience level</option>
+            <option value="0-2" className="text-black">0-2 years</option>
+            <option value="3-5" className="text-black">3-5 years</option>
+            <option value="6-10" className="text-black">6-10 years</option>
+            <option value="11-15" className="text-black">11-15 years</option>
+            <option value="15+" className="text-black">15+ years</option>
+          </select>
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-lg font-medium text-white mb-2">Professional Bio</label>
+          <textarea
+            value={formData.bio}
+            onChange={(e) => handleInputChange('bio', e.target.value)}
+            rows={4}
+            className="w-full px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70 resize-none"
+            placeholder="Tell us about your background, achievements, and what makes you a great speaker..."
+          />
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-lg font-medium text-white mb-2">Website (Optional)</label>
+          <input
+            value={formData.website}
+            onChange={(e) => handleInputChange('website', e.target.value)}
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
+            placeholder="https://yourwebsite.com"
+          />
+        </div>
+
+        <div className="space-y-3">
+          <label className="block text-lg font-medium text-white mb-2">LinkedIn Profile (Optional)</label>
+          <input
+            value={formData.linkedin}
+            onChange={(e) => handleInputChange('linkedin', e.target.value)}
+            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
+            placeholder="https://linkedin.com/in/yourprofile"
+          />
         </div>
 
         <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
           <h3 className="text-lg font-medium text-white mb-3">🎉 You're almost done!</h3>
           <p className="text-white/80">
-            Click "Create Account" to complete your registration and join C&I.
+            Click "Create Account" to complete your registration and start your speaking journey.
           </p>
         </div>
       </div>
@@ -560,12 +468,12 @@ const UnifiedSignup: React.FC = () => {
             <Link to="/" className="text-2xl md:text-3xl font-black text-white">
               C&I
             </Link>
-            <button
-              onClick={() => navigate('/login')}
+            <Link
+              to="/speaker-login"
               className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
               Sign In
-            </button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -575,10 +483,10 @@ const UnifiedSignup: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-12 sm:mb-16">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-6">
-              Create Your Account
+              Create Speaker Account
             </h1>
             <p className="text-lg sm:text-xl text-white font-normal max-w-2xl mx-auto">
-              Join thousands of users who trust C&I for connecting speakers and event organizers
+              Join as a speaker to showcase your expertise and connect with event organizers
             </p>
           </div>
 
@@ -586,13 +494,13 @@ const UnifiedSignup: React.FC = () => {
           <div className="mb-12 sm:mb-16">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
               <span className="text-lg font-medium text-white">
-                Step {currentStep} of 4
+                Step {currentStep} of 3
               </span>
             </div>
             <div className="w-full bg-white/20 rounded-full h-3">
               <div
                 className="bg-white h-3 rounded-full transition-all duration-500"
-                style={{ width: `${(currentStep / 4) * 100}%` }}
+                style={{ width: `${(currentStep / 3) * 100}%` }}
               />
             </div>
           </div>
@@ -602,8 +510,14 @@ const UnifiedSignup: React.FC = () => {
             {currentStep === 1 && renderStep1()}
             {currentStep === 2 && renderStep2()}
             {currentStep === 3 && renderStep3()}
-            {currentStep === 4 && renderStep4()}
           </div>
+
+          {/* Error Message */}
+          {error && (
+            <div className="p-4 bg-red-500/20 border border-red-500/30 rounded-xl backdrop-blur-sm mb-6">
+              <span className="text-red-200 font-medium">{error}</span>
+            </div>
+          )}
 
           {/* Navigation Buttons */}
           <div className="flex flex-col sm:flex-row justify-between gap-6 sm:gap-8">
@@ -615,7 +529,7 @@ const UnifiedSignup: React.FC = () => {
               Previous
             </button>
 
-            {currentStep < 4 ? (
+            {currentStep < 3 ? (
               <button
                 onClick={handleNext}
                 className="bg-white text-black font-medium hover:bg-gray-100 rounded-lg transition-colors duration-200 order-1 sm:order-2 flex-1 sm:flex-none sm:min-w-[140px] h-14"
@@ -628,7 +542,7 @@ const UnifiedSignup: React.FC = () => {
                 disabled={isLoading}
                 className="bg-white text-black font-medium hover:bg-gray-100 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed order-1 sm:order-2 flex-1 sm:flex-none sm:min-w-[180px] h-14"
               >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
+                {isLoading ? 'Creating Account...' : 'Create Speaker Account'}
               </button>
             )}
           </div>
@@ -638,31 +552,23 @@ const UnifiedSignup: React.FC = () => {
             <p className="text-white font-normal">
               Already have an account?{' '}
               <Link
-                to="/login"
+                to="/speaker-login"
                 className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
               >
                 Sign in here
               </Link>
             </p>
-
+            
             <div className="mt-4">
               <p className="text-white/70 font-normal text-sm mb-3">
-                Choose your account type:
+                Are you an event organizer looking for speakers?
               </p>
-              <div className="flex flex-col gap-2">
-                <Link 
-                  to="/host-signup" 
-                  className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
-                >
-                  Sign up as Host/Organizer
-                </Link>
-                <Link 
-                  to="/speaker-signup" 
-                  className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
-                >
-                  Sign up as Speaker
-                </Link>
-              </div>
+              <Link 
+                to="/host-signup" 
+                className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
+              >
+                Sign up as Host
+              </Link>
             </div>
           </div>
         </div>
@@ -671,4 +577,4 @@ const UnifiedSignup: React.FC = () => {
   );
 };
 
-export default UnifiedSignup;
+export default SpeakerSignup;

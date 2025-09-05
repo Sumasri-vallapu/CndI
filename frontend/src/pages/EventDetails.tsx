@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
 
 const speakers = [
   {
@@ -79,7 +80,7 @@ export default function EventDetails() {
 
       {/* Main Content */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 pb-8">
-        <h1 className="text-white text-2xl font-bold mb-8">Book Speaker Event details</h1>
+        <h1 className="text-white text-2xl font-bold mb-8">Book Speaker - {activeTab}</h1>
 
         {/* Speaker Info */}
         <div className="flex items-center justify-center mb-8">
@@ -97,22 +98,28 @@ export default function EventDetails() {
           </div>
         </div>
 
-        {/* Tab Navigation */}
+        {/* Status Bar */}
         <div className="bg-white rounded-t-2xl p-2 mb-0 shadow-lg">
           <div className="flex overflow-x-auto">
-            {tabs.map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-6 py-3 text-sm font-medium whitespace-nowrap rounded-lg transition-colors ${
-                  activeTab === tab
-                    ? 'bg-[#27465C] text-white'
-                    : 'text-gray-600 hover:text-gray-800'
-                }`}
-              >
-                {tab}
-              </button>
-            ))}
+            {tabs.map((tab, index) => {
+              const isCompleted = tabs.indexOf(activeTab) > index;
+              const isCurrent = activeTab === tab;
+              
+              return (
+                <div
+                  key={tab}
+                  className={`px-6 py-3 text-sm font-medium whitespace-nowrap ${
+                    isCompleted
+                      ? 'text-black'
+                      : isCurrent
+                      ? 'text-black'
+                      : 'text-gray-400'
+                  }`}
+                >
+                  {tab}
+                </div>
+              );
+            })}
           </div>
         </div>
 
@@ -242,12 +249,14 @@ export default function EventDetails() {
 
           {/* Book Speaker Button */}
           <div className="flex justify-center mt-8">
-            <button
+            <Button
               onClick={handleBookSpeaker}
-              className="bg-[#27465C] text-white px-8 py-3 rounded-lg font-medium hover:bg-[#1e3a4a] transition-colors shadow-lg"
+              variant="dark"
+              size="lg"
+              className="px-8 py-3 font-medium"
             >
-              Book Speaker
-            </button>
+              Next: Organizer Info
+            </Button>
           </div>
         </div>
       </div>
