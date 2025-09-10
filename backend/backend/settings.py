@@ -45,7 +45,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -104,8 +104,14 @@ CORS_ALLOWED_ORIGINS = [
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True  # For development - restrict in production
 
-# Email Configuration (optional - can be disabled)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'  # Prints emails to console
+# Email Configuration for SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'vallapusumasri@gmail.com'
+EMAIL_HOST_PASSWORD = 'bvvs wgmo bjcb yvld'
+DEFAULT_FROM_EMAIL = 'Connect and Inspire <vallapusumasri@gmail.com>'
 
 # Security settings (for production, set DEBUG=False and uncomment these)
 # SECURE_SSL_REDIRECT = True

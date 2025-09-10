@@ -44,7 +44,7 @@ const HostLogin: React.FC = () => {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('userType', 'host');
         
-        navigate('/find-speaker');
+        navigate('/host/dashboard');
       } else {
         const err = await res.json();
         setError(err.error || 'Login failed. Please check your credentials.');

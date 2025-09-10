@@ -44,7 +44,7 @@ const SpeakerLogin: React.FC = () => {
         localStorage.setItem('user', JSON.stringify(data.user));
         localStorage.setItem('userType', 'speaker');
         
-        navigate('/speaker-dashboard');
+        navigate('/speaker/dashboard');
       } else {
         const err = await res.json();
         setError(err.error || 'Login failed. Please check your credentials.');

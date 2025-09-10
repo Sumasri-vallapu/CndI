@@ -5,6 +5,7 @@ from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.conf import settings
 from .models import UserProfile
 from datetime import datetime, timedelta
 from django.utils import timezone
@@ -36,28 +37,22 @@ def send_otp(request):
         'name': name
     }
 
-    # HTML email template from emailtemplate.txt
-    email_subject = "OTP - ClearMyFile"
-    html_message = f"""<!DOCTYPE html>
-<html>
-  <body style="font-family: Arial, sans-serif; background: #fff; padding: 20px; text-align: center;">
-    <div style="max-width: 500px; background: #fff; margin: auto; padding: 30px; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);">
-      <h2 style="color: #333;">
-        Welcome to <span style="color: #49a741;">ClearMyFile</span>!
-      </h2>
-      <p style="font-size: 16px; color: #555;">
-        To verify your email address, please use the code below:
-      </p>
-      <div style="font-size: 24px; font-weight: bold; margin: 20px 0; color: #49a741;">
-        {otp}
-      </div>
-      <p style="font-size: 12px; color: #999; margin-top: 20px;">
-        If you didn’t create an account, please ignore this email.
-      </p>
-    </div>
-  </body>
-</html>
-"""
+    # Use the same template as the new authentication system
+    from django.template.loader import render_to_string
+    
+    email_subject = "[Connect & Inspire] Email Verification"
+    
+    # Prepare email context
+    email_context = {
+        'OTP': otp,
+        'SUPPORT_EMAIL': settings.EMAIL_HOST_USER,
+        'first_name': name,
+        'user_type': '',
+        'purpose': 'email_verification'
+    }
+    
+    # Render email template (same as new auth system)
+    html_message = render_to_string('emails/otp_email.html', email_context)
 
     try:
         from django.core.mail import EmailMultiAlternatives
@@ -65,7 +60,7 @@ def send_otp(request):
         # Create email with both text and HTML versions
         text_content = f"""Hello {name}!
 
-Thank you for joining ClearMyFile! 
+Thank you for joining Connect & Inspire! 
 
 To verify your email address, please use the verification code below:
 
@@ -73,15 +68,15 @@ Verification Code: {otp}
 
 This code will expire in 10 minutes for your security.
 
-If you didn't create an account with ClearMyFile, please ignore this email.
+If you didn't create an account with Connect & Inspire, please ignore this email.
 
 Best regards,
-The ClearMyFile Team"""
+The Connect & Inspire Team"""
         
         msg = EmailMultiAlternatives(
             email_subject,
             text_content,
-            "noreply@clearmyfile.org",
+            settings.DEFAULT_FROM_EMAIL,
             [email]
         )
         msg.attach_alternative(html_message, "text/html")
@@ -160,23 +155,23 @@ def signup(request):
             del otp_store[email]
         
         # Send welcome email
-        welcome_subject = "Welcome to ClearMyFile - You're All Set!"
+        welcome_subject = "Welcome to Connect & Inspire - You're All Set!"
         welcome_message = f"""Congratulations {user.first_name}!
 
-Your ClearMyFile account has been successfully created and verified!
+Your Connect & Inspire account has been successfully created and verified!
 
-You're now part of our growing community dedicated to making document verification simple, secure, and reliable.
+You're now part of our growing community dedicated to connecting speakers and hosts for meaningful events.
 
 What's Next?
 • Complete your profile to get started
-• Explore our document verification services
+• Explore our speaker and event hosting services
 • Connect with our support team if you need any help
 
-Why Choose ClearMyFile?
-• Fast and secure document processing
+Why Choose Connect & Inspire?
+• Fast and secure event coordination
 • 24/7 customer support
 • User-friendly interface
-• Trusted by thousands of users
+• Trusted by speakers and hosts worldwide
 
 Ready to get started? Log in to your account and explore all the features we have to offer.
 
@@ -185,17 +180,17 @@ If you have any questions or need assistance, don't hesitate to reach out to our
 Welcome aboard!
 
 Best regards,
-The ClearMyFile Team
+The Connect & Inspire Team
 
 ---
-ClearMyFile.org - Making document verification simple and secure
-Need help? Contact us at support@clearmyfile.org"""
+Connect & Inspire - Connecting speakers and hosts for meaningful events
+Need help? Contact us at {settings.EMAIL_HOST_USER}"""
 
         try:
             send_mail(
                 welcome_subject,
                 welcome_message,
-                "welcome@clearmyfile.org",
+                settings.DEFAULT_FROM_EMAIL,
                 [email],
                 fail_silently=False,
             )
@@ -205,7 +200,7 @@ Need help? Contact us at support@clearmyfile.org"""
         # Generate tokens
         refresh = RefreshToken.for_user(user)
         return Response({
-            "message": "Account created successfully! Welcome to ClearMyFile!",
+            "message": "Account created successfully! Welcome to Connect & Inspire!",
             "access": str(refresh.access_token),
             "refresh": str(refresh),
             "user": {
@@ -304,9 +299,9 @@ def forgot_password(request):
 
         try:
             send_mail(
-                "Password Reset - ClearMyFile",
-                f"Your password reset code is: {otp}",
-                "clearmyfile.org@gmail.com",  # Replace with your email
+                "[Connect & Inspire] Password Reset",
+                f"Your Connect & Inspire password reset code is: {otp}",
+                settings.DEFAULT_FROM_EMAIL,
                 [email],
                 fail_silently=False,
             )
@@ -384,4 +379,294 @@ def get_grampanchayats(request):
     mandal_id = request.GET.get('mandal_id')
     grampanchayats = GramPanchayat.objects.filter(mandal_id=mandal_id)
     return Response([{"id": grampanchayat.id, "name": grampanchayat.gram_panchayat_name} for grampanchayat in grampanchayats])
+
+
+# Import additional modules for new views
+from rest_framework import generics, status
+from django.db.models import Q
+from .models import Host, Speaker, Event, SpeakerAvailability, Payment, Message, EventRating
+from .serializers import (
+    HostSerializer, SpeakerSerializer, EventSerializer, SpeakerAvailabilitySerializer,
+    MessageSerializer, PaymentSerializer, EventRatingSerializer
+)
+
+
+# Host Views
+class HostListCreateView(generics.ListCreateAPIView):
+    queryset = Host.objects.all()
+    serializer_class = HostSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class HostDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Host.objects.all()
+    serializer_class = HostSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Speaker Views
+class SpeakerListView(generics.ListAPIView):
+    queryset = Speaker.objects.all()
+    serializer_class = SpeakerSerializer
+    
+    def get_queryset(self):
+        queryset = Speaker.objects.all()
+        expertise = self.request.query_params.get('expertise', None)
+        availability = self.request.query_params.get('availability', None)
+        
+        if expertise:
+            queryset = queryset.filter(expertise=expertise)
+        if availability:
+            queryset = queryset.filter(availability_status=availability)
+            
+        return queryset
+
+
+class SpeakerDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Speaker.objects.all()
+    serializer_class = SpeakerSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Speaker Availability Views
+@api_view(['GET'])
+def speaker_availability(request, speaker_id):
+    """Get speaker's availability for a specific date range"""
+    try:
+        speaker = Speaker.objects.get(id=speaker_id)
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
+        if start_date and end_date:
+            availability = SpeakerAvailability.objects.filter(
+                speaker=speaker,
+                date__range=[start_date, end_date]
+            )
+        else:
+            # Default to next 30 days
+            availability = SpeakerAvailability.objects.filter(
+                speaker=speaker,
+                date__range=[datetime.now().date(), datetime.now().date() + timedelta(days=30)]
+            )
+            
+        serializer = SpeakerAvailabilitySerializer(availability, many=True)
+        return Response(serializer.data)
+    except Speaker.DoesNotExist:
+        return Response({'error': 'Speaker not found'}, status=404)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_speaker_availability(request):
+    """Update speaker's availability"""
+    serializer = SpeakerAvailabilitySerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Event Views
+class EventListCreateView(generics.ListCreateAPIView):
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Event.objects.all()
+        
+        # Filter by organizer if user is a host
+        if hasattr(user, 'host'):
+            queryset = queryset.filter(organizer_email=user.email)
+        # Filter by speaker if user is a speaker
+        elif hasattr(user, 'speaker'):
+            queryset = queryset.filter(speaker=user.speaker)
+            
+        # Additional filters
+        status_filter = self.request.query_params.get('status', None)
+        if status_filter:
+            queryset = queryset.filter(status=status_filter)
+            
+        return queryset
+
+
+class EventDetailView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Event.objects.all()
+    serializer_class = EventSerializer
+    permission_classes = [IsAuthenticated]
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def event_response(request, event_id):
+    """Handle speaker response to event request"""
+    try:
+        event = Event.objects.get(id=event_id)
+        action = request.data.get('action')  # 'accept' or 'decline'
+        notes = request.data.get('notes', '')
+        
+        if action == 'accept':
+            event.status = 'accepted'
+        elif action == 'decline':
+            event.status = 'declined'
+        else:
+            return Response({'error': 'Invalid action'}, status=400)
+            
+        event.responded_at = datetime.now()
+        event.response_notes = notes
+        event.save()
+        
+        serializer = EventSerializer(event)
+        return Response(serializer.data)
+    except Event.DoesNotExist:
+        return Response({'error': 'Event not found'}, status=404)
+
+
+# Message Views
+class MessageListCreateView(generics.ListCreateAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        event_id = self.request.query_params.get('event_id', None)
+        
+        queryset = Message.objects.filter(
+            Q(sender=user) | Q(recipient=user)
+        )
+        
+        if event_id:
+            queryset = queryset.filter(event_id=event_id)
+            
+        return queryset
+    
+    def perform_create(self, serializer):
+        serializer.save(sender=self.request.user)
+
+
+class MessageDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = MessageSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        return Message.objects.filter(Q(sender=user) | Q(recipient=user))
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def mark_message_read(request, message_id):
+    """Mark a message as read"""
+    try:
+        message = Message.objects.get(id=message_id, recipient=request.user)
+        message.is_read = True
+        message.save()
+        return Response({'status': 'Message marked as read'})
+    except Message.DoesNotExist:
+        return Response({'error': 'Message not found'}, status=404)
+
+
+# Payment Views
+class PaymentListView(generics.ListAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'host'):
+            return Payment.objects.filter(event__organizer_email=user.email)
+        elif hasattr(user, 'speaker'):
+            return Payment.objects.filter(event__speaker=user.speaker)
+        return Payment.objects.none()
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_payment(request):
+    """Create a payment for an event"""
+    event_id = request.data.get('event_id')
+    amount = request.data.get('amount')
+    
+    try:
+        event = Event.objects.get(id=event_id)
+        
+        # Check if payment already exists
+        if hasattr(event, 'payment'):
+            return Response({'error': 'Payment already exists for this event'}, status=400)
+            
+        payment = Payment.objects.create(
+            event=event,
+            amount=amount,
+            status='pending'
+        )
+        
+        serializer = PaymentSerializer(payment)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    except Event.DoesNotExist:
+        return Response({'error': 'Event not found'}, status=404)
+
+
+# Rating Views
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def create_event_rating(request):
+    """Create a rating for a completed event"""
+    serializer = EventRatingSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# Dashboard Stats Views
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def host_dashboard_stats(request):
+    """Get dashboard statistics for hosts"""
+    user = request.user
+    if not hasattr(user, 'host'):
+        return Response({'error': 'User is not a host'}, status=400)
+    
+    events = Event.objects.filter(organizer_email=user.email)
+    
+    stats = {
+        'total_requests': events.count(),
+        'pending_requests': events.filter(status='pending').count(),
+        'accepted_requests': events.filter(status='accepted').count(),
+        'completed_events': events.filter(status='completed').count(),
+        'upcoming_events': events.filter(
+            status='accepted',
+            event_date__gte=datetime.now()
+        ).count(),
+    }
+    
+    return Response(stats)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def speaker_dashboard_stats(request):
+    """Get dashboard statistics for speakers"""
+    user = request.user
+    if not hasattr(user, 'speaker'):
+        return Response({'error': 'User is not a speaker'}, status=400)
+    
+    events = Event.objects.filter(speaker=user.speaker)
+    
+    stats = {
+        'total_requests': events.count(),
+        'pending_requests': events.filter(status='pending').count(),
+        'accepted_requests': events.filter(status='accepted').count(),
+        'completed_events': events.filter(status='completed').count(),
+        'upcoming_events': events.filter(
+            status='accepted',
+            event_date__gte=datetime.now()
+        ).count(),
+        'average_rating': user.speaker.average_rating,
+    }
+    
+    return Response(stats)
 

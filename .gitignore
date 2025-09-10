@@ -1,6 +1,9 @@
 # Ignore virtual environment
 venv/
 yuv_venv/
+.venv/
+backend/.venv/
+*/.venv/
 # Ignore Python cache
 __pycache__/
 *.pyc

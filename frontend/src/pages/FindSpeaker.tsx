@@ -124,17 +124,44 @@ export default function FindSpeaker() {
   };
 
   const handleSpeakerSelect = (speakerId: number) => {
-    navigate(`/event-details/${speakerId}`);
+    navigate(`/speaker/${speakerId}`);
   };
 
   return (
     <div className="min-h-screen bg-[#27465C]">
       {/* Navigation */}
-      <nav className="w-full py-6 px-4 md:px-8">
+      <nav className="w-full py-6 px-4 md:px-8 border-b border-white/10">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div onClick={() => navigate('/')} className="cursor-pointer">
-            <div className="text-white text-3xl font-bold">C&I</div>
+            <div className="text-white text-3xl font-black">C&I</div>
             <div className="text-white text-sm">Connect and Inspire</div>
+          </div>
+          <div className="hidden md:flex items-center gap-8">
+            <button onClick={() => navigate('/home')} className="text-white hover:opacity-80 font-medium">Home</button>
+            <button onClick={() => navigate('/about')} className="text-white hover:opacity-80 font-medium">About Us</button>
+            <button onClick={() => navigate('/contact')} className="text-white hover:opacity-80 font-medium">Contact us</button>
+            <div className="flex items-center gap-4">
+              <button 
+                onClick={() => navigate('/host-login')}
+                className="bg-white text-black px-6 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium"
+              >
+                Host Sign in
+              </button>
+              <button 
+                onClick={() => navigate('/speaker-login')}
+                className="bg-white text-black px-6 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium"
+              >
+                Speaker Sign in
+              </button>
+            </div>
+          </div>
+          <div className="md:hidden">
+            <button 
+              onClick={() => navigate('/host-login')}
+              className="bg-white text-black px-4 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium text-sm"
+            >
+              Sign in
+            </button>
           </div>
         </div>
       </nav>
@@ -166,21 +193,28 @@ export default function FindSpeaker() {
           {/* Filter Pills */}
           <div className="flex flex-wrap gap-3">
             {Object.entries(filterOptions).map(([filterType, options]) => (
-              <select
-                key={filterType}
-                value={filters[filterType as keyof typeof filters]}
-                onChange={(e) => handleFilterChange(filterType, e.target.value)}
-                className="px-4 py-2 rounded-full bg-white text-black border-none focus:outline-none focus:ring-2 focus:ring-white/20 capitalize cursor-pointer"
-              >
-                {options.map(option => (
-                  <option key={option} value={option}>
-                    {filterType === 'organization' && option !== 'All' 
-                      ? option.split(',')[0] // Show only first organization for brevity
-                      : option
-                    }
-                  </option>
-                ))}
-              </select>
+              <div key={filterType} className="relative">
+                <select
+                  value={filters[filterType as keyof typeof filters]}
+                  onChange={(e) => handleFilterChange(filterType, e.target.value)}
+                  className="px-4 py-2 pr-8 rounded-full bg-white text-black border-none focus:outline-none focus:ring-2 focus:ring-white/20 capitalize cursor-pointer appearance-none"
+                >
+                  <option value="All">{filterType}</option>
+                  {options.slice(1).map(option => (
+                    <option key={option} value={option}>
+                      {filterType === 'organization' && option !== 'All' 
+                        ? option.split(',')[0] // Show only first organization for brevity
+                        : option
+                      }
+                    </option>
+                  ))}
+                </select>
+                <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </div>
+              </div>
             ))}
           </div>
         </div>

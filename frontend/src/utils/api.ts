@@ -7,7 +7,20 @@ const BASE_URL = 'http://localhost:8000/api';
 // API endpoints
 export const ENDPOINTS = {
   BASE_URL,
-  // Authentication endpoints
+  
+  // NEW OTP-based Authentication endpoints
+  AUTH: {
+    SIGNUP_REQUEST: `${BASE_URL}/auth/signup-request/`,
+    VERIFY_OTP: `${BASE_URL}/auth/verify-otp/`,
+    SET_PASSWORD: `${BASE_URL}/auth/set-password/`,
+    LOGIN: `${BASE_URL}/auth/login/`,
+    FORGOT_PASSWORD: `${BASE_URL}/auth/forgot-password/`,
+    RESET_PASSWORD: `${BASE_URL}/auth/reset-password/`,
+    RESEND_OTP: `${BASE_URL}/auth/resend-otp/`,
+    CHECK_EMAIL_EXISTS: `${BASE_URL}/auth/check-email-exists/`,
+  },
+  
+  // Legacy endpoints (for backward compatibility during transition)
   SEND_OTP: `${BASE_URL}/send_otp/`,
   SIGNUP: `${BASE_URL}/signup/`,
   LOGIN: `${BASE_URL}/login/`,
