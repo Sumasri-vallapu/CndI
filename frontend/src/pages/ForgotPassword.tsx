@@ -20,7 +20,7 @@ const ForgotPassword: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(ENDPOINTS.FORGOT_PASSWORD, {
+      const res = await fetch(ENDPOINTS.AUTH.FORGOT_PASSWORD, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

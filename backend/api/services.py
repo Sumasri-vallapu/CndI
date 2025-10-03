@@ -36,7 +36,10 @@ class EmailService:
                 email=email,
                 purpose=purpose
             )
-            
+
+            # Debug logging
+            logger.info(f"Created OTP for {email} - Code: {otp_instance.otp_code}, Purpose: {purpose}")
+
             # Prepare email context
             email_context = {
                 'OTP': otp_instance.otp_code,
@@ -79,50 +82,66 @@ class EmailService:
     def verify_otp(email, otp_code, purpose):
         """
         Verify OTP code
-        
+
         Args:
             email (str): Email address
             otp_code (str): OTP code to verify
             purpose (str): Purpose of OTP
-            
+
         Returns:
             tuple: (success: bool, message: str, otp_instance: OTPVerification or None)
         """
         try:
+            # Debug logging
+            logger.info(f"Attempting to verify OTP - Email: {email}, Code: {otp_code}, Purpose: {purpose}")
+
             # Find the OTP instance
             otp_instance = OTPVerification.objects.filter(
                 email=email,
                 purpose=purpose,
                 is_verified=False
             ).first()
-            
+
             if not otp_instance:
+                logger.warning(f"No OTP found for {email} with purpose {purpose}")
+                # Check if any OTP exists for this email
+                all_otps = OTPVerification.objects.filter(email=email)
+                logger.info(f"All OTPs for {email}: {[(o.purpose, o.otp_code, o.is_verified) for o in all_otps]}")
                 return False, "No valid OTP found for this email", None
-            
+
+            # Debug log the found OTP
+            logger.info(f"Found OTP - Code: {otp_instance.otp_code}, Expected: {otp_code}, Match: {otp_instance.otp_code == otp_code}")
+
             # Check if expired
             if otp_instance.is_expired():
+                logger.warning(f"OTP expired for {email}")
                 return False, "OTP has expired. Please request a new one", otp_instance
-            
+
             # Check max attempts
             if otp_instance.attempts >= otp_instance.max_attempts:
+                logger.warning(f"Max attempts exceeded for {email}")
                 return False, "Maximum verification attempts exceeded. Please request a new OTP", otp_instance
-            
-            # Verify OTP code
-            if otp_instance.otp_code != otp_code:
+
+            # Verify OTP code (convert both to string and strip whitespace)
+            stored_otp = str(otp_instance.otp_code).strip()
+            provided_otp = str(otp_code).strip()
+
+            if stored_otp != provided_otp:
+                logger.warning(f"OTP mismatch - Stored: '{stored_otp}', Provided: '{provided_otp}'")
                 otp_instance.increment_attempts()
                 remaining_attempts = otp_instance.max_attempts - otp_instance.attempts
                 if remaining_attempts > 0:
                     return False, f"Invalid OTP code. {remaining_attempts} attempts remaining", otp_instance
                 else:
                     return False, "Invalid OTP code. Maximum attempts exceeded", otp_instance
-            
+
             # OTP is valid
             otp_instance.is_verified = True
             otp_instance.save()
-            
+
             logger.info(f"OTP verified successfully for {email} - {purpose}")
             return True, "OTP verified successfully", otp_instance
-            
+
         except Exception as e:
             logger.error(f"Error verifying OTP for {email}: {str(e)}")
             return False, f"Verification error: {str(e)}", None

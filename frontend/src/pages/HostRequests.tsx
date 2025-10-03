@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   Search,
   Filter,
   Calendar,
@@ -14,7 +14,9 @@ import {
   MessageSquare,
   Building,
   DollarSign,
-  Briefcase
+  Briefcase,
+  ChevronDown,
+  Check
 } from 'lucide-react';
 
 interface SpeakingRequest {
@@ -128,6 +130,7 @@ const HostRequests: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedRequest, setSelectedRequest] = useState<SpeakingRequest | null>(null);
   const [showDetails, setShowDetails] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   useEffect(() => {
     let filtered = requests;
@@ -177,6 +180,16 @@ const HostRequests: React.FC = () => {
     setShowDetails(true);
   };
 
+  const statusOptions = [
+    { value: 'all', label: 'All Status', color: 'text-gray-700' },
+    { value: 'pending', label: 'Pending', color: 'text-yellow-600' },
+    { value: 'accepted', label: 'Accepted', color: 'text-green-600' },
+    { value: 'declined', label: 'Declined', color: 'text-red-600' },
+    { value: 'completed', label: 'Completed', color: 'text-blue-600' }
+  ];
+
+  const selectedOption = statusOptions.find(opt => opt.value === statusFilter) || statusOptions[0];
+
   return (
     <div className="min-h-screen bg-[#27465C]">
       {/* Header */}
@@ -209,17 +222,59 @@ const HostRequests: React.FC = () => {
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
               />
             </div>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="accepted">Accepted</option>
-              <option value="declined">Declined</option>
-              <option value="completed">Completed</option>
-            </select>
+            {/* Custom Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setShowDropdown(!showDropdown)}
+                className="w-full sm:w-48 px-4 py-2.5 bg-white border border-gray-300 rounded-lg flex items-center justify-between hover:border-[#27465C] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+              >
+                <div className="flex items-center space-x-2">
+                  <Filter className="w-4 h-4 text-gray-500" />
+                  <span className={`font-medium ${selectedOption.color}`}>
+                    {selectedOption.label}
+                  </span>
+                </div>
+                <ChevronDown
+                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                    showDropdown ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showDropdown && (
+                <>
+                  {/* Backdrop */}
+                  <div
+                    className="fixed inset-0 z-10"
+                    onClick={() => setShowDropdown(false)}
+                  />
+
+                  {/* Dropdown List */}
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                    {statusOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        onClick={() => {
+                          setStatusFilter(option.value);
+                          setShowDropdown(false);
+                        }}
+                        className={`w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-150 ${
+                          statusFilter === option.value ? 'bg-[#27465C]/5' : ''
+                        }`}
+                      >
+                        <span className={`font-medium ${option.color}`}>
+                          {option.label}
+                        </span>
+                        {statusFilter === option.value && (
+                          <Check className="w-4 h-4 text-[#27465C]" />
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </div>
 

@@ -1,21 +1,25 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
+import { ENDPOINTS } from '../utils/api';
+import { Loader2 } from 'lucide-react';
 
 interface Speaker {
-  id: string;
-  name: string;
-  title: string;
-  company: string;
-  location: string;
+  id: number;
+  user_name: string;
+  user_email: string;
   bio: string;
-  expertise: string[];
-  languages: string[];
-  rating: number;
-  totalReviews: number;
-  image: string;
-  availability: 'Available' | 'Busy' | 'Booked';
-  priceRange: string;
-  experience: string;
+  expertise: string;
+  speaking_topics: string;
+  experience_years: number;
+  hourly_rate: number | null;
+  availability_status: string;
+  profile_image: string;
+  website: string;
+  social_media: any;
+  average_rating: number;
+  location: string;
+  languages: string;
+  industry: string;
 }
 
 export default function SpeakerProfile() {
@@ -24,35 +28,35 @@ export default function SpeakerProfile() {
   const [speaker, setSpeaker] = useState<Speaker | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Mock data - replace with actual API call
   useEffect(() => {
-    const mockSpeaker: Speaker = {
-      id: speakerId || '1',
-      name: 'Dr. Sarah Johnson',
-      title: 'AI & Machine Learning Expert',
-      company: 'Tech Innovators Inc.',
-      location: 'San Francisco, CA',
-      bio: 'Dr. Sarah Johnson is a renowned expert in artificial intelligence and machine learning with over 15 years of experience. She has led groundbreaking research at top tech companies and has been a keynote speaker at major conferences worldwide. Her expertise spans deep learning, natural language processing, and ethical AI development.',
-      expertise: ['Artificial Intelligence', 'Machine Learning', 'Deep Learning', 'Data Science', 'Technology Leadership'],
-      languages: ['English', 'Spanish', 'Mandarin'],
-      rating: 4.9,
-      totalReviews: 127,
-      image: '/img2.png',
-      availability: 'Available',
-      priceRange: '$5,000 - $10,000',
-      experience: '15+ years'
+    const fetchSpeaker = async () => {
+      if (!speakerId) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(ENDPOINTS.SPEAKER_DETAIL(parseInt(speakerId)));
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch speaker');
+        }
+
+        const data = await response.json();
+        setSpeaker(data);
+      } catch (error) {
+        console.error('Error fetching speaker:', error);
+        setSpeaker(null);
+      } finally {
+        setLoading(false);
+      }
     };
-    
-    setTimeout(() => {
-      setSpeaker(mockSpeaker);
-      setLoading(false);
-    }, 500);
+
+    fetchSpeaker();
   }, [speakerId]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-[#27465C] flex items-center justify-center">
-        <div className="text-white text-xl">Loading speaker profile...</div>
+        <Loader2 className="w-12 h-12 text-white animate-spin" />
       </div>
     );
   }
@@ -111,8 +115,8 @@ export default function SpeakerProfile() {
             {/* Profile Image */}
             <div className="flex-shrink-0">
               <img
-                src={speaker.image}
-                alt={speaker.name}
+                src={speaker.profile_image || '/img2.png'}
+                alt={speaker.user_name}
                 className="w-48 h-48 rounded-2xl object-cover shadow-xl"
               />
             </div>
@@ -121,37 +125,39 @@ export default function SpeakerProfile() {
             <div className="flex-1">
               <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-6">
                 <div>
-                  <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">{speaker.name}</h1>
-                  <h2 className="text-xl sm:text-2xl text-white/90 font-medium mb-2">{speaker.title}</h2>
-                  <p className="text-white/80 mb-2">{speaker.company}</p>
+                  <h1 className="text-3xl sm:text-4xl font-black text-white mb-2">{speaker.user_name}</h1>
+                  <h2 className="text-xl sm:text-2xl text-white/90 font-medium mb-2 capitalize">{speaker.expertise}</h2>
+                  <p className="text-white/80 mb-2">{speaker.industry}</p>
                   <p className="text-white/70 mb-4 flex items-center gap-2">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                     </svg>
-                    {speaker.location}
+                    {speaker.location || 'Location not specified'}
                   </p>
 
                   {/* Rating */}
                   <div className="flex items-center gap-2 mb-4">
-                    <div className="flex">{renderStars(speaker.rating)}</div>
-                    <span className="text-white font-medium">{speaker.rating}</span>
-                    <span className="text-white/70">({speaker.totalReviews} reviews)</span>
+                    <div className="flex">{renderStars(speaker.average_rating)}</div>
+                    <span className="text-white font-medium">{speaker.average_rating.toFixed(1)}</span>
+                    <span className="text-white/70">(Rating)</span>
                   </div>
 
                   {/* Quick Stats */}
                   <div className="flex flex-wrap gap-4 text-sm">
                     <div className="bg-white/20 px-3 py-1 rounded-full">
-                      <span className="text-white">{speaker.experience} experience</span>
+                      <span className="text-white">{speaker.experience_years}+ years experience</span>
                     </div>
-                    <div className="bg-white/20 px-3 py-1 rounded-full">
-                      <span className="text-white">{speaker.priceRange}</span>
-                    </div>
+                    {speaker.hourly_rate && (
+                      <div className="bg-white/20 px-3 py-1 rounded-full">
+                        <span className="text-white">${speaker.hourly_rate}/hour</span>
+                      </div>
+                    )}
                     <div className={`px-3 py-1 rounded-full ${
-                      speaker.availability === 'Available' ? 'bg-green-500/20 text-green-300' :
-                      speaker.availability === 'Busy' ? 'bg-yellow-500/20 text-yellow-300' :
+                      speaker.availability_status === 'available' ? 'bg-green-500/20 text-green-300' :
+                      speaker.availability_status === 'busy' ? 'bg-yellow-500/20 text-yellow-300' :
                       'bg-red-500/20 text-red-300'
                     }`}>
-                      <span>{speaker.availability}</span>
+                      <span className="capitalize">{speaker.availability_status}</span>
                     </div>
                   </div>
                 </div>
@@ -188,35 +194,37 @@ export default function SpeakerProfile() {
               <p className="text-white/80 leading-relaxed">{speaker.bio}</p>
             </div>
 
-            {/* Expertise */}
+            {/* Speaking Topics */}
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-2xl font-black text-white mb-4">Expertise</h3>
+              <h3 className="text-2xl font-black text-white mb-4">Speaking Topics</h3>
               <div className="flex flex-wrap gap-3">
-                {speaker.expertise.map((skill, index) => (
+                {speaker.speaking_topics.split(',').map((topic, index) => (
                   <span
                     key={index}
                     className="bg-white/20 text-white px-4 py-2 rounded-lg font-medium"
                   >
-                    {skill}
+                    {topic.trim()}
                   </span>
                 ))}
               </div>
             </div>
 
             {/* Languages */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-2xl font-black text-white mb-4">Languages</h3>
-              <div className="flex flex-wrap gap-3">
-                {speaker.languages.map((language, index) => (
-                  <span
-                    key={index}
-                    className="bg-white/20 text-white px-4 py-2 rounded-lg font-medium"
-                  >
-                    {language}
-                  </span>
-                ))}
+            {speaker.languages && (
+              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
+                <h3 className="text-2xl font-black text-white mb-4">Languages</h3>
+                <div className="flex flex-wrap gap-3">
+                  {speaker.languages.split(',').map((language, index) => (
+                    <span
+                      key={index}
+                      className="bg-white/20 text-white px-4 py-2 rounded-lg font-medium"
+                    >
+                      {language.trim()}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Sidebar */}
@@ -227,12 +235,12 @@ export default function SpeakerProfile() {
               <div className="space-y-3">
                 <div className="flex justify-between items-center">
                   <span className="text-white">Status</span>
-                  <span className={`px-2 py-1 rounded text-sm ${
-                    speaker.availability === 'Available' ? 'bg-green-500/20 text-green-300' :
-                    speaker.availability === 'Busy' ? 'bg-yellow-500/20 text-yellow-300' :
+                  <span className={`px-2 py-1 rounded text-sm capitalize ${
+                    speaker.availability_status === 'available' ? 'bg-green-500/20 text-green-300' :
+                    speaker.availability_status === 'busy' ? 'bg-yellow-500/20 text-yellow-300' :
                     'bg-red-500/20 text-red-300'
                   }`}>
-                    {speaker.availability}
+                    {speaker.availability_status}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -250,7 +258,7 @@ export default function SpeakerProfile() {
             <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
               <h3 className="text-xl font-black text-white mb-4">Quick Contact</h3>
               <p className="text-white/80 text-sm mb-4">
-                Ready to book {speaker.name.split(' ')[0]} for your event? Send a request with your event details.
+                Ready to book {speaker.user_name.split(' ')[0]} for your event? Send a request with your event details.
               </p>
               <button
                 onClick={() => navigate(`/send-request/${speaker.id}`)}

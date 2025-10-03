@@ -16,6 +16,7 @@ const ResetPasswordNew: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     // Redirect back if no email/otp or not verified
@@ -72,13 +73,14 @@ const ResetPasswordNew: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(ENDPOINTS.RESET_PASSWORD, {
+      const res = await fetch(ENDPOINTS.AUTH.RESET_PASSWORD, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
-          otp,
-          new_password: formData.newPassword
+          otp_code: otp,
+          new_password: formData.newPassword,
+          confirm_password: formData.confirmPassword
         })
       });
 
@@ -106,15 +108,15 @@ const ResetPasswordNew: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#27465C] flex flex-col">
       {/* Navigation */}
-      <nav className="bg-white border-b-2 border-gray-100">
+      <nav className="bg-[#27465C] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-bold text-[white]">
+            <Link to="/" className="text-2xl md:text-3xl font-black text-white">
               C&I
             </Link>
-            <Link 
+            <Link
               to="/login"
-              className="bg-[white] text-white font-medium shadow hover:bg-[gray-100] transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
+              className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
               Back to Login
             </Link>
@@ -126,11 +128,11 @@ const ResetPasswordNew: React.FC = () => {
         <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-semibold text-[white] mb-6">
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-6">
               Create New Password
             </h1>
-            <p className="text-lg text-gray-600 font-bold">
-              Enter your new password for <span className="text-[white] font-bold">{email}</span>
+            <p className="text-lg text-white font-normal">
+              Enter your new password for <span className="font-medium">{email}</span>
             </p>
           </div>
 
@@ -142,7 +144,7 @@ const ResetPasswordNew: React.FC = () => {
                 <div className="space-y-4">
                   <label className="block text-lg font-medium text-gray-700 mb-2">New Password *</label>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={formData.newPassword}
                     onChange={(e) => handleInputChange('newPassword', e.target.value)}
                     placeholder="Create a strong password"
@@ -177,7 +179,7 @@ const ResetPasswordNew: React.FC = () => {
                 <div className="space-y-4">
                   <label className="block text-lg font-medium text-gray-700 mb-2">Confirm New Password *</label>
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                     placeholder="Re-enter your new password"
@@ -191,6 +193,20 @@ const ResetPasswordNew: React.FC = () => {
                   )}
                 </div>
 
+                {/* Show Password Checkbox */}
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    className="w-4 h-4 rounded border-gray-300 text-[#27465C] focus:ring-2 focus:ring-[#27465C] cursor-pointer"
+                  />
+                  <label htmlFor="showPassword" className="text-gray-700 text-sm font-medium cursor-pointer select-none">
+                    Show Password
+                  </label>
+                </div>
+
                 {/* Error Message */}
                 {error && (
                   <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
@@ -202,7 +218,7 @@ const ResetPasswordNew: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading || !passwordMatch || passwordStrength.score < 60}
-                  className="w-full h-12 bg-[white] text-white rounded-lg font-medium hover:bg-[gray-100] focus:outline-none focus:ring-2 focus:ring-[white] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-12 bg-white text-black rounded-lg font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#27465C] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Resetting Password...' : 'Reset Password'}
                 </button>

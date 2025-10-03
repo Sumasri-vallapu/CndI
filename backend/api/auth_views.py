@@ -92,16 +92,21 @@ def verify_otp(request):
     """
     Step 2: Verify OTP code
     """
+    # Debug log the incoming request
+    logger.info(f"OTP Verification Request Data: {request.data}")
+
     serializer = OTPVerificationSerializer(data=request.data)
     if serializer.is_valid():
         email = serializer.validated_data['email']
         otp_code = serializer.validated_data['otp_code']
         purpose = serializer.validated_data['purpose']
-        
+
+        logger.info(f"Serializer validated - Email: {email}, OTP: {otp_code}, Purpose: {purpose}")
+
         try:
             # Verify OTP
             success, message, otp_instance = EmailService.verify_otp(email, otp_code, purpose)
-            
+
             if success:
                 # Mark pending user as email verified
                 try:
@@ -110,24 +115,26 @@ def verify_otp(request):
                     pending_user.save()
                 except PendingUser.DoesNotExist:
                     pass
-                
+
                 return Response({
                     'message': message,
                     'verified': True
                 }, status=status.HTTP_200_OK)
             else:
+                logger.warning(f"OTP verification failed: {message}")
                 return Response({
                     'error': message,
                     'verified': False
                 }, status=status.HTTP_400_BAD_REQUEST)
-                
+
         except Exception as e:
             logger.error(f"OTP verification error: {str(e)}")
             return Response({
                 'error': 'Failed to verify OTP'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        logger.error(f"Serializer validation failed: {serializer.errors}")
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -145,41 +152,64 @@ def set_password(request):
         try:
             # Check if email was verified
             pending_user = PendingUser.objects.get(email=email, is_email_verified=True)
-            
+
             with transaction.atomic():
-                # Create Django User
-                user = User.objects.create_user(
-                    username=email,
-                    email=email,
-                    first_name=pending_user.first_name,
-                    last_name=pending_user.last_name,
-                    password=password
-                )
-                
-                # Create specific profile based on user type
-                if pending_user.user_type == 'host':
-                    # Create Host profile
-                    host_profile = Host.objects.create(user=user)
-                    
-                    # Also create basic UserProfile
-                    user_profile = UserProfile.objects.create(user=user)
-                    
-                elif pending_user.user_type == 'speaker':
-                    # Create Speaker profile
-                    speaker_profile = Speaker.objects.create(user=user)
-                    
-                    # Also create basic UserProfile  
-                    user_profile = UserProfile.objects.create(user=user)
-                
+                # Check if user already exists
+                user = User.objects.filter(email=email).first()
+
+                if user:
+                    # User exists - add additional profile (dual registration)
+                    # Verify password matches
+                    if not user.check_password(password):
+                        return Response({
+                            'error': 'Email already registered with a different password. Please use the same password or login.'
+                        }, status=status.HTTP_400_BAD_REQUEST)
+
+                    # Add the new profile type
+                    if pending_user.user_type == 'host':
+                        if hasattr(user, 'host'):
+                            return Response({
+                                'error': 'You are already registered as a Host. Please login.'
+                            }, status=status.HTTP_400_BAD_REQUEST)
+                        Host.objects.create(user=user)
+                    elif pending_user.user_type == 'speaker':
+                        if hasattr(user, 'speaker'):
+                            return Response({
+                                'error': 'You are already registered as a Speaker. Please login.'
+                            }, status=status.HTTP_400_BAD_REQUEST)
+                        Speaker.objects.create(user=user)
+                else:
+                    # Create new Django User
+                    user = User.objects.create_user(
+                        username=email,
+                        email=email,
+                        first_name=pending_user.first_name,
+                        last_name=pending_user.last_name,
+                        password=password
+                    )
+
+                    # Create specific profile based on user type
+                    if pending_user.user_type == 'host':
+                        Host.objects.create(user=user)
+                    elif pending_user.user_type == 'speaker':
+                        Speaker.objects.create(user=user)
+
+                    # Create basic UserProfile if it doesn't exist
+                    if not hasattr(user, 'userprofile'):
+                        UserProfile.objects.create(user=user)
+
                 # Clean up
                 pending_user.delete()
-                
+
                 # Clear any remaining OTPs for this email
                 OTPVerification.objects.filter(email=email).delete()
-                
+
                 # Generate JWT tokens
                 refresh = RefreshToken.for_user(user)
-                
+
+                # Determine current user type for response
+                user_type = pending_user.user_type
+
                 return Response({
                     'message': 'Account created successfully!',
                     'access': str(refresh.access_token),
@@ -189,7 +219,9 @@ def set_password(request):
                         'email': user.email,
                         'first_name': user.first_name,
                         'last_name': user.last_name,
-                        'user_type': pending_user.user_type
+                        'user_type': user_type,
+                        'is_host': hasattr(user, 'host'),
+                        'is_speaker': hasattr(user, 'speaker')
                     }
                 }, status=status.HTTP_201_CREATED)
                 
@@ -225,16 +257,22 @@ def login(request):
             authenticated_user = authenticate(username=user.username, password=password)
             
             if authenticated_user:
-                # Determine user type
+                # Determine user types (can have both)
+                is_host = hasattr(user, 'host')
+                is_speaker = hasattr(user, 'speaker')
+
+                # Default user_type for backward compatibility
                 user_type = None
-                if hasattr(user, 'host'):
+                if is_host and is_speaker:
+                    user_type = 'both'
+                elif is_host:
                     user_type = 'host'
-                elif hasattr(user, 'speaker'):
+                elif is_speaker:
                     user_type = 'speaker'
-                
+
                 # Generate tokens
                 refresh = RefreshToken.for_user(authenticated_user)
-                
+
                 return Response({
                     'message': 'Login successful',
                     'access': str(refresh.access_token),
@@ -244,7 +282,9 @@ def login(request):
                         'email': user.email,
                         'first_name': user.first_name,
                         'last_name': user.last_name,
-                        'user_type': user_type
+                        'user_type': user_type,
+                        'is_host': is_host,
+                        'is_speaker': is_speaker
                     }
                 }, status=status.HTTP_200_OK)
             else:
@@ -435,10 +475,18 @@ def check_email_exists(request):
 @permission_classes([AllowAny])
 def debug_otps(request):
     """Debug endpoint to check OTPs (remove in production)"""
-    otps = OTPVerification.objects.all().values(
-        'email', 'otp_code', 'purpose', 'is_verified', 'created_at', 'expires_at'
-    )
-    return Response({"otps": list(otps)})
+    email = request.query_params.get('email')
+
+    if email:
+        otps = OTPVerification.objects.filter(email=email).values(
+            'email', 'otp_code', 'purpose', 'is_verified', 'attempts', 'created_at', 'expires_at'
+        ).order_by('-created_at')
+    else:
+        otps = OTPVerification.objects.all().values(
+            'email', 'otp_code', 'purpose', 'is_verified', 'attempts', 'created_at', 'expires_at'
+        ).order_by('-created_at')[:10]
+
+    return Response({"otps": list(otps), "count": len(otps)})
 
 
 @api_view(['GET'])

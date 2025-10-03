@@ -56,7 +56,7 @@ const ResetPasswordOtp: React.FC = () => {
     setIsResending(true);
     
     try {
-      const res = await fetch(ENDPOINTS.FORGOT_PASSWORD, {
+      const res = await fetch(ENDPOINTS.AUTH.FORGOT_PASSWORD, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
@@ -82,15 +82,15 @@ const ResetPasswordOtp: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#27465C] flex flex-col">
       {/* Navigation */}
-      <nav className="bg-white border-b-2 border-gray-100">
+      <nav className="bg-[#27465C] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-bold text-[white]">
+            <Link to="/" className="text-2xl md:text-3xl font-black text-white">
               C&I
             </Link>
-            <Link 
+            <Link
               to="/login"
-              className="bg-[white] text-white font-medium shadow hover:bg-[gray-100] transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
+              className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
               Back to Login
             </Link>
@@ -102,11 +102,11 @@ const ResetPasswordOtp: React.FC = () => {
         <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
           <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-semibold text-[white] mb-6">
+            <h1 className="text-3xl sm:text-4xl font-black text-white mb-6">
               Enter Reset Code
             </h1>
-            <p className="text-lg text-gray-600 font-bold">
-              We've sent a 4-digit code to <span className="text-[white] font-bold">{email}</span>
+            <p className="text-lg text-white font-normal">
+              We've sent a 4-digit code to <span className="font-medium">{email}</span>
             </p>
           </div>
 
@@ -145,21 +145,21 @@ const ResetPasswordOtp: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || otp.length !== 4}
-                className="w-full h-12 bg-[white] text-white rounded-lg font-medium hover:bg-[gray-100] focus:outline-none focus:ring-2 focus:ring-[white] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-12 bg-white text-black rounded-lg font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#27465C] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Verifying...' : 'Verify Code'}
+                {isLoading ? 'Verifying...' : 'Next'}
               </button>
 
               {/* Resend Code */}
               <div className="text-center">
-                <p className="text-gray-600 font-bold mb-2">
+                <p className="text-gray-600 font-medium mb-2">
                   Didn't receive the code?
                 </p>
                 <button
                   type="button"
                   onClick={handleResendCode}
                   disabled={isResending}
-                  className="text-[white] hover:text-[gray-100] font-bold transition-colors duration-200 disabled:opacity-50"
+                  className="text-[#27465C] hover:text-[#1f3a48] font-medium transition-colors duration-200 disabled:opacity-50 underline"
                 >
                   {isResending ? 'Sending...' : 'Resend Code'}
                 </button>
@@ -168,9 +168,9 @@ const ResetPasswordOtp: React.FC = () => {
 
             {/* Back Link */}
             <div className="text-center mt-8">
-              <Link 
-                to="/forgot-password" 
-                className="text-gray-600 hover:text-gray-800 font-bold transition-colors duration-200"
+              <Link
+                to="/forgot-password"
+                className="text-gray-600 hover:text-gray-800 font-medium transition-colors duration-200"
               >
                 ← Back to Email Entry
               </Link>

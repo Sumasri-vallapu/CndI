@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { User, Settings, LogOut, ChevronDown } from 'lucide-react';
 
 interface EventRequest {
   id: string;
@@ -23,9 +24,28 @@ export default function SpeakerDashboard() {
   const [activeTab, setActiveTab] = useState<'requests' | 'calendar' | 'profile'>('requests');
   const [requests, setRequests] = useState<EventRequest[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [speakerName, setSpeakerName] = useState('');
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   // Mock data - replace with actual API calls
   useEffect(() => {
+    // Get speaker name from localStorage
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const user = JSON.parse(userData);
+      setSpeakerName(user.first_name || 'Speaker');
+    }
+
+    // Close dropdown when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+
     const mockRequests: EventRequest[] = [
       {
         id: '1',
@@ -81,7 +101,17 @@ export default function SpeakerDashboard() {
       setRequests(mockRequests);
       setLoading(false);
     }, 500);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('userType');
+    navigate('/speaker-login');
+  };
 
   const handleRequestAction = (requestId: string, action: 'accept' | 'decline' | 'negotiate') => {
     setRequests(prev => prev.map(req => 
@@ -254,13 +284,63 @@ export default function SpeakerDashboard() {
             <div className="text-white text-sm">Connect and Inspire</div>
           </div>
           <div className="flex items-center gap-4">
-            <span className="text-white/80">Welcome back, Speaker!</span>
-            <button 
-              onClick={() => navigate('/')}
-              className="bg-white text-black px-6 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium"
-            >
-              Sign out
-            </button>
+            {/* Profile Dropdown */}
+            <div className="relative" ref={profileMenuRef}>
+              <button
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                className="flex items-center space-x-3 hover:bg-white/10 rounded-lg px-3 py-2 transition-colors"
+              >
+                <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-[#27465C]" />
+                </div>
+                <span className="text-white font-medium">{speakerName}</span>
+                <ChevronDown className={`w-4 h-4 text-white transition-transform ${showProfileMenu ? 'rotate-180' : ''}`} />
+              </button>
+
+              {/* Dropdown Menu */}
+              {showProfileMenu && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <div className="px-4 py-3 border-b border-gray-100">
+                    <p className="text-sm font-medium text-black">{speakerName}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {JSON.parse(localStorage.getItem('user') || '{}').email}
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      setActiveTab('profile');
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>View Profile</span>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowProfileMenu(false);
+                      navigate('/speaker/settings');
+                    }}
+                    className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center space-x-2"
+                  >
+                    <Settings className="w-4 h-4" />
+                    <span>Settings</span>
+                  </button>
+
+                  <div className="border-t border-gray-100 my-1"></div>
+
+                  <button
+                    onClick={handleLogout}
+                    className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span>Logout</span>
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>

@@ -1,6 +1,6 @@
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -411,24 +411,25 @@ class HostDetailView(generics.RetrieveUpdateDestroyAPIView):
 class SpeakerListView(generics.ListAPIView):
     queryset = Speaker.objects.all()
     serializer_class = SpeakerSerializer
-    
+    permission_classes = [AllowAny]  # Allow public access to browse speakers
+
     def get_queryset(self):
         queryset = Speaker.objects.all()
         expertise = self.request.query_params.get('expertise', None)
         availability = self.request.query_params.get('availability', None)
-        
+
         if expertise:
             queryset = queryset.filter(expertise=expertise)
         if availability:
             queryset = queryset.filter(availability_status=availability)
-            
+
         return queryset
 
 
 class SpeakerDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Speaker.objects.all()
     serializer_class = SpeakerSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]  # Allow public access to view speaker profiles
 
 
 # Speaker Availability Views

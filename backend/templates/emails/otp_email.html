@@ -151,7 +151,13 @@
 
 <body>
     <!-- Preheader (preview text) -->
-    <div class="preheader">Your Connect & Inspire verification code is {{OTP}} — valid for 10 minutes.</div>
+    <div class="preheader">
+        {% if 'forgot' in purpose %}
+            Your password reset code is {{OTP}} — valid for 10 minutes.
+        {% else %}
+            Your Connect & Inspire verification code is {{OTP}} — valid for 10 minutes.
+        {% endif %}
+    </div>
 
     <!-- Outer background -->
     <table role="presentation" cellpadding="0" cellspacing="0" width="100%" class="outer">
@@ -165,17 +171,27 @@
                                 <!-- Header / Brand (Clean, no logo) -->
                                 <div style="text-align: center; margin-bottom: 20px;">
                                     <h1 style="color:#27465C; font-size:24px; font-weight:700; margin:0 0 8px 0;">Connect &amp; Inspire</h1>
-                                    <p style="color:#6b7780; font-size:14px; margin:0;">{% if user_type %}{{ user_type }} Registration{% else %}Email Verification{% endif %}</p>
+                                    <p style="color:#6b7780; font-size:14px; margin:0;">
+                                        {% if 'forgot' in purpose %}Password Reset{% elif user_type %}{{ user_type }} Registration{% else %}Email Verification{% endif %}
+                                    </p>
                                 </div>
 
                                 <!-- Title -->
-                                <h2 style="color:#0f2d34; font-size:20px; margin:20px 0 12px 0; text-align:center;">Your verification code
+                                <h2 style="color:#0f2d34; font-size:20px; margin:20px 0 12px 0; text-align:center;">
+                                    {% if 'forgot' in purpose %}
+                                        Reset Your Password
+                                    {% else %}
+                                        Your Verification Code
+                                    {% endif %}
                                 </h2>
 
                                 <!-- Intro / instructions -->
                                 <p class="otp-intro" style="margin:0; text-align:center;">
-                                    {% if first_name %}Hi {{ first_name }}, w{% else %}W{% endif %}e've sent you a verification code to complete your registration. This code is valid for
-                                    <strong>10 minutes</strong>. Do not share this code with anyone.
+                                    {% if 'forgot' in purpose %}
+                                        {% if first_name %}Hi {{ first_name }}, w{% else %}W{% endif %}e received a request to reset your password. Use the code below to set a new password. This code is valid for <strong>10 minutes</strong>.
+                                    {% else %}
+                                        {% if first_name %}Hi {{ first_name }}, w{% else %}W{% endif %}e've sent you a verification code to complete your registration. This code is valid for <strong>10 minutes</strong>. Do not share this code with anyone.
+                                    {% endif %}
                                 </p>
 
                                 <!-- OTP display -->
@@ -183,13 +199,22 @@
                                     <div class="otp-code" style="font-family:monospace, monospace;">
                                         {{OTP}}
                                     </div>
-                                    <div class="otp-note">Enter this code to complete your Connect &amp; Inspire registration
+                                    <div class="otp-note">
+                                        {% if 'forgot' in purpose %}
+                                            Enter this code to reset your password
+                                        {% else %}
+                                            Enter this code to complete your Connect &amp; Inspire registration
+                                        {% endif %}
                                     </div>
                                 </div>
 
                                 <!-- Secondary text -->
                                 <p style="color:#6b7780; font-size:13px; text-align:center; margin:24px 0 0;">
-                                    If you did not request this verification code, you can safely ignore this email.
+                                    {% if 'forgot' in purpose %}
+                                        If you did not request a password reset, please ignore this email or contact support if you're concerned about your account security.
+                                    {% else %}
+                                        If you did not request this verification code, you can safely ignore this email.
+                                    {% endif %}
                                 </p>
 
                                 <!-- Footer -->

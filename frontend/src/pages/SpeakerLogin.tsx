@@ -10,6 +10,7 @@ const SpeakerLogin: React.FC = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (field: 'email' | 'password', value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -27,23 +28,29 @@ const SpeakerLogin: React.FC = () => {
 
     setIsLoading(true);
     try {
-      const res = await fetch(ENDPOINTS.LOGIN, {
+      const res = await fetch(ENDPOINTS.AUTH.LOGIN, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          password: formData.password,
-          userType: 'speaker'
+          password: formData.password
         })
       });
 
       if (res.ok) {
         const data = await res.json();
+
+        // Verify user is a speaker (can also be host)
+        if (!data.user.is_speaker) {
+          setError('This account is not registered as a Speaker. Please use Host login or sign up as Speaker.');
+          return;
+        }
+
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('userType', 'speaker');
-        
+        localStorage.setItem('userType', data.user.user_type);
+
         navigate('/speaker/dashboard');
       } else {
         const err = await res.json();
@@ -107,13 +114,25 @@ const SpeakerLogin: React.FC = () => {
               <div className="space-y-4">
                 <label className="block text-lg font-medium text-white mb-2">Password *</label>
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   placeholder="Enter your password"
                   className="w-full h-12 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
                   disabled={isLoading}
                 />
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="showPassword"
+                    checked={showPassword}
+                    onChange={(e) => setShowPassword(e.target.checked)}
+                    className="w-4 h-4 rounded border-white/30 bg-white/20 text-white focus:ring-2 focus:ring-white cursor-pointer"
+                  />
+                  <label htmlFor="showPassword" className="text-white text-sm font-medium cursor-pointer select-none">
+                    Show Password
+                  </label>
+                </div>
               </div>
 
               {/* Error Message */}

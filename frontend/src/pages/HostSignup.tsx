@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ENDPOINTS } from '../utils/api';
+import CustomDropdown from '../components/CustomDropdown';
 
 interface HostFormData {
   email: string;
@@ -24,6 +25,8 @@ const HostSignup: React.FC = () => {
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: '' });
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const [formData, setFormData] = useState<HostFormData>({
     email: '', otp: '', password: '', confirmPassword: '',
@@ -43,6 +46,20 @@ const HostSignup: React.FC = () => {
     });
   };
 
+  // Start cooldown timer
+  const startResendCooldown = () => {
+    setResendCooldown(60);
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const handleInputChange = (field: keyof HostFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (error) setError('');
@@ -60,39 +77,57 @@ const HostSignup: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      const checkRes = await fetch(`${ENDPOINTS.CHECK_EMAIL_EXISTS}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email })
-      });
-
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        if (checkData.exists) {
-          setError('This email address is already registered. Please use a different email or sign in.');
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      const res = await fetch(ENDPOINTS.SEND_OTP, {
+      const res = await fetch(ENDPOINTS.AUTH.SIGNUP_REQUEST, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          name: 'Host User'
+          user_type: 'host',
+          first_name: formData.firstName,
+          last_name: formData.lastName
         })
       });
 
       if (res.ok) {
         setOtpSent(true);
         setError('');
+        startResendCooldown();
       } else {
         const err = await res.json();
         setError(err.error || 'Failed to send OTP');
       }
     } catch {
       setError('Failed to send OTP');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendOtp = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await fetch(ENDPOINTS.AUTH.RESEND_OTP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          purpose: 'signup_host'
+        })
+      });
+
+      if (res.ok) {
+        setError('');
+        startResendCooldown();
+        // Show success message briefly
+        const successMsg = 'New verification code sent to your email';
+        setError(''); // Clear any previous errors
+      } else {
+        const err = await res.json();
+        setError(err.error || 'Failed to resend OTP');
+      }
+    } catch {
+      setError('Failed to resend OTP');
     } finally {
       setIsLoading(false);
     }
@@ -107,12 +142,13 @@ const HostSignup: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(ENDPOINTS.VERIFY_OTP, {
+      const res = await fetch(ENDPOINTS.AUTH.VERIFY_OTP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          otp: formData.otp
+          otp_code: formData.otp,
+          purpose: 'signup_host'
         })
       });
 
@@ -178,21 +214,13 @@ const HostSignup: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(ENDPOINTS.SIGNUP, {
+      const res = await fetch(ENDPOINTS.AUTH.SET_PASSWORD, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          name: `${formData.firstName} ${formData.lastName}`.trim(),
-          phone: formData.phone,
-          organization: formData.organization,
-          organizationType: formData.organizationType,
-          position: formData.position,
-          userType: 'host',
-          otp: formData.otp
+          confirm_password: formData.confirmPassword
         })
       });
 
@@ -201,8 +229,8 @@ const HostSignup: React.FC = () => {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('userType', 'host');
-        navigate('/find-speaker');
+        localStorage.setItem('userType', data.user.user_type);
+        navigate('/host/dashboard');
       } else {
         const err = await res.json();
         setError(err.error || 'Failed to create account');
@@ -250,7 +278,7 @@ const HostSignup: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
             <p className="text-white text-center font-medium">
-              We've sent a 6-digit code to <span className="font-medium text-white underline">{formData.email}</span>
+              We've sent a 4-digit code to <span className="font-medium text-white underline">{formData.email}</span>
             </p>
           </div>
           <div className="flex gap-4">
@@ -258,8 +286,8 @@ const HostSignup: React.FC = () => {
               type="text"
               value={formData.otp}
               onChange={(e) => handleInputChange('otp', e.target.value)}
-              placeholder="Enter 6-digit code"
-              maxLength={6}
+              placeholder="Enter 4-digit code"
+              maxLength={4}
               className="w-full flex-1 h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-center font-mono tracking-wider text-base text-white placeholder:text-white/70"
             />
             <button
@@ -268,6 +296,19 @@ const HostSignup: React.FC = () => {
               className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-6 h-14 disabled:opacity-50 whitespace-nowrap"
             >
               {isLoading ? 'Verifying...' : 'Verify'}
+            </button>
+          </div>
+
+          {/* Resend OTP */}
+          <div className="text-center">
+            <button
+              onClick={resendOtp}
+              disabled={isLoading || resendCooldown > 0}
+              className="text-white hover:text-gray-200 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              {resendCooldown > 0
+                ? `Resend code in ${resendCooldown}s`
+                : 'Didn\'t receive code? Resend'}
             </button>
           </div>
         </div>
@@ -279,7 +320,7 @@ const HostSignup: React.FC = () => {
           <div className="space-y-3">
             <label className="block text-lg font-medium text-white mb-2">Password *</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
               placeholder="Create a strong password"
@@ -310,7 +351,7 @@ const HostSignup: React.FC = () => {
           <div className="space-y-3">
             <label className="block text-lg font-medium text-white mb-2">Confirm Password *</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
               placeholder="Re-enter your password"
@@ -321,6 +362,19 @@ const HostSignup: React.FC = () => {
                 <span className="text-red-200 font-medium">Passwords do not match</span>
               </div>
             )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="showPassword"
+              checked={showPassword}
+              onChange={(e) => setShowPassword(e.target.checked)}
+              className="w-4 h-4 rounded border-white/30 bg-white/20 text-white focus:ring-2 focus:ring-white cursor-pointer"
+            />
+            <label htmlFor="showPassword" className="text-white text-sm font-medium cursor-pointer select-none">
+              Show Password
+            </label>
           </div>
         </div>
       )}
@@ -386,21 +440,22 @@ const HostSignup: React.FC = () => {
         </div>
 
         <div className="space-y-3 sm:col-span-2">
-          <label className="block text-lg font-medium text-white mb-2">Organization Type</label>
-          <select
+          <CustomDropdown
+            label="Organization Type"
+            options={[
+              { value: '', label: 'Select organization type' },
+              { value: 'corporate', label: 'Corporate' },
+              { value: 'non-profit', label: 'Non-Profit' },
+              { value: 'educational', label: 'Educational Institution' },
+              { value: 'government', label: 'Government' },
+              { value: 'startup', label: 'Startup' },
+              { value: 'event-management', label: 'Event Management Company' },
+              { value: 'other', label: 'Other' }
+            ]}
             value={formData.organizationType}
-            onChange={(e) => handleInputChange('organizationType', e.target.value)}
-            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white"
-          >
-            <option value="" className="text-black">Select organization type</option>
-            <option value="corporate" className="text-black">Corporate</option>
-            <option value="non-profit" className="text-black">Non-Profit</option>
-            <option value="educational" className="text-black">Educational Institution</option>
-            <option value="government" className="text-black">Government</option>
-            <option value="startup" className="text-black">Startup</option>
-            <option value="event-management" className="text-black">Event Management Company</option>
-            <option value="other" className="text-black">Other</option>
-          </select>
+            onChange={(value) => handleInputChange('organizationType', value)}
+            placeholder="Select organization type"
+          />
         </div>
       </div>
     </div>

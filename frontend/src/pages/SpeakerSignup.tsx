@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { ENDPOINTS } from '../utils/api';
+import CustomDropdown from '../components/CustomDropdown';
 
 interface SpeakerFormData {
   email: string;
@@ -27,6 +28,8 @@ const SpeakerSignup: React.FC = () => {
   const [passwordStrength, setPasswordStrength] = useState({ score: 0, feedback: '' });
   const [passwordMatch, setPasswordMatch] = useState(true);
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
   const [formData, setFormData] = useState<SpeakerFormData>({
     email: '', otp: '', password: '', confirmPassword: '',
@@ -46,6 +49,20 @@ const SpeakerSignup: React.FC = () => {
     });
   };
 
+  // Start cooldown timer
+  const startResendCooldown = () => {
+    setResendCooldown(60);
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timer);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const handleInputChange = (field: keyof SpeakerFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (error) setError('');
@@ -63,39 +80,54 @@ const SpeakerSignup: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      const checkRes = await fetch(`${ENDPOINTS.CHECK_EMAIL_EXISTS}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: formData.email })
-      });
-
-      if (checkRes.ok) {
-        const checkData = await checkRes.json();
-        if (checkData.exists) {
-          setError('This email address is already registered. Please use a different email or sign in.');
-          setIsLoading(false);
-          return;
-        }
-      }
-
-      const res = await fetch(ENDPOINTS.SEND_OTP, {
+      const res = await fetch(ENDPOINTS.AUTH.SIGNUP_REQUEST, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          name: 'Speaker User'
+          user_type: 'speaker',
+          first_name: formData.firstName,
+          last_name: formData.lastName
         })
       });
 
       if (res.ok) {
         setOtpSent(true);
         setError('');
+        startResendCooldown();
       } else {
         const err = await res.json();
         setError(err.error || 'Failed to send OTP');
       }
     } catch {
       setError('Failed to send OTP');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const resendOtp = async () => {
+    setIsLoading(true);
+    setError('');
+    try {
+      const res = await fetch(ENDPOINTS.AUTH.RESEND_OTP, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          purpose: 'signup_speaker'
+        })
+      });
+
+      if (res.ok) {
+        setError('');
+        startResendCooldown();
+      } else {
+        const err = await res.json();
+        setError(err.error || 'Failed to resend OTP');
+      }
+    } catch {
+      setError('Failed to resend OTP');
     } finally {
       setIsLoading(false);
     }
@@ -110,12 +142,13 @@ const SpeakerSignup: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(ENDPOINTS.VERIFY_OTP, {
+      const res = await fetch(ENDPOINTS.AUTH.VERIFY_OTP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          otp: formData.otp
+          otp_code: formData.otp,
+          purpose: 'signup_speaker'
         })
       });
 
@@ -181,24 +214,13 @@ const SpeakerSignup: React.FC = () => {
     setIsLoading(true);
     setError('');
     try {
-      const res = await fetch(ENDPOINTS.SIGNUP, {
+      const res = await fetch(ENDPOINTS.AUTH.SET_PASSWORD, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
           password: formData.password,
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          name: `${formData.firstName} ${formData.lastName}`.trim(),
-          phone: formData.phone,
-          expertise: formData.expertise,
-          experience: formData.experience,
-          bio: formData.bio,
-          location: formData.location,
-          website: formData.website,
-          linkedin: formData.linkedin,
-          userType: 'speaker',
-          otp: formData.otp
+          confirm_password: formData.confirmPassword
         })
       });
 
@@ -207,8 +229,8 @@ const SpeakerSignup: React.FC = () => {
         localStorage.setItem('access_token', data.access);
         localStorage.setItem('refresh_token', data.refresh);
         localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('userType', 'speaker');
-        navigate('/speaker-dashboard');
+        localStorage.setItem('userType', data.user.user_type);
+        navigate('/speaker/dashboard');
       } else {
         const err = await res.json();
         setError(err.error || 'Failed to create account');
@@ -256,7 +278,7 @@ const SpeakerSignup: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
             <p className="text-white text-center font-medium">
-              We've sent a 6-digit code to <span className="font-medium text-white underline">{formData.email}</span>
+              We've sent a 4-digit code to <span className="font-medium text-white underline">{formData.email}</span>
             </p>
           </div>
           <div className="flex gap-4">
@@ -264,8 +286,8 @@ const SpeakerSignup: React.FC = () => {
               type="text"
               value={formData.otp}
               onChange={(e) => handleInputChange('otp', e.target.value)}
-              placeholder="Enter 6-digit code"
-              maxLength={6}
+              placeholder="Enter 4-digit code"
+              maxLength={4}
               className="w-full flex-1 h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-center font-mono tracking-wider text-base text-white placeholder:text-white/70"
             />
             <button
@@ -274,6 +296,19 @@ const SpeakerSignup: React.FC = () => {
               className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-6 h-14 disabled:opacity-50 whitespace-nowrap"
             >
               {isLoading ? 'Verifying...' : 'Verify'}
+            </button>
+          </div>
+
+          {/* Resend OTP */}
+          <div className="text-center">
+            <button
+              onClick={resendOtp}
+              disabled={isLoading || resendCooldown > 0}
+              className="text-white hover:text-gray-200 font-medium transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+            >
+              {resendCooldown > 0
+                ? `Resend code in ${resendCooldown}s`
+                : 'Didn\'t receive code? Resend'}
             </button>
           </div>
         </div>
@@ -285,7 +320,7 @@ const SpeakerSignup: React.FC = () => {
           <div className="space-y-3">
             <label className="block text-lg font-medium text-white mb-2">Password *</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={(e) => handleInputChange('password', e.target.value)}
               placeholder="Create a strong password"
@@ -316,7 +351,7 @@ const SpeakerSignup: React.FC = () => {
           <div className="space-y-3">
             <label className="block text-lg font-medium text-white mb-2">Confirm Password *</label>
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
               placeholder="Re-enter your password"
@@ -327,6 +362,19 @@ const SpeakerSignup: React.FC = () => {
                 <span className="text-red-200 font-medium">Passwords do not match</span>
               </div>
             )}
+          </div>
+
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="showPassword"
+              checked={showPassword}
+              onChange={(e) => setShowPassword(e.target.checked)}
+              className="w-4 h-4 rounded border-white/30 bg-white/20 text-white focus:ring-2 focus:ring-white cursor-pointer"
+            />
+            <label htmlFor="showPassword" className="text-white text-sm font-medium cursor-pointer select-none">
+              Show Password
+            </label>
           </div>
         </div>
       )}
@@ -403,19 +451,20 @@ const SpeakerSignup: React.FC = () => {
 
       <div className="space-y-6">
         <div className="space-y-3">
-          <label className="block text-lg font-medium text-white mb-2">Years of Experience</label>
-          <select
+          <CustomDropdown
+            label="Years of Experience"
+            options={[
+              { value: '', label: 'Select experience level' },
+              { value: '0-2', label: '0-2 years' },
+              { value: '3-5', label: '3-5 years' },
+              { value: '6-10', label: '6-10 years' },
+              { value: '11-15', label: '11-15 years' },
+              { value: '15+', label: '15+ years' }
+            ]}
             value={formData.experience}
-            onChange={(e) => handleInputChange('experience', e.target.value)}
-            className="w-full h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white"
-          >
-            <option value="" className="text-black">Select experience level</option>
-            <option value="0-2" className="text-black">0-2 years</option>
-            <option value="3-5" className="text-black">3-5 years</option>
-            <option value="6-10" className="text-black">6-10 years</option>
-            <option value="11-15" className="text-black">11-15 years</option>
-            <option value="15+" className="text-black">15+ years</option>
-          </select>
+            onChange={(value) => handleInputChange('experience', value)}
+            placeholder="Select experience level"
+          />
         </div>
 
         <div className="space-y-3">

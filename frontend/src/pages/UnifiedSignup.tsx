@@ -286,7 +286,7 @@ const UnifiedSignup: React.FC = () => {
         <div className="space-y-6">
           <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
             <p className="text-white text-center font-medium">
-              We've sent a 6-digit code to <span className="font-medium text-white underline">{formData.email}</span>
+              We've sent a 4-digit code to <span className="font-medium text-white underline">{formData.email}</span>
             </p>
           </div>
           <div className="flex gap-4">
@@ -294,8 +294,8 @@ const UnifiedSignup: React.FC = () => {
               type="text"
               value={formData.otp}
               onChange={(e) => handleInputChange('otp', e.target.value)}
-              placeholder="Enter 6-digit code"
-              maxLength={6}
+              placeholder="Enter 4-digit code"
+              maxLength={4}
               className="w-full flex-1 h-14 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-center font-mono tracking-wider text-base text-white placeholder:text-white/70"
             />
             <button

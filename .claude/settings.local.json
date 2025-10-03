@@ -30,7 +30,8 @@
       "Bash(tar:*)",
       "Bash(mkdir:*)",
       "Bash(cp:*)",
-      "Bash(timeout 10s npm run dev)"
+      "Bash(timeout 10s npm run dev)",
+      "Bash(./venv/Scripts/python.exe manage.py shell -c \"from api.models import Speaker; speakers = Speaker.objects.all(); print(f''Total speakers: {speakers.count()}''); [print(f''ID: {s.id}, Name: {s.user.get_full_name()}'') for s in speakers]\")"
     ],
     "deny": []
   }

@@ -150,6 +150,9 @@ class Speaker(models.Model):
     profile_image = models.URLField(blank=True)
     website = models.URLField(blank=True)
     social_media = models.JSONField(default=dict, blank=True)
+    location = models.CharField(max_length=200, blank=True, help_text="City, State/Country")
+    languages = models.CharField(max_length=200, blank=True, help_text="Comma-separated languages")
+    industry = models.CharField(max_length=100, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -327,7 +330,7 @@ class OTPVerification(models.Model):
     ]
     
     email = models.EmailField()
-    otp_code = models.CharField(max_length=6)
+    otp_code = models.CharField(max_length=4)
     purpose = models.CharField(max_length=20, choices=PURPOSE_CHOICES)
     is_verified = models.BooleanField(default=False)
     attempts = models.PositiveIntegerField(default=0)
@@ -337,7 +340,7 @@ class OTPVerification(models.Model):
     
     class Meta:
         ordering = ['-created_at']
-        unique_together = ['email', 'purpose', 'is_verified']
+        # Removed unique_together constraint to allow multiple OTP attempts
     
     def save(self, *args, **kwargs):
         if not self.otp_code:
@@ -348,7 +351,7 @@ class OTPVerification(models.Model):
     
     @staticmethod
     def generate_otp():
-        return ''.join(random.choices(string.digits, k=6))
+        return ''.join(random.choices(string.digits, k=4))
     
     def is_expired(self):
         return timezone.now() > self.expires_at

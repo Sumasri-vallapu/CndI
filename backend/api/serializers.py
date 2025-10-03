@@ -62,14 +62,15 @@ class SpeakerSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     average_rating = serializers.ReadOnlyField()
-    
+
     class Meta:
         model = Speaker
         fields = [
             'id', 'user', 'user_email', 'user_name', 'bio', 'expertise',
-            'speaking_topics', 'experience_years', 'hourly_rate', 
-            'availability_status', 'profile_image', 'website', 
-            'social_media', 'average_rating', 'created_at', 'updated_at'
+            'speaking_topics', 'experience_years', 'hourly_rate',
+            'availability_status', 'profile_image', 'website',
+            'social_media', 'location', 'languages', 'industry',
+            'average_rating', 'created_at', 'updated_at'
         ]
 
 
@@ -153,7 +154,7 @@ class SignupRequestSerializer(serializers.Serializer):
 class OTPVerificationSerializer(serializers.Serializer):
     """OTP verification"""
     email = serializers.EmailField()
-    otp_code = serializers.CharField(max_length=6, min_length=6)
+    otp_code = serializers.CharField(max_length=6, min_length=4)
     purpose = serializers.CharField()
 
 
@@ -199,7 +200,7 @@ class ForgotPasswordSerializer(serializers.Serializer):
 class ResetPasswordSerializer(serializers.Serializer):
     """Reset password with OTP"""
     email = serializers.EmailField()
-    otp_code = serializers.CharField(max_length=6, min_length=6)
+    otp_code = serializers.CharField(max_length=4, min_length=4)
     new_password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
     

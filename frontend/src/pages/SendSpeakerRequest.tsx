@@ -256,7 +256,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.title}
                     onChange={(e) => handleInputChange('title', e.target.value)}
                     placeholder="Enter event title"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -267,7 +267,13 @@ const SendSpeakerRequest: React.FC = () => {
                   <select
                     value={eventRequest.eventType}
                     onChange={(e) => handleInputChange('eventType', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 appearance-none cursor-pointer hover:border-gray-300 bg-white"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                      backgroundPosition: 'right 0.5rem center',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundSize: '1.5em 1.5em'
+                    }}
                   >
                     {eventTypes.map(type => (
                       <option key={type.value} value={type.value}>{type.label}</option>
@@ -285,7 +291,7 @@ const SendSpeakerRequest: React.FC = () => {
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   placeholder="Describe the event, topics to be covered, and objectives"
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                 />
               </div>
 
@@ -299,7 +305,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.eventDate}
                     onChange={(e) => handleInputChange('eventDate', e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -311,7 +317,7 @@ const SendSpeakerRequest: React.FC = () => {
                     type="time"
                     value={eventRequest.eventTime}
                     onChange={(e) => handleInputChange('eventTime', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -322,7 +328,13 @@ const SendSpeakerRequest: React.FC = () => {
                   <select
                     value={eventRequest.duration}
                     onChange={(e) => handleInputChange('duration', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 appearance-none cursor-pointer hover:border-gray-300 bg-white"
+                    style={{
+                      backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
+                      backgroundPosition: 'right 0.5rem center',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundSize: '1.5em 1.5em'
+                    }}
                   >
                     <option value="30">30 minutes</option>
                     <option value="45">45 minutes</option>
@@ -343,7 +355,7 @@ const SendSpeakerRequest: React.FC = () => {
                   value={eventRequest.location}
                   onChange={(e) => handleInputChange('location', e.target.value)}
                   placeholder="e.g., San Francisco Convention Center, Virtual Event, etc."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                 />
               </div>
 
@@ -357,7 +369,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.audience}
                     onChange={(e) => handleInputChange('audience', e.target.value)}
                     placeholder="e.g., Healthcare professionals, Tech leaders, Students"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -370,7 +382,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.audienceSize}
                     onChange={(e) => handleInputChange('audienceSize', parseInt(e.target.value) || 0)}
                     min="1"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
               </div>
@@ -385,7 +397,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.budgetMin}
                     onChange={(e) => handleInputChange('budgetMin', parseInt(e.target.value) || 0)}
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -398,7 +410,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.budgetMax}
                     onChange={(e) => handleInputChange('budgetMax', parseInt(e.target.value) || 0)}
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
               </div>
@@ -412,7 +424,7 @@ const SendSpeakerRequest: React.FC = () => {
                   onChange={(e) => handleInputChange('requirements', e.target.value)}
                   placeholder="Any special equipment, accessibility needs, or other requirements"
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                 />
               </div>
             </div>
@@ -445,7 +457,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.organizerName}
                     onChange={(e) => handleInputChange('organizerName', e.target.value)}
                     placeholder="Enter your full name"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -458,7 +470,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.organizerEmail}
                     onChange={(e) => handleInputChange('organizerEmail', e.target.value)}
                     placeholder="Enter your email address"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
               </div>
@@ -473,7 +485,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.organizerCompany}
                     onChange={(e) => handleInputChange('organizerCompany', e.target.value)}
                     placeholder="Enter organization name"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
 
@@ -486,7 +498,7 @@ const SendSpeakerRequest: React.FC = () => {
                     value={eventRequest.organizerPhone}
                     onChange={(e) => handleInputChange('organizerPhone', e.target.value)}
                     placeholder="Enter phone number"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-[#27465C] transition-all duration-200 hover:border-gray-300"
                   />
                 </div>
               </div>

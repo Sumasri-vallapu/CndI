@@ -35,4 +35,8 @@ export const ENDPOINTS = {
   GET_MANDALS: `${BASE_URL}/mandals/`,
   GET_GRAMPANCHAYATS: `${BASE_URL}/grampanchayats/`,
 
+  // Speaker endpoints
+  SPEAKERS: `${BASE_URL}/speakers/`,
+  SPEAKER_DETAIL: (id: number) => `${BASE_URL}/speakers/${id}/`,
+
 } as const; 
