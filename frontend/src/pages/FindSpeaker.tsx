@@ -203,51 +203,41 @@ export default function FindSpeaker() {
   return (
     <div className="min-h-screen bg-[#27465C]">
       {/* Navigation */}
-      <nav className="w-full py-6 px-4 md:px-8 border-b border-white/10">
+      <nav className="w-full py-3 px-4 md:px-8">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <div onClick={() => navigate('/')} className="cursor-pointer">
-            <div className="text-white text-3xl font-black">C&I</div>
-            <div className="text-white text-sm">Connect and Inspire</div>
+            <div className="text-white text-2xl font-bold">C&I</div>
+            <div className="text-white text-xs">Connect and Inspire</div>
           </div>
-          <div className="hidden md:flex items-center gap-8">
-            <button onClick={() => navigate('/home')} className="text-white hover:opacity-80 font-medium">Home</button>
-            <button onClick={() => navigate('/about')} className="text-white hover:opacity-80 font-medium">About Us</button>
-            <button onClick={() => navigate('/contact')} className="text-white hover:opacity-80 font-medium">Contact us</button>
-            <div className="flex items-center gap-4">
-              <button 
+          <div className="flex items-center gap-6">
+            <button onClick={() => navigate('/home')} className="text-white hover:opacity-80 text-sm">Home</button>
+            <button onClick={() => navigate('/about')} className="text-white hover:opacity-80 text-sm">About Us</button>
+            <button onClick={() => navigate('/contact')} className="text-white hover:opacity-80 text-sm">Contact us</button>
+            <div className="flex items-center gap-3">
+              <button
                 onClick={() => navigate('/host-login')}
-                className="bg-white text-black px-6 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium"
+                className="bg-white text-black px-4 py-1.5 rounded hover:bg-gray-100 transition-all font-medium text-sm"
               >
                 Host Sign in
               </button>
-              <button 
+              <button
                 onClick={() => navigate('/speaker-login')}
-                className="bg-white text-black px-6 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium"
+                className="bg-white text-black px-4 py-1.5 rounded hover:bg-gray-100 transition-all font-medium text-sm"
               >
                 Speaker Sign in
               </button>
             </div>
           </div>
-          <div className="md:hidden">
-            <button 
-              onClick={() => navigate('/host-login')}
-              className="bg-white text-black px-4 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium text-sm"
-            >
-              Sign in
-            </button>
-          </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 md:px-8 pb-8">
-        <h1 className="text-white text-2xl font-bold mb-8">Find Speaker</h1>
-
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pb-8 pt-8">
         {/* Search and Filters */}
         <div className="mb-8">
-          {/* Search Bar */}
-          <div className="mb-6">
-            <div className="relative max-w-md">
+          <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
+            {/* Search Bar */}
+            <div className="relative flex-1 w-full">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -261,65 +251,51 @@ export default function FindSpeaker() {
                 className="w-full pl-10 pr-4 py-3 rounded-full bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20"
               />
             </div>
-          </div>
 
-          {/* Filter Pills */}
-          <div className="flex flex-wrap gap-3">
-            <FilterDropdown
-              label="expertise"
-              displayLabel="Expertise"
-              options={filterOptions.expertise}
-              value={filters.expertise}
-              onChange={(value) => handleFilterChange('expertise', value)}
-            />
-            <FilterDropdown
-              label="industry"
-              displayLabel="Industry"
-              options={filterOptions.industry}
-              value={filters.industry}
-              onChange={(value) => handleFilterChange('industry', value)}
-            />
-            <FilterDropdown
-              label="location"
-              displayLabel="Location"
-              options={filterOptions.location}
-              value={filters.location}
-              onChange={(value) => handleFilterChange('location', value)}
-            />
-            <FilterDropdown
-              label="language"
-              displayLabel="Language"
-              options={filterOptions.language}
-              value={filters.language}
-              onChange={(value) => handleFilterChange('language', value)}
-            />
-            <FilterDropdown
-              label="availability"
-              displayLabel="Availability"
-              options={filterOptions.availability}
-              value={filters.availability}
-              onChange={(value) => handleFilterChange('availability', value)}
-            />
-            <FilterDropdown
-              label="experience"
-              displayLabel="Experience"
-              options={filterOptions.experience}
-              value={filters.experience}
-              onChange={(value) => handleFilterChange('experience', value)}
-            />
-            <FilterDropdown
-              label="priceRange"
-              displayLabel="Price Range"
-              options={filterOptions.priceRange}
-              value={filters.priceRange}
-              onChange={(value) => handleFilterChange('priceRange', value)}
-            />
+            {/* Filter Pills */}
+            <div className="flex flex-wrap gap-3">
+              <FilterDropdown
+                label="industry"
+                displayLabel="Industry"
+                options={filterOptions.industry}
+                value={filters.industry}
+                onChange={(value) => handleFilterChange('industry', value)}
+              />
+              <FilterDropdown
+                label="location"
+                displayLabel="Location"
+                options={filterOptions.location}
+                value={filters.location}
+                onChange={(value) => handleFilterChange('location', value)}
+              />
+              <FilterDropdown
+                label="language"
+                displayLabel="Language"
+                options={filterOptions.language}
+                value={filters.language}
+                onChange={(value) => handleFilterChange('language', value)}
+              />
+              <FilterDropdown
+                label="availability"
+                displayLabel="Availability"
+                options={filterOptions.availability}
+                value={filters.availability}
+                onChange={(value) => handleFilterChange('availability', value)}
+              />
+              <FilterDropdown
+                label="priceRange"
+                displayLabel="Price Range"
+                options={filterOptions.priceRange}
+                value={filters.priceRange}
+                onChange={(value) => handleFilterChange('priceRange', value)}
+              />
+            </div>
           </div>
         </div>
 
         {/* Loading State */}
         {loading && (
-          <div className="flex justify-center items-center py-20">
+          <div className="flex justify-center items-center py-10">
             <Loader2 className="w-12 h-12 text-white animate-spin" />
           </div>
         )}
@@ -427,7 +403,7 @@ export default function FindSpeaker() {
 
         {/* No Results Message */}
         {!loading && !error && filteredSpeakers.length === 0 && (
-          <div className="text-center text-white py-12">
+          <div className="text-center text-white py-6">
             <p className="text-lg mb-2">No speakers found</p>
             <p className="text-sm opacity-75">Try adjusting your search or filters</p>
           </div>

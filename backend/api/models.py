@@ -290,21 +290,49 @@ class Payment(models.Model):
         return f"Payment for {self.event.title} - ${self.amount}"
 
 
+class Conversation(models.Model):
+    """Conversation between host and speaker"""
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='host_conversations')
+    speaker = models.ForeignKey(User, on_delete=models.CASCADE, related_name='speaker_conversations')
+    event = models.ForeignKey(Event, on_delete=models.SET_NULL, null=True, blank=True, related_name='conversations')
+    subject = models.CharField(max_length=200, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-updated_at']
+        unique_together = ['host', 'speaker', 'event']
+
+    def __str__(self):
+        return f"Conversation: {self.host.email} - {self.speaker.email}"
+
+    @property
+    def last_message(self):
+        return self.messages.first()
+
+    @property
+    def unread_count_for_host(self):
+        return self.messages.filter(sender=self.speaker, is_read=False).count()
+
+    @property
+    def unread_count_for_speaker(self):
+        return self.messages.filter(sender=self.host, is_read=False).count()
+
+
 class Message(models.Model):
     """Message system for host-speaker communication"""
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='messages')
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
     recipient = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
-    subject = models.CharField(max_length=200)
     body = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['-created_at']
-    
+
     def __str__(self):
-        return f"{self.subject} - {self.sender.first_name} to {self.recipient.first_name}"
+        return f"{self.sender.first_name} to {self.recipient.first_name} - {self.created_at}"
 
 
 class EventRating(models.Model):
@@ -373,7 +401,7 @@ class PendingUser(models.Model):
         ('host', 'Host'),
         ('speaker', 'Speaker/Guest'),
     ]
-    
+
     email = models.EmailField(unique=True)
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
     first_name = models.CharField(max_length=30, blank=True)
@@ -382,9 +410,26 @@ class PendingUser(models.Model):
     additional_data = models.JSONField(default=dict, blank=True)  # Store any additional signup data
     is_email_verified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    
+
     class Meta:
         ordering = ['-created_at']
-    
+
     def __str__(self):
         return f"{self.email} - {self.user_type}"
+
+
+class ContactSubmission(models.Model):
+    """Contact form submissions"""
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    is_responded = models.BooleanField(default=False)
+    responded_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"

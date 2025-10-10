@@ -8,7 +8,7 @@ from .views import (
     event_response, mark_message_read, create_payment, create_event_rating,
     host_dashboard_stats, speaker_dashboard_stats
 )
-from . import auth_views
+from . import auth_views, api_views
 
 urlpatterns = [
     # New OTP-based Authentication URLs
@@ -25,18 +25,8 @@ urlpatterns = [
     path('debug/otps/', auth_views.debug_otps, name='debug-otps'),
     path('debug/pending-users/', auth_views.debug_pending_users, name='debug-pending-users'),
     path('debug/users/', views.debug_users, name='debug-users'),
-    
-    # Legacy authentication endpoints (keep for backward compatibility during transition)
-    path('send_otp/', views.send_otp),
-    path('verify_otp/', views.verify_otp),
-    path('signup/', views.signup),
-    path('login/', views.login),
-    path('check_email_exists/', views.check_email_exists),
-    path('forgot_password/', views.forgot_password),
-    path('reset_password/', views.reset_password),
-    path('protected/', views.protected_view),
-    
-        # location api   
+
+    # location api   
     path('states/', get_states, name='get_states'),
     path('districts/', get_districts, name='get_districts'),
     path('mandals/', get_mandals, name='get_mandals'),
@@ -70,4 +60,49 @@ urlpatterns = [
     
     # Rating URLs
     path('create-event-rating/', create_event_rating, name='create-event-rating'),
+
+    # ==================== NEW COMPREHENSIVE API ENDPOINTS ====================
+
+    # Host Endpoints
+    path('api/host/profile/', api_views.host_profile, name='api-host-profile'),
+    path('api/host/dashboard/', api_views.host_dashboard, name='api-host-dashboard'),
+    path('api/host/requests/', api_views.host_requests, name='api-host-requests'),
+
+    # Speaker Endpoints
+    path('api/speakers/', api_views.speakers_list, name='api-speakers-list'),
+    path('api/speaker/profile/', api_views.speaker_profile, name='api-speaker-profile'),
+    path('api/speaker/profile/<int:speaker_id>/', api_views.speaker_profile, name='api-speaker-profile-detail'),
+    path('api/speaker/dashboard/', api_views.speaker_dashboard, name='api-speaker-dashboard'),
+    path('api/speaker/events/', api_views.speaker_events, name='api-speaker-events'),
+    path('api/speaker/<int:speaker_id>/ratings/', api_views.speaker_ratings, name='api-speaker-ratings'),
+
+    # Event/Request Endpoints
+    path('api/requests/create/', api_views.create_speaker_request, name='api-create-request'),
+    path('api/events/<int:event_id>/', api_views.event_detail, name='api-event-detail'),
+    path('api/events/<int:event_id>/update-status/', api_views.update_event_status, name='api-update-event-status'),
+
+    # Availability Endpoints
+    path('api/speaker/<int:speaker_id>/availability/', api_views.speaker_availability, name='api-speaker-availability'),
+    path('api/speaker/availability/update/', api_views.update_availability, name='api-update-availability'),
+
+    # Messaging/Conversation Endpoints
+    path('api/conversations/', api_views.conversations_list, name='api-conversations-list'),
+    path('api/conversations/create/', api_views.create_conversation, name='api-create-conversation'),
+    path('api/conversations/<int:conversation_id>/messages/', api_views.conversation_messages, name='api-conversation-messages'),
+    path('api/messages/send/', api_views.send_message, name='api-send-message'),
+
+    # Payment Endpoints
+    path('api/payments/', api_views.payments_list, name='api-payments-list'),
+    path('api/payments/create/', api_views.create_payment, name='api-create-payment'),
+    path('api/payments/<int:payment_id>/update-status/', api_views.update_payment_status, name='api-update-payment-status'),
+
+    # Rating Endpoints
+    path('api/ratings/create/', api_views.create_rating, name='api-create-rating'),
+
+    # Contact Form Endpoint
+    path('contact/', api_views.contact_form, name='api-contact-form'),
+
+    # File Upload Endpoints
+    path('api/upload/profile-image/', api_views.upload_profile_image, name='api-upload-profile-image'),
+    path('api/upload/document/', api_views.upload_document, name='api-upload-document'),
 ]

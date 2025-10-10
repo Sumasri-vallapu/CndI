@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ENDPOINTS } from '../utils/api';
 import {
   ArrowLeft,
   Calendar,
@@ -15,7 +16,8 @@ import {
   CheckCircle,
   AlertCircle,
   Star,
-  User
+  User,
+  Loader2
 } from 'lucide-react';
 
 interface Speaker {
@@ -77,6 +79,7 @@ const SendSpeakerRequest: React.FC = () => {
   });
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const eventTypes = [
     { value: 'conference', label: 'Conference' },
@@ -90,23 +93,28 @@ const SendSpeakerRequest: React.FC = () => {
   ];
 
   useEffect(() => {
-    // Mock speaker data - replace with API call
-    setTimeout(() => {
-      setSpeaker({
-        id: 1,
-        user_name: "Dr. Sarah Johnson",
-        user_email: "sarah.johnson@medical.com",
-        bio: "Leading expert in AI applications in healthcare with over 15 years of experience in medical technology innovation.",
-        expertise: "healthcare",
-        speaking_topics: "AI in Healthcare, Medical Technology, Digital Health, Telemedicine",
-        experience_years: 15,
-        hourly_rate: 500,
-        availability_status: "available",
-        profile_image: "",
-        average_rating: 4.8
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchSpeaker = async () => {
+      if (!speakerId) return;
+
+      try {
+        setLoading(true);
+        const response = await fetch(ENDPOINTS.SPEAKER_DETAIL(parseInt(speakerId)));
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch speaker');
+        }
+
+        const data = await response.json();
+        setSpeaker(data);
+      } catch (error) {
+        console.error('Error fetching speaker:', error);
+        setError('Failed to load speaker information');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSpeaker();
   }, [speakerId]);
 
   const handleInputChange = (field: keyof EventRequest, value: string | number) => {
@@ -128,14 +136,65 @@ const SendSpeakerRequest: React.FC = () => {
   };
 
   const sendRequest = async () => {
+    if (!speaker) return;
+
     setCurrentStep('sending');
     setSending(true);
-    
-    // Simulate sending request
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      // Combine date and time into datetime for backend
+      const eventDateTime = `${eventRequest.eventDate}T${eventRequest.eventTime}:00`;
+
+      const payload = {
+        speaker: speaker.id,
+        title: eventRequest.title,
+        description: eventRequest.description,
+        event_date: eventDateTime,
+        duration_minutes: parseInt(eventRequest.duration),
+        location: eventRequest.location,
+        event_type: eventRequest.eventType,
+        audience: eventRequest.audience,
+        audience_size: eventRequest.audienceSize,
+        budget_min: eventRequest.budgetMin,
+        budget_max: eventRequest.budgetMax,
+        requirements: eventRequest.requirements,
+        organizer_name: eventRequest.organizerName,
+        organizer_email: eventRequest.organizerEmail,
+        organizer_company: eventRequest.organizerCompany,
+        organizer_phone: eventRequest.organizerPhone,
+        status: 'pending'
+      };
+
+      const token = localStorage.getItem('token');
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      };
+
+      // Add authorization header if token exists
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(ENDPOINTS.EVENTS, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to send request');
+      }
+
       setSending(false);
       setCurrentStep('success');
-    }, 3000);
+    } catch (error: any) {
+      console.error('Error sending request:', error);
+      setError(error.message || 'Failed to send request. Please try again.');
+      setSending(false);
+      setCurrentStep('review');
+    }
   };
 
   const formatCurrency = (value: number) => {
@@ -148,7 +207,24 @@ const SendSpeakerRequest: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#27465C] flex items-center justify-center">
-        <div className="text-white text-lg">Loading speaker information...</div>
+        <Loader2 className="w-12 h-12 text-white animate-spin" />
+      </div>
+    );
+  }
+
+  if (error && !speaker) {
+    return (
+      <div className="min-h-screen bg-[#27465C] flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+          <div className="text-white text-lg">{error}</div>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-4 bg-white text-black px-6 py-2 rounded-lg hover:bg-gray-100"
+          >
+            Go Back
+          </button>
+        </div>
       </div>
     );
   }
@@ -586,6 +662,16 @@ const SendSpeakerRequest: React.FC = () => {
                   </ul>
                 </div>
               </div>
+
+              {/* Error Message */}
+              {error && (
+                <div className="flex items-start p-4 bg-red-50 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5" />
+                  <div className="text-sm text-red-800">
+                    <p className="font-medium">{error}</p>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="mt-6 flex justify-between">

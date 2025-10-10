@@ -85,37 +85,37 @@ const ResetPasswordOtp: React.FC = () => {
       <nav className="bg-[#27465C] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-black text-white">
+            <Link to="/" className="text-2xl font-bold text-white">
               C&I
             </Link>
             <Link
-              to="/login"
+              to="/"
               className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
-              Back to Login
+              Back to Home
             </Link>
           </div>
         </div>
       </nav>
 
-      <div className="flex-1 py-8 sm:py-12 flex items-center justify-center">
+      <div className="flex-1 py-4 sm:py-6 flex items-center justify-center">
         <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-6">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-white mb-3">
               Enter Reset Code
             </h1>
-            <p className="text-lg text-white font-normal">
+            <p className="text-base text-white font-normal">
               We've sent a 4-digit code to <span className="font-medium">{email}</span>
             </p>
           </div>
 
           {/* Form */}
-          <div className="bg-white rounded-2xl p-8 sm:p-10 shadow-lg">
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-lg">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* OTP Input */}
-              <div className="space-y-4">
-                <label className="block text-lg font-medium text-gray-700 mb-2">Reset Code *</label>
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-700">Reset Code *</label>
                 <input
                   type="text"
                   value={otp}
@@ -126,7 +126,7 @@ const ResetPasswordOtp: React.FC = () => {
                   }}
                   placeholder="Enter 4-digit code"
                   maxLength={4}
-                  className="w-full h-12 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[white] focus:border-[white] transition-colors duration-200 text-center font-mono tracking-wider text-xl"
+                  className="w-full h-10 px-3 py-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[white] focus:border-[white] transition-colors duration-200 text-center font-mono tracking-wider text-base"
                   disabled={isLoading}
                 />
                 <p className="text-sm text-gray-500 text-center">
@@ -145,14 +145,14 @@ const ResetPasswordOtp: React.FC = () => {
               <button
                 type="submit"
                 disabled={isLoading || otp.length !== 4}
-                className="w-full h-12 bg-white text-black rounded-lg font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#27465C] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full h-10 bg-white text-black rounded-lg font-medium hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-[#27465C] focus:ring-offset-2 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Verifying...' : 'Next'}
               </button>
 
               {/* Resend Code */}
               <div className="text-center">
-                <p className="text-gray-600 font-medium mb-2">
+                <p className="text-gray-600 font-medium mb-2 text-sm">
                   Didn't receive the code?
                 </p>
                 <button
@@ -167,10 +167,10 @@ const ResetPasswordOtp: React.FC = () => {
             </form>
 
             {/* Back Link */}
-            <div className="text-center mt-8">
+            <div className="text-center mt-4">
               <Link
                 to="/forgot-password"
-                className="text-gray-600 hover:text-gray-800 font-medium transition-colors duration-200"
+                className="text-gray-600 hover:text-gray-800 font-medium transition-colors duration-200 text-sm"
               >
                 ← Back to Email Entry
               </Link>

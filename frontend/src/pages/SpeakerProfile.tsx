@@ -98,9 +98,9 @@ export default function SpeakerProfile() {
             >
               ← Back to Search
             </button>
-            <button 
+            <button
               onClick={() => navigate('/host-login')}
-              className="bg-white text-black px-6 py-2 rounded hover:bg-gray-100 transition-all duration-300 font-medium"
+              className="bg-white text-black px-4 py-1.5 rounded hover:bg-gray-100 transition-all font-medium text-sm"
             >
               Sign in
             </button>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { ENDPOINTS } from '../utils/api';
 import {
   Send,
   ArrowLeft,
@@ -15,19 +16,22 @@ import {
   Star,
   Building,
   CheckCircle,
-  Circle
+  Circle,
+  Loader2
 } from 'lucide-react';
 
 interface Message {
   id: number;
+  sender: number;
+  recipient: number;
   sender_name: string;
   recipient_name: string;
+  event: number;
+  event_title: string;
   subject: string;
   body: string;
   is_read: boolean;
   created_at: string;
-  sender_id: number;
-  recipient_id: number;
 }
 
 interface Conversation {
@@ -66,7 +70,83 @@ const HostMessaging: React.FC = () => {
   const [sending, setSending] = useState(false);
   const [showEventInfo, setShowEventInfo] = useState(false);
 
-  // Mock data - replace with API calls
+  // Fetch events and messages from backend
+  useEffect(() => {
+    const fetchData = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        navigate('/host-login');
+        return;
+      }
+
+      try {
+        setLoading(true);
+
+        // Fetch all events for the host
+        const eventsResponse = await fetch(ENDPOINTS.EVENTS, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        if (eventsResponse.ok) {
+          const events = await eventsResponse.json();
+
+          // Group events by speaker to create conversations
+          const conversationsMap = new Map<number, Conversation>();
+
+          for (const event of events) {
+            if (!conversationsMap.has(event.speaker)) {
+              conversationsMap.set(event.speaker, {
+                id: event.speaker,
+                event_id: event.id,
+                event_title: event.title,
+                participant_name: event.speaker_name,
+                participant_email: '',
+                participant_type: 'speaker',
+                last_message: '',
+                last_message_time: event.created_at,
+                unread_count: 0,
+                event_date: event.event_date,
+                event_status: event.status
+              });
+            }
+          }
+
+          setConversations(Array.from(conversationsMap.values()));
+        }
+
+        // If a conversation is selected, fetch its messages
+        if (conversationId) {
+          const messagesResponse = await fetch(`${ENDPOINTS.MESSAGES}?event_id=${conversationId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          if (messagesResponse.ok) {
+            const messagesData = await messagesResponse.json();
+            setMessages(messagesData);
+
+            // Update selected conversation
+            const conversation = conversations.find(c => c.id === parseInt(conversationId));
+            if (conversation) {
+              setSelectedConversation(conversation);
+            }
+          }
+        }
+
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [conversationId, navigate]);
+
+  // Backup mock data for now
   useEffect(() => {
     setTimeout(() => {
       const mockConversations: Conversation[] = [
@@ -189,34 +269,55 @@ const HostMessaging: React.FC = () => {
 
   const handleSendMessage = async () => {
     if (!newMessage.trim() || !selectedConversation || sending) return;
-    
+
     setSending(true);
-    
-    // Simulate sending message
-    setTimeout(() => {
-      const message: Message = {
-        id: messages.length + 1,
-        sender_name: "Tech Summit Organizer", // Current user name
-        recipient_name: selectedConversation.participant_name,
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Not authenticated');
+      }
+
+      // Get current user ID from token or localStorage
+      const userDataString = localStorage.getItem('userData');
+      const userData = userDataString ? JSON.parse(userDataString) : null;
+
+      const payload = {
+        event: selectedConversation.event_id,
+        recipient: selectedConversation.id, // speaker ID
         subject: `Re: ${selectedConversation.event_title}`,
-        body: newMessage,
-        is_read: false,
-        created_at: new Date().toISOString(),
-        sender_id: 1, // Current user ID
-        recipient_id: 2
+        body: newMessage
       };
-      
-      setMessages(prev => [...prev, message]);
+
+      const response = await fetch(ENDPOINTS.MESSAGES, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      const sentMessage = await response.json();
+      setMessages(prev => [...prev, sentMessage]);
       setNewMessage('');
-      setSending(false);
-      
+
       // Update conversation last message
       setConversations(prev => prev.map(conv =>
         conv.id === selectedConversation.id
           ? { ...conv, last_message: newMessage, last_message_time: new Date().toISOString() }
           : conv
       ));
-    }, 1000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      alert('Failed to send message. Please try again.');
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {

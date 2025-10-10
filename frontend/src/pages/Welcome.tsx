@@ -15,18 +15,18 @@ const Welcome: React.FC = () => {
     // Check if user is logged in
     const token = localStorage.getItem('access_token');
     const userData = localStorage.getItem('user');
-    
+
     if (!token || !userData) {
-      // Redirect to login if not authenticated
-      navigate('/login');
+      // Redirect to home if not authenticated
+      navigate('/');
       return;
     }
 
     try {
       setUser(JSON.parse(userData));
     } catch {
-      // If user data is corrupted, redirect to login
-      navigate('/login');
+      // If user data is corrupted, redirect to home
+      navigate('/');
     }
   }, [navigate]);
 
@@ -34,7 +34,7 @@ const Welcome: React.FC = () => {
     localStorage.removeItem('access_token');
     localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
-    navigate('/login');
+    navigate('/');
   };
 
   if (!user) {
@@ -72,7 +72,7 @@ const Welcome: React.FC = () => {
         </div>
       </nav>
 
-      <div className="flex-1 flex items-center justify-center py-8 sm:py-12">
+      <div className="flex-1 flex items-center justify-center py-4 sm:py-6">
         <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           {/* Welcome Message */}
           <div className="bg-white rounded-2xl p-8 sm:p-12 shadow-lg">

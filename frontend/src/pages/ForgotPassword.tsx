@@ -49,38 +49,38 @@ const ForgotPassword: React.FC = () => {
       <nav className="bg-[#27465C] border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <Link to="/" className="text-2xl md:text-3xl font-black text-white">
+            <Link to="/" className="text-2xl font-bold text-white">
               C&I
             </Link>
-            <Link 
-              to="/login"
+            <Link
+              to="/"
               className="bg-white text-black font-medium hover:bg-gray-100 transition rounded px-4 py-2 sm:px-6 sm:py-3 text-sm sm:text-base"
             >
-              Back to Login
+              Back to Home
             </Link>
           </div>
         </div>
       </nav>
 
-      <div className="flex-1 py-8 sm:py-12 flex items-center justify-center">
+      <div className="flex-1 py-4 sm:py-6 flex items-center justify-center">
         <div className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8">
           {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-3xl sm:text-4xl font-black text-white mb-6">
+          <div className="text-center mb-6">
+            <h1 className="text-2xl font-bold text-white mb-3">
               Forgot Password?
             </h1>
-            <p className="text-lg text-white font-normal">
+            <p className="text-base text-white font-normal">
               Don't worry! Enter your email and we'll send you a reset code.
             </p>
           </div>
 
           {/* Form */}
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 sm:p-10 border border-white/20">
+          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-white/20">
             {!success ? (
-              <form onSubmit={handleSubmit} className="space-y-8">
+              <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Email Input */}
-                <div className="space-y-4">
-                  <label className="block text-lg font-medium text-white mb-2">Email Address *</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium text-white">Email Address *</label>
                   <input
                     type="email"
                     value={email}
@@ -89,7 +89,7 @@ const ForgotPassword: React.FC = () => {
                       if (error) setError('');
                     }}
                     placeholder="Enter your email address"
-                    className="w-full h-12 px-4 py-3 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-base text-white placeholder:text-white/70"
+                    className="w-full h-10 px-3 py-2 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-sm text-white placeholder:text-white/70"
                     disabled={isLoading}
                   />
                 </div>
@@ -105,15 +105,15 @@ const ForgotPassword: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full h-12 bg-white text-black font-medium rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#27465C] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-10 bg-white text-black font-medium rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-[#27465C] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? 'Sending Reset Code...' : 'Send Reset Code'}
                 </button>
               </form>
             ) : (
-              <div className="text-center space-y-6">
+              <div className="text-center space-y-4">
                 <div>
-                  <h3 className="text-xl font-medium text-white mb-2">Reset Code Sent!</h3>
+                  <h3 className="text-base font-medium text-white mb-2">Reset Code Sent!</h3>
                   <p className="text-white">
                     We've sent a 4-digit reset code to <span className="font-medium">{email}</span>
                   </p>
@@ -125,14 +125,14 @@ const ForgotPassword: React.FC = () => {
             )}
 
             {/* Back to Login */}
-            <div className="text-center mt-8">
-              <p className="text-white font-normal">
+            <div className="text-center mt-4">
+              <p className="text-white font-normal text-sm">
                 Remember your password?{' '}
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/"
                   className="text-white hover:text-gray-200 font-medium underline transition-colors duration-200"
                 >
-                  Sign in here
+                  Back to Home
                 </Link>
               </p>
             </div>

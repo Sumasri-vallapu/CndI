@@ -39,4 +39,13 @@ export const ENDPOINTS = {
   SPEAKERS: `${BASE_URL}/speakers/`,
   SPEAKER_DETAIL: (id: number) => `${BASE_URL}/speakers/${id}/`,
 
+  // Event endpoints
+  EVENTS: `${BASE_URL}/events/`,
+  EVENT_DETAIL: (id: number) => `${BASE_URL}/events/${id}/`,
+
+  // Message endpoints
+  MESSAGES: `${BASE_URL}/messages/`,
+  MESSAGE_DETAIL: (id: number) => `${BASE_URL}/messages/${id}/`,
+  MARK_MESSAGE_READ: (id: number) => `${BASE_URL}/mark-message-read/${id}/`,
+
 } as const; 

@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from .models import (
     UserProfile, State, District, Mandal, GramPanchayat,
     Host, Speaker, Event, SpeakerAvailability, Payment, Message, EventRating,
-    OTPVerification, PendingUser
+    OTPVerification, PendingUser, Conversation
 )
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -101,15 +101,42 @@ class EventSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
     sender_name = serializers.CharField(source='sender.get_full_name', read_only=True)
     recipient_name = serializers.CharField(source='recipient.get_full_name', read_only=True)
-    event_title = serializers.CharField(source='event.title', read_only=True)
-    
+    sender_email = serializers.CharField(source='sender.email', read_only=True)
+
     class Meta:
         model = Message
         fields = [
-            'id', 'event', 'event_title', 'sender', 'sender_name', 
-            'recipient', 'recipient_name', 'subject', 'body', 
+            'id', 'conversation', 'sender', 'sender_name', 'sender_email',
+            'recipient', 'recipient_name', 'body',
             'is_read', 'created_at'
         ]
+
+
+class ConversationSerializer(serializers.ModelSerializer):
+    host_name = serializers.CharField(source='host.get_full_name', read_only=True)
+    speaker_name = serializers.CharField(source='speaker.get_full_name', read_only=True)
+    host_email = serializers.CharField(source='host.email', read_only=True)
+    speaker_email = serializers.CharField(source='speaker.email', read_only=True)
+    event_title = serializers.CharField(source='event.title', read_only=True, allow_null=True)
+    last_message = MessageSerializer(read_only=True)
+    unread_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Conversation
+        fields = [
+            'id', 'host', 'host_name', 'host_email', 'speaker', 'speaker_name',
+            'speaker_email', 'event', 'event_title', 'subject', 'last_message',
+            'unread_count', 'created_at', 'updated_at'
+        ]
+
+    def get_unread_count(self, obj):
+        request = self.context.get('request')
+        if request and request.user:
+            if hasattr(request.user, 'host') and request.user == obj.host:
+                return obj.unread_count_for_host
+            elif hasattr(request.user, 'speaker') and request.user == obj.speaker:
+                return obj.unread_count_for_speaker
+        return 0
 
 
 class PaymentSerializer(serializers.ModelSerializer):

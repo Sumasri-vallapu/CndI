@@ -1,7 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
-import UnifiedSignup from './pages/UnifiedSignup';
-import Login from './pages/Login';
 import HostLogin from './pages/HostLogin';
 import HostSignup from './pages/HostSignup';
 import SpeakerLogin from './pages/SpeakerLogin';
@@ -26,8 +24,9 @@ import HostRequests from './pages/HostRequests';
 import HostAvailability from './pages/HostAvailability';
 import SpeakerCalendar from './pages/SpeakerCalendar';
 import PaymentFlow from './pages/PaymentFlow';
-import HostMessaging from './pages/HostMessaging';
+import HostMessaging from './pages/HostMessagingSimple';
 import SendSpeakerRequest from './pages/SendSpeakerRequest';
+import DashboardLink from './components/DashboardLink';
 
 // Simple Protected component for testing
 const Protected = () => {
@@ -44,20 +43,19 @@ const Protected = () => {
 export default function App() {
   return (
     <BrowserRouter>
+      {/* Global floating dashboard link button */}
+      <DashboardLink />
+
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/home" element={<Home />} />
-        
-        {/* Legacy auth routes - keeping for backward compatibility */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<UnifiedSignup />} />
-        
-        {/* New role-based auth routes */}
+
+        {/* Role-based auth routes */}
         <Route path="/host-login" element={<HostLogin />} />
         <Route path="/host-signup" element={<HostSignup />} />
         <Route path="/speaker-login" element={<SpeakerLogin />} />
         <Route path="/speaker-signup" element={<SpeakerSignup />} />
-        
+
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password-otp" element={<ResetPasswordOtp />} />
@@ -71,7 +69,7 @@ export default function App() {
         <Route path="/about" element={<AboutUs />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/protected" element={<Protected />} />
-        
+
         {/* Host Dashboard and Management Routes */}
         <Route path="/host/dashboard" element={<HostDashboard />} />
         <Route path="/host/profile/edit" element={<HostProfileEdit />} />
@@ -79,7 +77,7 @@ export default function App() {
         <Route path="/host/availability" element={<HostAvailability />} />
         <Route path="/host/messages" element={<HostMessaging />} />
         <Route path="/host/messages/:conversationId" element={<HostMessaging />} />
-        
+
         {/* Speaker Dashboard and Management Routes */}
         <Route path="/speaker/dashboard" element={<SpeakerDashboard />} />
         <Route path="/speaker/calendar/:speakerId" element={<SpeakerCalendar />} />
