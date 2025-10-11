@@ -1,6 +1,9 @@
 # Ignore virtual environment
 venv/
 yuv_venv/
+.venv/
+backend/.venv/
+*/.venv/
 # Ignore Python cache
 __pycache__/
 *.pyc
@@ -22,4 +25,45 @@ frontend/node_modules/
 # Ignore VS Code settings
 .vscode/
 
+# Ignore Claude-generated documentation files
+# Keep README.md but ignore all other .md files
+*.md
+!README.md
+!CHANGELOG.md
+!CONTRIBUTING.md
+!LICENSE.md
 
+# Ignore Claude Code configuration folder
+.claude/
+
+# Ignore SQLite databases (development only)
+*.sqlite3
+*.db
+
+# Ignore log files
+*.log
+
+# Ignore frontend build output
+frontend/dist/
+frontend/build/
+
+# Ignore test/temporary HTML files
+*test*.html
+*mockup*.html
+emailtemplateUI.html
+
+# Ignore temporary text files
+backend_common_commands.txt
+common_claude_prompts.txt
+newuicolours.txt
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Ignore IDE-specific files
+.idea/
+*.iml

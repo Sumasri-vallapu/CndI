@@ -1,37 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm run dev:*)",
-      "Bash(node:*)",
-      "Bash(npx puppeteer browsers:*)",
-      "Bash(./node_modules/.bin/puppeteer:*)",
-      "Bash(rg:*)",
       "Bash(python manage.py:*)",
-      "Bash(python3 manage.py check:*)",
-      "Bash(ls:*)",
+      "Bash(python3 manage.py makemigrations:*)",
       "Bash(source:*)",
-      "Bash(./venv/Scripts/python.exe manage.py check)",
-      "Bash(curl:*)",
-      "Bash(./venv/Scripts/python.exe manage.py runserver 127.0.0.1:8000)",
-      "Bash(./venv/Scripts/python.exe manage.py runserver 127.0.0.1:8001)",
-      "Bash(pkill:*)",
-      "Bash(./venv/Scripts/python.exe manage.py migrate)",
-      "Bash(npm run build:*)",
-      "Bash(npx tsc:*)",
-      "Bash(python3:*)",
-      "Bash(grep:*)",
-      "Bash(python:*)",
-      "Bash(python3 manage.py runserver:*)",
-      "Bash(npm install)",
-      "Bash(rm:*)",
-      "Bash(npm install:*)",
-      "Bash(npm cache clean:*)",
-      "Bash(yarn add:*)",
-      "Bash(tar:*)",
-      "Bash(mkdir:*)",
-      "Bash(cp:*)",
-      "Bash(timeout 10s npm run dev)"
+      "Bash(./venv/bin/python manage.py makemigrations)",
+      "Bash(rm:*)"
     ],
-    "deny": []
+    "deny": [],
+    "ask": []
   }
 }
