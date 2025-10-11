@@ -248,165 +248,101 @@ const HostDashboard: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Welcome Section */}
-        <div className="mb-8 relative">
-          <h1 className="text-3xl md:text-4xl font-black text-white mb-2">
+        <div className="mb-6 relative">
+          <h1 className="text-lg md:text-xl font-black text-white mb-1">
             Welcome back, {hostName}!
           </h1>
-          <p className="text-white/80 text-base md:text-lg">Here's what's happening with your speaking opportunities today.</p>
+          <p className="text-white/80 text-sm">Here's what's happening with your speaking opportunities today.</p>
         </div>
 
-        {/* Enhanced Stats Cards with Visual Indicators */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        {/* Stats Cards - Redesigned */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {/* Pending Requests Card */}
-          <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-yellow-200">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-yellow-500 rounded-xl shadow-md">
-                <Clock className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-0.5">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="p-1.5 bg-[#27465C] rounded-lg shadow-sm">
+                <Clock className="w-4 h-4 text-white" />
               </div>
-              <div className="flex items-center space-x-1 text-xs font-medium text-yellow-700 bg-yellow-200 px-2 py-1 rounded-full">
-                <Activity className="w-3 h-3" />
-                <span>Urgent</span>
-              </div>
+              <h3 className="text-xs font-bold text-gray-700">Pending Requests</h3>
             </div>
-            <p className="text-sm font-medium text-yellow-700 mb-1">Pending Requests</p>
-            <p className="text-3xl font-black text-yellow-900 mb-2">{stats.pendingRequests}</p>
-            <p className="text-xs text-yellow-600">Requires your attention</p>
+            <p className="text-2xl font-black text-[#27465C] text-center mt-1">{stats.pendingRequests}</p>
           </div>
 
           {/* Upcoming Events Card */}
-          <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-green-200">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-green-500 rounded-xl shadow-md">
-                <Calendar className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-0.5">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="p-1.5 bg-[#27465C] rounded-lg shadow-sm">
+                <Calendar className="w-4 h-4 text-white" />
               </div>
-              <div className="flex items-center space-x-1 text-xs font-medium text-green-700">
-                <ArrowUpRight className="w-3 h-3" />
-                <span>+{stats.monthlyGrowth}%</span>
-              </div>
+              <h3 className="text-xs font-bold text-gray-700">Upcoming Events</h3>
             </div>
-            <p className="text-sm font-medium text-green-700 mb-1">Upcoming Events</p>
-            <p className="text-3xl font-black text-green-900 mb-2">{stats.upcomingEvents}</p>
-            <p className="text-xs text-green-600">Next 30 days</p>
+            <p className="text-2xl font-black text-[#27465C] text-center mt-1">{stats.upcomingEvents}</p>
           </div>
 
           {/* Completed Events Card */}
-          <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-blue-200">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-blue-500 rounded-xl shadow-md">
-                <CheckCircle className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-0.5">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="p-1.5 bg-[#27465C] rounded-lg shadow-sm">
+                <CheckCircle className="w-4 h-4 text-white" />
               </div>
-              <div className="flex items-center space-x-1">
-                <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-                <span className="text-sm font-bold text-blue-900">{stats.rating}</span>
-              </div>
+              <h3 className="text-xs font-bold text-gray-700">Completed Events</h3>
             </div>
-            <p className="text-sm font-medium text-blue-700 mb-1">Completed Events</p>
-            <p className="text-3xl font-black text-blue-900 mb-2">{stats.completedEvents}</p>
-            <p className="text-xs text-blue-600">{stats.totalRatings} ratings received</p>
+            <p className="text-2xl font-black text-[#27465C] text-center mt-1">{stats.completedEvents}</p>
           </div>
 
           {/* Total Earnings Card */}
-          <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-purple-200">
-            <div className="flex items-start justify-between mb-4">
-              <div className="p-3 bg-purple-500 rounded-xl shadow-md">
-                <DollarSign className="w-6 h-6 text-white" />
+          <div className="bg-white rounded-xl p-3 shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100 hover:-translate-y-0.5">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="p-1.5 bg-[#27465C] rounded-lg shadow-sm">
+                <DollarSign className="w-4 h-4 text-white" />
               </div>
-              <div className="flex items-center space-x-1 text-xs font-medium text-purple-700">
-                <TrendingUp className="w-3 h-3" />
-                <span>{stats.responseRate}%</span>
-              </div>
+              <h3 className="text-xs font-bold text-gray-700">Total Earnings</h3>
             </div>
-            <p className="text-sm font-medium text-purple-700 mb-1">Total Earnings</p>
-            <p className="text-3xl font-black text-purple-900 mb-2">${stats.totalEarnings.toLocaleString()}</p>
-            <p className="text-xs text-purple-600">All time earnings</p>
-          </div>
-        </div>
-
-        {/* Quick Actions with Icons */}
-        <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 mb-8 border border-white/20">
-          <h3 className="text-lg font-black text-white mb-4 flex items-center space-x-2">
-            <Activity className="w-5 h-5" />
-            <span>Quick Actions</span>
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <button
-              onClick={() => navigate('/find-speaker')}
-              className="bg-white text-black font-medium px-4 py-3 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 flex flex-col items-center justify-center space-y-2"
-            >
-              <Users className="w-5 h-5" />
-              <span className="text-sm">Find Speakers</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/host/requests')}
-              className="bg-white text-black font-medium px-4 py-3 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 flex flex-col items-center justify-center space-y-2"
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span className="text-sm">My Requests</span>
-            </button>
-
-            <button
-              onClick={() => navigate('/host/messages')}
-              className="bg-white text-black font-medium px-4 py-3 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 flex flex-col items-center justify-center space-y-2 relative"
-            >
-              <MessageSquare className="w-5 h-5" />
-              <span className="text-sm">Messages</span>
-              {stats.pendingRequests > 0 && (
-                <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-              )}
-            </button>
-
-            <button
-              onClick={() => navigate('/host/profile/edit')}
-              className="bg-white text-black font-medium px-4 py-3 rounded-xl hover:bg-gray-50 transition-all duration-300 hover:shadow-lg transform hover:-translate-y-1 flex flex-col items-center justify-center space-y-2"
-            >
-              <User className="w-5 h-5" />
-              <span className="text-sm">My Profile</span>
-            </button>
+            <p className="text-2xl font-black text-[#27465C] text-center mt-1">${stats.totalEarnings.toLocaleString()}</p>
           </div>
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Recent Requests - Takes 2 columns */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-              <div className="px-6 py-4 bg-gradient-to-r from-[#27465C] to-[#1e3a4a] border-b border-white/10">
+            <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+              <div className="px-4 py-3 bg-gradient-to-r from-[#27465C] to-[#1e3a4a] border-b border-white/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-xl font-black text-white mb-1">Recent Requests</h2>
-                    <p className="text-white/80 text-sm">Manage your speaking opportunities</p>
+                    <h2 className="text-lg font-black text-white mb-0.5">Speaking Requests</h2>
+                    <p className="text-white/80 text-xs">Manage your speaking opportunities</p>
                   </div>
                   <Link
                     to="/host/requests"
-                    className="bg-white text-[#27465C] hover:bg-gray-100 font-medium text-sm px-4 py-2 rounded-lg transition-colors flex items-center space-x-1"
+                    className="bg-white text-[#27465C] hover:bg-gray-100 font-medium text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1"
                   >
                     <span>View All</span>
-                    <ArrowUpRight className="w-4 h-4" />
+                    <ArrowUpRight className="w-3 h-3" />
                   </Link>
                 </div>
               </div>
 
               <div className="divide-y divide-gray-100">
                 {recentRequests.map((request) => (
-                  <div key={request.id} className="px-6 py-5 hover:bg-gray-50 transition-all duration-200 group">
+                  <div key={request.id} className="px-4 py-3 hover:bg-gray-50 transition-all duration-200 group">
                     <div className="flex items-start justify-between">
-                      <div className="flex-1 pr-4">
-                        <div className="flex items-center space-x-3 mb-3">
-                          <h3 className="font-black text-black text-lg group-hover:text-[#27465C] transition-colors">{request.eventTitle}</h3>
-                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(request.status)} shadow-sm`}>
+                      <div className="flex-1 pr-3">
+                        <div className="flex items-center space-x-2 mb-2">
+                          <h3 className="font-black text-black text-sm group-hover:text-[#27465C] transition-colors">{request.eventTitle}</h3>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold ${getStatusColor(request.status)}`}>
                             {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                           </span>
                         </div>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <User className="w-4 h-4 text-gray-400" />
-                          <p className="text-sm font-medium text-gray-700">
+                        <div className="flex items-center space-x-1.5 mb-1.5">
+                          <User className="w-3 h-3 text-gray-400" />
+                          <p className="text-xs font-medium text-gray-700">
                             {request.organizerName}
                           </p>
                         </div>
-                        <div className="flex items-center space-x-4 text-xs text-gray-500">
+                        <div className="flex items-center space-x-3 text-xs text-gray-500">
                           <div className="flex items-center space-x-1">
                             <Calendar className="w-3 h-3" />
                             <span>{new Date(request.eventDate).toLocaleDateString()}</span>
@@ -417,17 +353,17 @@ const HostDashboard: React.FC = () => {
                           </div>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <button className="p-2 text-gray-400 hover:text-[#27465C] hover:bg-gray-100 rounded-lg transition-all">
-                          <Eye className="w-5 h-5" />
+                      <div className="flex items-center space-x-1.5">
+                        <button className="p-1.5 text-gray-400 hover:text-[#27465C] hover:bg-gray-100 rounded-lg transition-all">
+                          <Eye className="w-4 h-4" />
                         </button>
                         {request.status === 'pending' && (
                           <>
-                            <button className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all">
-                              <CheckCircle className="w-5 h-5" />
+                            <button className="p-1.5 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all">
+                              <CheckCircle className="w-4 h-4" />
                             </button>
-                            <button className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
-                              <XCircle className="w-5 h-5" />
+                            <button className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                              <XCircle className="w-4 h-4" />
                             </button>
                           </>
                         )}
@@ -441,35 +377,35 @@ const HostDashboard: React.FC = () => {
 
           {/* Activity Feed - Takes 1 column */}
           <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-4">
-              <div className="px-6 py-4 bg-gradient-to-r from-[#27465C] to-[#1e3a4a] border-b border-white/10">
-                <h3 className="text-lg font-black text-white mb-1">Recent Activity</h3>
+            <div className="bg-white rounded-xl shadow-xl overflow-hidden sticky top-4 border border-gray-200">
+              <div className="px-4 py-3 bg-gradient-to-r from-[#27465C] to-[#1e3a4a] border-b border-white/10">
+                <h3 className="text-lg font-black text-white mb-0.5">Recent Activity</h3>
                 <p className="text-white/80 text-xs">Your latest updates</p>
               </div>
-              <div className="p-4 max-h-[600px] overflow-y-auto">
-                <div className="space-y-4">
+              <div className="p-3 max-h-[500px] overflow-y-auto">
+                <div className="space-y-3">
                   {activityFeed.map((activity, index) => (
-                    <div key={activity.id} className="flex items-start space-x-3 group">
-                      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
+                    <div key={activity.id} className="flex items-start space-x-2 group">
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${
                         activity.icon === 'request' ? 'bg-yellow-100' :
                         activity.icon === 'check' ? 'bg-green-100' :
                         activity.icon === 'calendar' ? 'bg-blue-100' :
                         'bg-purple-100'
                       }`}>
-                        {activity.icon === 'request' && <Clock className="w-5 h-5 text-yellow-600" />}
-                        {activity.icon === 'check' && <CheckCircle className="w-5 h-5 text-green-600" />}
-                        {activity.icon === 'calendar' && <Calendar className="w-5 h-5 text-blue-600" />}
-                        {activity.icon === 'star' && <Star className="w-5 h-5 text-purple-600 fill-purple-600" />}
+                        {activity.icon === 'request' && <Clock className="w-4 h-4 text-yellow-600" />}
+                        {activity.icon === 'check' && <CheckCircle className="w-4 h-4 text-green-600" />}
+                        {activity.icon === 'calendar' && <Calendar className="w-4 h-4 text-blue-600" />}
+                        {activity.icon === 'star' && <Star className="w-4 h-4 text-purple-600 fill-purple-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-bold text-gray-900 group-hover:text-[#27465C] transition-colors">
+                        <p className="text-xs font-bold text-gray-900 group-hover:text-[#27465C] transition-colors">
                           {activity.title}
                         </p>
-                        <p className="text-xs text-gray-600 mt-1">
+                        <p className="text-xs text-gray-600 mt-0.5">
                           {activity.description}
                         </p>
-                        <p className="text-xs text-gray-400 mt-1 flex items-center space-x-1">
-                          <Clock className="w-3 h-3" />
+                        <p className="text-xs text-gray-400 mt-0.5 flex items-center space-x-1">
+                          <Clock className="w-2.5 h-2.5" />
                           <span>{activity.time}</span>
                         </p>
                       </div>
@@ -478,7 +414,7 @@ const HostDashboard: React.FC = () => {
                 </div>
 
                 {/* View All Activity Link */}
-                <button className="w-full mt-4 py-2 text-sm font-medium text-[#27465C] hover:bg-gray-50 rounded-lg transition-colors">
+                <button className="w-full mt-3 py-1.5 text-xs font-medium text-[#27465C] hover:bg-gray-50 rounded-lg transition-colors">
                   View All Activity
                 </button>
               </div>

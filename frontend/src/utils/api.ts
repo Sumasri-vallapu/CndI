@@ -1,8 +1,8 @@
 // API configuration
-//const LOC_URL = 'https://yuvachetana.com//api';
-//const BASE_URL = 'https://clearmyfile.com/api';
-
-const BASE_URL = 'http://localhost:8000/api';
+// Automatically detect environment - production uses relative /api, development uses localhost
+const BASE_URL = import.meta.env.PROD
+  ? '/api'  // Production: relative path (nginx will proxy /api to backend)
+  : 'http://localhost:8000/api';  // Development: direct backend URL
 
 // API endpoints
 export const ENDPOINTS = {
