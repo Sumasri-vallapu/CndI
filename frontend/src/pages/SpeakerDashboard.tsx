@@ -232,141 +232,41 @@ export default function SpeakerDashboard() {
 
   const renderOverview = () => (
     <div className="space-y-6">
-      {/* Welcome Banner */}
-      <div className="bg-gradient-to-r from-[#27465C] to-[#1e3a4a] rounded-2xl p-8 text-white shadow-xl">
-        <div className="flex items-center space-x-3 mb-3">
-          <h1 className="text-3xl md:text-4xl font-black">Welcome back, {speakerName}!</h1>
-          <Sparkles className="w-8 h-8 text-yellow-400 animate-pulse" />
-        </div>
-        <p className="text-white/90 text-lg mb-4">You're doing amazing! Here's your impact at a glance.</p>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <p className="text-white/80 text-sm mb-1">Total Requests</p>
-            <p className="text-3xl font-black">{stats.totalRequests}</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <p className="text-white/80 text-sm mb-1">Total Earnings</p>
-            <p className="text-3xl font-black">${(stats.totalEarnings / 1000).toFixed(0)}K</p>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <p className="text-white/80 text-sm mb-1">Avg Rating</p>
-            <div className="flex items-center space-x-2">
-              <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-              <p className="text-3xl font-black">{stats.averageRating}</p>
-            </div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-            <p className="text-white/80 text-sm mb-1">Growth</p>
-            <div className="flex items-center space-x-1">
-              <ArrowUpRight className="w-5 h-5 text-green-400" />
-              <p className="text-3xl font-black">+{stats.monthlyGrowth}%</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Pending Requests */}
-        <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-yellow-200">
-          <div className="flex items-start justify-between mb-4">
-            <div className="p-3 bg-yellow-500 rounded-xl shadow-md">
-              <Clock className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex items-center space-x-1 text-xs font-medium text-yellow-700 bg-yellow-200 px-2 py-1 rounded-full">
-              <Activity className="w-3 h-3" />
-              <span>Action Needed</span>
-            </div>
-          </div>
-          <p className="text-sm font-medium text-yellow-700 mb-1">Pending Requests</p>
-          <p className="text-3xl font-black text-yellow-900 mb-2">{stats.pendingRequests}</p>
-          <p className="text-xs text-yellow-600">Awaiting your response</p>
-        </div>
-
-        {/* Accepted Requests */}
-        <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-green-200">
-          <div className="flex items-start justify-between mb-4">
-            <div className="p-3 bg-green-500 rounded-xl shadow-md">
-              <CheckCircle className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex items-center space-x-1 text-xs font-medium text-green-700">
-              <TrendingUp className="w-3 h-3" />
-              <span>+{stats.monthlyGrowth}%</span>
-            </div>
-          </div>
-          <p className="text-sm font-medium text-green-700 mb-1">Upcoming Events</p>
-          <p className="text-3xl font-black text-green-900 mb-2">{stats.upcomingEvents}</p>
-          <p className="text-xs text-green-600">Confirmed bookings</p>
-        </div>
-
-        {/* Completed Events */}
-        <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-blue-200">
-          <div className="flex items-start justify-between mb-4">
-            <div className="p-3 bg-blue-500 rounded-xl shadow-md">
-              <Award className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex items-center space-x-1">
-              <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
-              <span className="text-sm font-bold text-blue-900">{stats.averageRating}</span>
-            </div>
-          </div>
-          <p className="text-sm font-medium text-blue-700 mb-1">Completed Events</p>
-          <p className="text-3xl font-black text-blue-900 mb-2">{stats.completedEvents}</p>
-          <p className="text-xs text-blue-600">Successful engagements</p>
-        </div>
-
-        {/* Total Earnings */}
-        <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-purple-200">
-          <div className="flex items-start justify-between mb-4">
-            <div className="p-3 bg-purple-500 rounded-xl shadow-md">
-              <DollarSign className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex items-center space-x-1 text-xs font-medium text-purple-700">
-              <BarChart3 className="w-3 h-3" />
-              <span>{stats.responseRate}%</span>
-            </div>
-          </div>
-          <p className="text-sm font-medium text-purple-700 mb-1">Total Earnings</p>
-          <p className="text-3xl font-black text-purple-900 mb-2">${stats.totalEarnings.toLocaleString()}</p>
-          <p className="text-xs text-purple-600">Lifetime revenue</p>
-        </div>
-      </div>
-
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Recent Requests */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div className="px-6 py-4 bg-gradient-to-r from-[#27465C] to-[#1e3a4a]">
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200">
+            <div className="px-4 py-3 bg-gradient-to-r from-[#27465C] to-[#1e3a4a]">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-black text-white mb-1">Recent Requests</h3>
-                  <p className="text-white/80 text-sm">Speaking opportunities waiting for you</p>
+                  <h3 className="text-lg font-black text-white mb-0.5">Speaking Requests</h3>
+                  <p className="text-white/80 text-xs">Speaking opportunities waiting for you</p>
                 </div>
                 <button
                   onClick={() => setActiveTab('requests')}
-                  className="bg-white text-[#27465C] hover:bg-gray-100 font-medium text-sm px-4 py-2 rounded-lg transition-colors flex items-center space-x-1"
+                  className="bg-white text-[#27465C] hover:bg-gray-100 font-medium text-xs px-3 py-1.5 rounded-lg transition-colors flex items-center space-x-1"
                 >
                   <span>View All</span>
-                  <ArrowUpRight className="w-4 h-4" />
+                  <ArrowUpRight className="w-3 h-3" />
                 </button>
               </div>
             </div>
             <div className="p-4">
               {requests.slice(0, 3).map((request) => (
-                <div key={request.id} className="bg-gray-50 rounded-xl p-5 mb-3 hover:bg-gray-100 transition-all group">
-                  <div className="flex items-start justify-between mb-3">
+                <div key={request.id} className="bg-gray-50 rounded-lg p-4 mb-3 hover:bg-gray-100 transition-all group">
+                  <div className="flex items-start justify-between mb-2">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-2">
-                        <h4 className="text-lg font-black text-gray-900 group-hover:text-[#27465C] transition-colors">
+                        <h4 className="text-sm font-black text-gray-900 group-hover:text-[#27465C] transition-colors">
                           {request.eventTitle}
                         </h4>
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold border ${getStatusColor(request.status)}`}>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border ${getStatusColor(request.status)}`}>
                           {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-2">{request.hostCompany} • {request.hostName}</p>
-                      <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                      <p className="text-xs text-gray-600 mb-1.5">{request.hostCompany} • {request.hostName}</p>
+                      <div className="flex flex-wrap gap-2 text-xs text-gray-500">
                         <div className="flex items-center space-x-1">
                           <Calendar className="w-3 h-3" />
                           <span>{request.eventDate}</span>
@@ -382,26 +282,26 @@ export default function SpeakerDashboard() {
                     </div>
                   </div>
                   {request.status === 'pending' && (
-                    <div className="flex space-x-2 mt-3">
+                    <div className="flex space-x-2 mt-2">
                       <button
                         onClick={() => handleRequestAction(request.id, 'accept')}
-                        className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-1"
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white px-3 py-1.5 rounded-lg font-medium transition-colors text-xs flex items-center justify-center space-x-1"
                       >
-                        <CheckCircle className="w-4 h-4" />
+                        <CheckCircle className="w-3.5 h-3.5" />
                         <span>Accept</span>
                       </button>
                       <button
                         onClick={() => handleRequestAction(request.id, 'negotiate')}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm flex items-center justify-center space-x-1"
+                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg font-medium transition-colors text-xs flex items-center justify-center space-x-1"
                       >
-                        <MessageSquare className="w-4 h-4" />
+                        <MessageSquare className="w-3.5 h-3.5" />
                         <span>Discuss</span>
                       </button>
                       <button
                         onClick={() => handleRequestAction(request.id, 'decline')}
-                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition-colors text-sm"
+                        className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg font-medium transition-colors text-xs"
                       >
-                        <XCircle className="w-4 h-4" />
+                        <XCircle className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   )}
@@ -413,40 +313,40 @@ export default function SpeakerDashboard() {
 
         {/* Activity Feed */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-lg overflow-hidden sticky top-4">
-            <div className="px-6 py-4 bg-gradient-to-r from-[#27465C] to-[#1e3a4a]">
-              <h3 className="text-lg font-black text-white mb-1">Activity Feed</h3>
+          <div className="bg-white rounded-xl shadow-xl overflow-hidden sticky top-4 border border-gray-200">
+            <div className="px-4 py-3 bg-gradient-to-r from-[#27465C] to-[#1e3a4a]">
+              <h3 className="text-lg font-black text-white mb-0.5">Recent Activity</h3>
               <p className="text-white/80 text-xs">Your recent updates</p>
             </div>
-            <div className="p-4 max-h-[500px] overflow-y-auto">
-              <div className="space-y-4">
+            <div className="p-3 max-h-[500px] overflow-y-auto">
+              <div className="space-y-3">
                 {activityFeed.map((activity) => (
-                  <div key={activity.id} className="flex items-start space-x-3 group">
-                    <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-md ${
+                  <div key={activity.id} className="flex items-start space-x-2 group">
+                    <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm ${
                       activity.icon === 'message' ? 'bg-yellow-100' :
                       activity.icon === 'check' ? 'bg-green-100' :
                       activity.icon === 'star' ? 'bg-purple-100' :
                       'bg-blue-100'
                     }`}>
-                      {activity.icon === 'message' && <MessageSquare className="w-5 h-5 text-yellow-600" />}
-                      {activity.icon === 'check' && <CheckCircle className="w-5 h-5 text-green-600" />}
-                      {activity.icon === 'star' && <Star className="w-5 h-5 text-purple-600 fill-purple-600" />}
-                      {activity.icon === 'dollar' && <DollarSign className="w-5 h-5 text-blue-600" />}
+                      {activity.icon === 'message' && <MessageSquare className="w-4 h-4 text-yellow-600" />}
+                      {activity.icon === 'check' && <CheckCircle className="w-4 h-4 text-green-600" />}
+                      {activity.icon === 'star' && <Star className="w-4 h-4 text-purple-600 fill-purple-600" />}
+                      {activity.icon === 'dollar' && <DollarSign className="w-4 h-4 text-blue-600" />}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-bold text-gray-900 group-hover:text-[#27465C] transition-colors">
+                      <p className="text-xs font-bold text-gray-900 group-hover:text-[#27465C] transition-colors">
                         {activity.title}
                       </p>
-                      <p className="text-xs text-gray-600 mt-1">{activity.description}</p>
-                      <p className="text-xs text-gray-400 mt-1 flex items-center space-x-1">
-                        <Clock className="w-3 h-3" />
+                      <p className="text-xs text-gray-600 mt-0.5">{activity.description}</p>
+                      <p className="text-xs text-gray-400 mt-0.5 flex items-center space-x-1">
+                        <Clock className="w-2.5 h-2.5" />
                         <span>{activity.time}</span>
                       </p>
                     </div>
                   </div>
                 ))}
               </div>
-              <button className="w-full mt-4 py-2 text-sm font-medium text-[#27465C] hover:bg-gray-50 rounded-lg transition-colors">
+              <button className="w-full mt-3 py-1.5 text-xs font-medium text-[#27465C] hover:bg-gray-50 rounded-lg transition-colors">
                 View All Activity
               </button>
             </div>
@@ -670,7 +570,7 @@ export default function SpeakerDashboard() {
 
               {/* Dropdown Menu */}
               {showProfileMenu && (
-                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-50">
+                <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-200 py-2 z-[100]">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <p className="text-sm font-bold text-black">{speakerName}</p>
                     <p className="text-xs text-gray-500 mt-1">
@@ -716,21 +616,76 @@ export default function SpeakerDashboard() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        {/* Welcome Section - Always visible */}
+        <div className="mb-3 relative">
+          <h1 className="text-base md:text-lg font-black text-white mb-0.5">
+            Welcome back, {speakerName}!
+          </h1>
+          <p className="text-white/80 text-xs">Here's what's happening with your speaking opportunities today.</p>
+        </div>
+
+        {/* Stats Cards - Always visible */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mb-4">
+          {/* Pending Requests Card */}
+          <div className="bg-white rounded-lg p-2.5 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
+            <div className="flex items-center space-x-2 mb-1.5">
+              <div className="p-1 bg-[#27465C] rounded">
+                <Clock className="w-3.5 h-3.5 text-white" />
+              </div>
+              <h3 className="text-xs font-bold text-gray-700">Pending Requests</h3>
+            </div>
+            <p className="text-xl font-black text-[#27465C] text-center">{stats.pendingRequests}</p>
+          </div>
+
+          {/* Upcoming Events Card */}
+          <div className="bg-white rounded-lg p-2.5 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
+            <div className="flex items-center space-x-2 mb-1.5">
+              <div className="p-1 bg-[#27465C] rounded">
+                <Calendar className="w-3.5 h-3.5 text-white" />
+              </div>
+              <h3 className="text-xs font-bold text-gray-700">Upcoming Events</h3>
+            </div>
+            <p className="text-xl font-black text-[#27465C] text-center">{stats.upcomingEvents}</p>
+          </div>
+
+          {/* Completed Events Card */}
+          <div className="bg-white rounded-lg p-2.5 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
+            <div className="flex items-center space-x-2 mb-1.5">
+              <div className="p-1 bg-[#27465C] rounded">
+                <CheckCircle className="w-3.5 h-3.5 text-white" />
+              </div>
+              <h3 className="text-xs font-bold text-gray-700">Completed Events</h3>
+            </div>
+            <p className="text-xl font-black text-[#27465C] text-center">{stats.completedEvents}</p>
+          </div>
+
+          {/* Total Earnings Card */}
+          <div className="bg-white rounded-lg p-2.5 shadow-md hover:shadow-lg transition-all duration-300 border border-gray-200">
+            <div className="flex items-center space-x-2 mb-1.5">
+              <div className="p-1 bg-[#27465C] rounded">
+                <DollarSign className="w-3.5 h-3.5 text-white" />
+              </div>
+              <h3 className="text-xs font-bold text-gray-700">Total Earnings</h3>
+            </div>
+            <p className="text-xl font-black text-[#27465C] text-center">${stats.totalEarnings.toLocaleString()}</p>
+          </div>
+        </div>
+
         {/* Tab Navigation */}
-        <div className="mb-8">
-          <div className="flex space-x-2 bg-white/10 backdrop-blur-sm rounded-2xl p-2 border border-white/20">
+        <div className="mb-4">
+          <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-xl p-1 border border-white/20">
             {[
-              { key: 'overview', label: 'Overview', icon: <Activity className="w-5 h-5" /> },
-              { key: 'requests', label: 'Requests', icon: <MessageSquare className="w-5 h-5" /> },
-              { key: 'calendar', label: 'Calendar', icon: <Calendar className="w-5 h-5" /> }
+              { key: 'overview', label: 'Overview', icon: <Activity className="w-4 h-4" /> },
+              { key: 'requests', label: 'Requests', icon: <MessageSquare className="w-4 h-4" /> },
+              { key: 'calendar', label: 'Calendar', icon: <Calendar className="w-4 h-4" /> }
             ].map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key as any)}
-                className={`flex-1 flex items-center justify-center gap-2 px-6 py-3 rounded-xl font-bold transition-all duration-300 ${
+                className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg font-bold transition-all duration-300 text-sm ${
                   activeTab === tab.key
-                    ? 'bg-white text-black shadow-xl transform scale-105'
+                    ? 'bg-white text-black shadow-lg'
                     : 'text-white hover:bg-white/20'
                 }`}
               >

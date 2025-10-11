@@ -33,8 +33,16 @@ frontend/node_modules/
 !CONTRIBUTING.md
 !LICENSE.md
 
-# Ignore Claude Code configuration folder
+# Ignore Claude Code configuration and traces
 .claude/
+CLAUDE.md
+claude.md
+*claude*.txt
+common_claude_prompts.txt
+
+# Ignore deployment summary files (user-specific)
+FINAL_SUMMARY.txt
+GIT_CLEANUP_SUMMARY.txt
 
 # Ignore SQLite databases (development only)
 *.sqlite3
@@ -43,7 +51,7 @@ frontend/node_modules/
 # Ignore log files
 *.log
 
-# Ignore frontend build output
+# Ignore frontend build output (should be built on server)
 frontend/dist/
 frontend/build/
 
@@ -54,8 +62,11 @@ emailtemplateUI.html
 
 # Ignore temporary text files
 backend_common_commands.txt
-common_claude_prompts.txt
 newuicolours.txt
+
+# Ignore production environment file with secrets
+backend/.env.production
+.env.production
 
 # Ignore OS-specific files
 .DS_Store

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import {
   ArrowLeft,
   Search,
@@ -16,7 +16,10 @@ import {
   DollarSign,
   Briefcase,
   ChevronDown,
-  Check
+  Check,
+  TrendingUp,
+  AlertCircle,
+  Home
 } from 'lucide-react';
 
 interface SpeakingRequest {
@@ -152,20 +155,20 @@ const HostRequests: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return 'bg-yellow-100 text-yellow-800';
-      case 'accepted': return 'bg-green-100 text-green-800';
-      case 'declined': return 'bg-red-100 text-red-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'pending': return 'bg-yellow-500/20 text-yellow-700 border border-yellow-500/40';
+      case 'accepted': return 'bg-green-500/20 text-green-700 border border-green-500/40';
+      case 'declined': return 'bg-red-500/20 text-red-700 border border-red-500/40';
+      case 'completed': return 'bg-blue-500/20 text-blue-700 border border-blue-500/40';
+      default: return 'bg-gray-500/20 text-gray-700 border border-gray-500/40';
     }
   };
 
-  const getUrgencyColor = (urgency: string) => {
+  const getUrgencyBadge = (urgency: string) => {
     switch (urgency) {
-      case 'high': return 'border-l-4 border-red-500';
-      case 'medium': return 'border-l-4 border-yellow-500';
-      case 'low': return 'border-l-4 border-green-500';
-      default: return 'border-l-4 border-gray-500';
+      case 'high': return { color: 'bg-red-500', text: 'Urgent', icon: <AlertCircle className="w-3 h-3" /> };
+      case 'medium': return { color: 'bg-yellow-500', text: 'Medium', icon: <Clock className="w-3 h-3" /> };
+      case 'low': return { color: 'bg-green-500', text: 'Low', icon: <TrendingUp className="w-3 h-3" /> };
+      default: return { color: 'bg-gray-500', text: 'Normal', icon: null };
     }
   };
 
@@ -181,61 +184,97 @@ const HostRequests: React.FC = () => {
   };
 
   const statusOptions = [
-    { value: 'all', label: 'All Status', color: 'text-gray-700' },
-    { value: 'pending', label: 'Pending', color: 'text-yellow-600' },
-    { value: 'accepted', label: 'Accepted', color: 'text-green-600' },
-    { value: 'declined', label: 'Declined', color: 'text-red-600' },
-    { value: 'completed', label: 'Completed', color: 'text-blue-600' }
+    { value: 'all', label: 'All Status', color: 'text-white', count: requests.length },
+    { value: 'pending', label: 'Pending', color: 'text-yellow-400', count: requests.filter(r => r.status === 'pending').length },
+    { value: 'accepted', label: 'Accepted', color: 'text-green-400', count: requests.filter(r => r.status === 'accepted').length },
+    { value: 'declined', label: 'Declined', color: 'text-red-400', count: requests.filter(r => r.status === 'declined').length },
+    { value: 'completed', label: 'Completed', color: 'text-blue-400', count: requests.filter(r => r.status === 'completed').length }
   ];
 
   const selectedOption = statusOptions.find(opt => opt.value === statusFilter) || statusOptions[0];
 
+  const stats = {
+    total: requests.length,
+    pending: requests.filter(r => r.status === 'pending').length,
+    accepted: requests.filter(r => r.status === 'accepted').length,
+    completed: requests.filter(r => r.status === 'completed').length
+  };
+
   return (
-    <div className="min-h-screen bg-[#27465C]">
+    <div className="min-h-screen bg-[#27465C] font-['Roboto']">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      <div className="bg-gradient-to-r from-[#27465C] to-[#1e3a4a] shadow-lg border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center py-4">
-            <button
-              onClick={() => navigate('/host/dashboard')}
-              className="flex items-center text-gray-600 hover:text-black mr-4"
-            >
-              <ArrowLeft className="w-5 h-5 mr-2" />
-              Back to Dashboard
-            </button>
-            <h1 className="text-2xl font-black text-black">Speaking Requests</h1>
+          <div className="py-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-4">
+                <button
+                  onClick={() => navigate('/host/dashboard')}
+                  className="flex items-center text-white/80 hover:text-white transition-colors group"
+                >
+                  <ArrowLeft className="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" />
+                  <span className="font-medium">Back to Dashboard</span>
+                </button>
+              </div>
+              <Link to="/" className="text-white/80 hover:text-white transition-colors">
+                <Home className="w-5 h-5" />
+              </Link>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-black text-white mb-2">Speaking Requests</h1>
+            <p className="text-white/80">Manage and respond to your speaking opportunities</p>
+          </div>
+
+          {/* Stats Bar */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pb-5">
+            <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 border border-white/20">
+              <div className="text-white/70 text-xs mb-1">Total Requests</div>
+              <div className="text-xl font-black text-white">{stats.total}</div>
+            </div>
+            <div className="bg-yellow-500/20 backdrop-blur-sm rounded-lg p-3 border border-yellow-500/30">
+              <div className="text-yellow-200 text-xs mb-1">Pending</div>
+              <div className="text-xl font-black text-yellow-100">{stats.pending}</div>
+            </div>
+            <div className="bg-green-500/20 backdrop-blur-sm rounded-lg p-3 border border-green-500/30">
+              <div className="text-green-200 text-xs mb-1">Accepted</div>
+              <div className="text-xl font-black text-green-100">{stats.accepted}</div>
+            </div>
+            <div className="bg-blue-500/20 backdrop-blur-sm rounded-lg p-3 border border-blue-500/30">
+              <div className="text-blue-200 text-xs mb-1">Completed</div>
+              <div className="text-xl font-black text-blue-100">{stats.completed}</div>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="bg-white rounded-lg p-4 shadow-sm mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 shadow-lg mb-5 border border-white/20">
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <div className="flex-1 relative">
-              <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <Search className="w-5 h-5 absolute left-4 top-1/2 transform -translate-y-1/2 text-white/60" />
               <input
                 type="text"
-                placeholder="Search requests by event, organizer, or company..."
+                placeholder="Search by event, organizer, or company..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                className="w-full pl-12 pr-4 py-3 bg-white/20 border-2 border-white/30 rounded-xl text-white placeholder:text-white/60 focus:bg-white/30 focus:border-white/50 focus:outline-none transition-all"
               />
             </div>
             {/* Custom Dropdown */}
             <div className="relative">
               <button
                 onClick={() => setShowDropdown(!showDropdown)}
-                className="w-full sm:w-48 px-4 py-2.5 bg-white border border-gray-300 rounded-lg flex items-center justify-between hover:border-[#27465C] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                className="w-full sm:w-56 px-4 py-3 bg-white/20 border-2 border-white/30 rounded-xl flex items-center justify-between hover:bg-white/30 transition-all duration-200 focus:outline-none focus:border-white/50"
               >
                 <div className="flex items-center space-x-2">
-                  <Filter className="w-4 h-4 text-gray-500" />
-                  <span className={`font-medium ${selectedOption.color}`}>
+                  <Filter className="w-4 h-4 text-white/80" />
+                  <span className={`font-bold ${selectedOption.color}`}>
                     {selectedOption.label}
                   </span>
+                  <span className="text-white/60 text-sm">({selectedOption.count})</span>
                 </div>
                 <ChevronDown
-                  className={`w-4 h-4 text-gray-500 transition-transform duration-200 ${
+                  className={`w-4 h-4 text-white/80 transition-transform duration-200 ${
                     showDropdown ? 'rotate-180' : ''
                   }`}
                 />
@@ -251,7 +290,7 @@ const HostRequests: React.FC = () => {
                   />
 
                   {/* Dropdown List */}
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                  <div className="absolute top-full left-0 right-0 mt-2 bg-[#1e3a4a] border-2 border-white/20 rounded-xl shadow-2xl z-20 overflow-hidden">
                     {statusOptions.map((option) => (
                       <button
                         key={option.value}
@@ -259,15 +298,18 @@ const HostRequests: React.FC = () => {
                           setStatusFilter(option.value);
                           setShowDropdown(false);
                         }}
-                        className={`w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors duration-150 ${
-                          statusFilter === option.value ? 'bg-[#27465C]/5' : ''
+                        className={`w-full px-4 py-3 flex items-center justify-between hover:bg-white/10 transition-colors duration-150 ${
+                          statusFilter === option.value ? 'bg-white/20' : ''
                         }`}
                       >
-                        <span className={`font-medium ${option.color}`}>
-                          {option.label}
-                        </span>
+                        <div className="flex items-center space-x-2">
+                          <span className={`font-bold ${option.color}`}>
+                            {option.label}
+                          </span>
+                          <span className="text-white/60 text-sm">({option.count})</span>
+                        </div>
                         {statusFilter === option.value && (
-                          <Check className="w-4 h-4 text-[#27465C]" />
+                          <Check className="w-5 h-5 text-white" />
                         )}
                       </button>
                     ))}
@@ -280,104 +322,136 @@ const HostRequests: React.FC = () => {
 
         {/* Request Cards */}
         <div className="space-y-4">
-          {filteredRequests.map((request) => (
-            <div key={request.id} className={`bg-white rounded-lg shadow-sm ${getUrgencyColor(request.urgency)}`}>
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <h3 className="text-xl font-black text-black">{request.eventTitle}</h3>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(request.status)}`}>
-                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                      </span>
-                      {request.urgency === 'high' && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                          Urgent
+          {filteredRequests.map((request) => {
+            const urgency = getUrgencyBadge(request.urgency);
+            return (
+              <div key={request.id} className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1">
+                <div className="p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center flex-wrap gap-2 mb-2">
+                        <h3 className="text-lg md:text-xl font-black text-gray-900">{request.eventTitle}</h3>
+                        <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(request.status)}`}>
+                          {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
                         </span>
+                        {request.urgency === 'high' && (
+                          <span className={`inline-flex items-center space-x-1 px-3 py-1 rounded-full text-xs font-bold ${urgency.color} text-white`}>
+                            {urgency.icon}
+                            <span>{urgency.text}</span>
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-gray-600 mb-3 leading-relaxed text-sm">{request.eventDescription}</p>
+                    </div>
+                  </div>
+
+                  {/* Event Details Grid */}
+                  <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3 mb-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                      <div className="flex items-center space-x-2">
+                        <div className="p-1.5 bg-blue-500 rounded-lg">
+                          <Building className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Company</div>
+                          <div className="font-bold text-gray-900 text-sm">{request.organizerCompany}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="p-1.5 bg-green-500 rounded-lg">
+                          <Calendar className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Date</div>
+                          <div className="font-bold text-gray-900 text-sm">{new Date(request.eventDate).toLocaleDateString()}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="p-1.5 bg-purple-500 rounded-lg">
+                          <MapPin className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Location</div>
+                          <div className="font-bold text-gray-900 text-sm">{request.location}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="p-1.5 bg-orange-500 rounded-lg">
+                          <Users className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Audience</div>
+                          <div className="font-bold text-gray-900 text-sm">{request.audienceSize} attendees</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="p-1.5 bg-indigo-500 rounded-lg">
+                          <Clock className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Time & Duration</div>
+                          <div className="font-bold text-gray-900 text-sm">{request.eventTime} • {request.eventDuration}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <div className="p-1.5 bg-emerald-500 rounded-lg">
+                          <DollarSign className="w-3.5 h-3.5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs text-gray-500">Budget</div>
+                          <div className="font-bold text-gray-900 text-sm">{request.budget}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-gray-200">
+                    <div className="text-xs text-gray-600">
+                      Requested by <span className="font-bold text-gray-900">{request.organizerName}</span> on {new Date(request.requestDate).toLocaleDateString()}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => viewRequestDetails(request)}
+                        className="flex items-center space-x-1.5 px-3 py-1.5 bg-gray-100 text-gray-900 hover:bg-gray-200 rounded-lg font-bold transition-colors text-sm"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                        <span>View</span>
+                      </button>
+                      {request.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => handleStatusUpdate(request.id, 'accepted')}
+                            className="flex items-center space-x-1.5 px-3 py-1.5 bg-green-600 text-white hover:bg-green-700 rounded-lg font-bold transition-all transform hover:-translate-y-0.5 shadow-lg text-sm"
+                          >
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            <span>Accept</span>
+                          </button>
+                          <button
+                            onClick={() => handleStatusUpdate(request.id, 'declined')}
+                            className="flex items-center space-x-1.5 px-3 py-1.5 bg-red-600 text-white hover:bg-red-700 rounded-lg font-bold transition-all transform hover:-translate-y-0.5 shadow-lg text-sm"
+                          >
+                            <XCircle className="w-3.5 h-3.5" />
+                            <span>Decline</span>
+                          </button>
+                        </>
                       )}
                     </div>
-                    <p className="text-gray-600 mb-3 line-clamp-2">{request.eventDescription}</p>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Building className="w-4 h-4 mr-2" />
-                    <span>{request.organizerCompany}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Calendar className="w-4 h-4 mr-2" />
-                    <span>{new Date(request.eventDate).toLocaleDateString()}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 mr-2" />
-                    <span>{request.location}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Users className="w-4 h-4 mr-2" />
-                    <span>{request.audienceSize} attendees</span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Clock className="w-4 h-4 mr-2" />
-                    <span>{request.eventTime} • {request.eventDuration}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Briefcase className="w-4 h-4 mr-2" />
-                    <span>{request.eventType}</span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <DollarSign className="w-4 h-4 mr-2" />
-                    <span>{request.budget}</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                  <div className="text-sm text-gray-500">
-                    Requested by <span className="font-medium">{request.organizerName}</span> on {new Date(request.requestDate).toLocaleDateString()}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => viewRequestDetails(request)}
-                      className="flex items-center space-x-1 px-3 py-1 text-sm text-[#27465C] hover:text-[#1e3a4a] font-medium"
-                    >
-                      <Eye className="w-4 h-4" />
-                      <span>View Details</span>
-                    </button>
-                    {request.status === 'pending' && (
-                      <>
-                        <button
-                          onClick={() => handleStatusUpdate(request.id, 'accepted')}
-                          className="flex items-center space-x-1 px-3 py-1 text-sm text-green-600 hover:text-green-700 font-medium"
-                        >
-                          <CheckCircle className="w-4 h-4" />
-                          <span>Accept</span>
-                        </button>
-                        <button
-                          onClick={() => handleStatusUpdate(request.id, 'declined')}
-                          className="flex items-center space-x-1 px-3 py-1 text-sm text-red-600 hover:text-red-700 font-medium"
-                        >
-                          <XCircle className="w-4 h-4" />
-                          <span>Decline</span>
-                        </button>
-                      </>
-                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
 
           {filteredRequests.length === 0 && (
-            <div className="bg-white rounded-lg p-8 text-center shadow-sm">
-              <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-black text-gray-900 mb-2">No requests found</h3>
-              <p className="text-gray-500">
-                {searchTerm || statusFilter !== 'all' 
-                  ? "No requests match your current filters." 
-                  : "You don't have any speaking requests yet."}
+            <div className="bg-white/10 backdrop-blur-sm rounded-xl p-8 text-center shadow-lg border border-white/20">
+              <div className="w-16 h-16 mx-auto mb-4 bg-white/20 rounded-full flex items-center justify-center">
+                <MessageSquare className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-xl font-black text-white mb-2">No requests found</h3>
+              <p className="text-white/80 text-sm">
+                {searchTerm || statusFilter !== 'all'
+                  ? "No requests match your current filters. Try adjusting your search."
+                  : "You don't have any speaking requests yet. They'll appear here when you receive them."}
               </p>
             </div>
           )}
@@ -386,111 +460,139 @@ const HostRequests: React.FC = () => {
 
       {/* Request Details Modal */}
       {showDetails && selectedRequest && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-black text-black">Request Details</h2>
-                <button
-                  onClick={() => setShowDetails(false)}
-                  className="text-gray-500 hover:text-black"
-                >
-                  <XCircle className="w-6 h-6" />
-                </button>
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+          <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl animate-slideUp">
+            <div className="sticky top-0 bg-gradient-to-r from-[#27465C] to-[#1e3a4a] px-5 py-4 border-b border-white/10 flex items-center justify-between">
+              <h2 className="text-xl font-black text-white">Request Details</h2>
+              <button
+                onClick={() => setShowDetails(false)}
+                className="text-white/80 hover:text-white hover:bg-white/10 p-1.5 rounded-lg transition-all"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-5 space-y-4">
+              <div>
+                <h3 className="text-xl font-black text-gray-900 mb-2">{selectedRequest.eventTitle}</h3>
+                <p className="text-gray-600 leading-relaxed text-sm">{selectedRequest.eventDescription}</p>
               </div>
 
-              <div className="space-y-6">
-                <div>
-                  <h3 className="font-black text-black mb-2">{selectedRequest.eventTitle}</h3>
-                  <p className="text-gray-600">{selectedRequest.eventDescription}</p>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h4 className="font-bold text-black mb-2">Event Information</h4>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex items-center">
-                        <Calendar className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{new Date(selectedRequest.eventDate).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Clock className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{selectedRequest.eventTime} • {selectedRequest.eventDuration}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <MapPin className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{selectedRequest.location}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="w-4 h-4 mr-2 text-gray-400" />
-                        <span>{selectedRequest.audienceSize} attendees</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-4 border border-blue-200">
+                  <h4 className="font-black text-gray-900 mb-3 flex items-center space-x-2 text-sm">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    <span>Event Information</span>
+                  </h4>
+                  <div className="space-y-2 text-xs">
+                    <div className="flex items-start">
+                      <Calendar className="w-3.5 h-3.5 mr-2 text-blue-600 mt-0.5" />
+                      <div>
+                        <div className="text-gray-500 text-xs">Date</div>
+                        <div className="font-bold text-gray-900 text-sm">{new Date(selectedRequest.eventDate).toLocaleDateString()}</div>
                       </div>
                     </div>
-                  </div>
-
-                  <div>
-                    <h4 className="font-bold text-black mb-2">Organizer Information</h4>
-                    <div className="space-y-2 text-sm">
+                    <div className="flex items-start">
+                      <Clock className="w-3.5 h-3.5 mr-2 text-blue-600 mt-0.5" />
                       <div>
-                        <span className="font-medium">Name:</span> {selectedRequest.organizerName}
+                        <div className="text-gray-500 text-xs">Time & Duration</div>
+                        <div className="font-bold text-gray-900 text-sm">{selectedRequest.eventTime} • {selectedRequest.eventDuration}</div>
                       </div>
+                    </div>
+                    <div className="flex items-start">
+                      <MapPin className="w-3.5 h-3.5 mr-2 text-blue-600 mt-0.5" />
                       <div>
-                        <span className="font-medium">Email:</span> {selectedRequest.organizerEmail}
+                        <div className="text-gray-500 text-xs">Location</div>
+                        <div className="font-bold text-gray-900 text-sm">{selectedRequest.location}</div>
                       </div>
+                    </div>
+                    <div className="flex items-start">
+                      <Users className="w-3.5 h-3.5 mr-2 text-blue-600 mt-0.5" />
                       <div>
-                        <span className="font-medium">Company:</span> {selectedRequest.organizerCompany}
+                        <div className="text-gray-500 text-xs">Audience Size</div>
+                        <div className="font-bold text-gray-900 text-sm">{selectedRequest.audienceSize} attendees</div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                <div>
-                  <h4 className="font-bold text-black mb-2">Event Details</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div className="bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg p-4 border border-purple-200">
+                  <h4 className="font-black text-gray-900 mb-3 flex items-center space-x-2 text-sm">
+                    <Building className="w-4 h-4 text-purple-600" />
+                    <span>Organizer Information</span>
+                  </h4>
+                  <div className="space-y-2 text-xs">
                     <div>
-                      <span className="font-medium">Event Type:</span> {selectedRequest.eventType}
+                      <div className="text-gray-500 text-xs mb-1">Name</div>
+                      <div className="font-bold text-gray-900 text-sm">{selectedRequest.organizerName}</div>
                     </div>
                     <div>
-                      <span className="font-medium">Budget:</span> {selectedRequest.budget}
+                      <div className="text-gray-500 text-xs mb-1">Email</div>
+                      <div className="font-bold text-gray-900 text-sm">{selectedRequest.organizerEmail}</div>
                     </div>
-                    <div className="md:col-span-2">
-                      <span className="font-medium">Audience:</span> {selectedRequest.audience}
+                    <div>
+                      <div className="text-gray-500 text-xs mb-1">Company</div>
+                      <div className="font-bold text-gray-900 text-sm">{selectedRequest.organizerCompany}</div>
                     </div>
                   </div>
                 </div>
-
-                {selectedRequest.requirements && (
-                  <div>
-                    <h4 className="font-bold text-black mb-2">Special Requirements</h4>
-                    <p className="text-sm text-gray-600">{selectedRequest.requirements}</p>
-                  </div>
-                )}
-
-                {selectedRequest.status === 'pending' && (
-                  <div className="flex space-x-3 pt-4 border-t border-gray-200">
-                    <button
-                      onClick={() => {
-                        handleStatusUpdate(selectedRequest.id, 'accepted');
-                        setShowDetails(false);
-                      }}
-                      className="flex-1 bg-green-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-green-700 flex items-center justify-center space-x-2"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      <span>Accept Request</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleStatusUpdate(selectedRequest.id, 'declined');
-                        setShowDetails(false);
-                      }}
-                      className="flex-1 bg-red-600 text-white font-medium py-2 px-4 rounded-lg hover:bg-red-700 flex items-center justify-center space-x-2"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      <span>Decline Request</span>
-                    </button>
-                  </div>
-                )}
               </div>
+
+              <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-4 border border-green-200">
+                <h4 className="font-black text-gray-900 mb-3 flex items-center space-x-2 text-sm">
+                  <Briefcase className="w-4 h-4 text-green-600" />
+                  <span>Event Details</span>
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                  <div>
+                    <div className="text-gray-500 text-xs mb-1">Event Type</div>
+                    <div className="font-bold text-gray-900 text-sm">{selectedRequest.eventType}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-500 text-xs mb-1">Budget</div>
+                    <div className="font-bold text-gray-900 text-sm">{selectedRequest.budget}</div>
+                  </div>
+                  <div className="md:col-span-2">
+                    <div className="text-gray-500 text-xs mb-1">Target Audience</div>
+                    <div className="font-bold text-gray-900 text-sm">{selectedRequest.audience}</div>
+                  </div>
+                </div>
+              </div>
+
+              {selectedRequest.requirements && (
+                <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg p-4 border border-orange-200">
+                  <h4 className="font-black text-gray-900 mb-2 flex items-center space-x-2 text-sm">
+                    <AlertCircle className="w-4 h-4 text-orange-600" />
+                    <span>Special Requirements</span>
+                  </h4>
+                  <p className="text-xs text-gray-700 leading-relaxed">{selectedRequest.requirements}</p>
+                </div>
+              )}
+
+              {selectedRequest.status === 'pending' && (
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2 pt-3 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      handleStatusUpdate(selectedRequest.id, 'accepted');
+                      setShowDetails(false);
+                    }}
+                    className="flex-1 bg-green-600 text-white font-black py-3 px-5 rounded-lg hover:bg-green-700 flex items-center justify-center space-x-2 transition-all transform hover:-translate-y-1 shadow-lg text-sm"
+                  >
+                    <CheckCircle className="w-4 h-4" />
+                    <span>Accept Request</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      handleStatusUpdate(selectedRequest.id, 'declined');
+                      setShowDetails(false);
+                    }}
+                    className="flex-1 bg-red-600 text-white font-black py-3 px-5 rounded-lg hover:bg-red-700 flex items-center justify-center space-x-2 transition-all transform hover:-translate-y-1 shadow-lg text-sm"
+                  >
+                    <XCircle className="w-4 h-4" />
+                    <span>Decline Request</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>

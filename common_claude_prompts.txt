@@ -1,6 +1,0 @@
-Generate this page’s code, but first draft a plan. After generating code:
--Render home page and check for any problems visually, i indeed see problem with signin button layout the white border is not complete around the button 
--Use Puppeteer to screenshot the page at Iphone 12/13+ Pro iOS 14.6 (mobile view)  
--Validate header layout, button alignment, and spacing  
--Report any issues and fix automatically before finalizing code
- 

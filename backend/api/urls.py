@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf import settings
 from api import views
 from .views import (
     get_states, get_districts, get_mandals, get_grampanchayats,
@@ -20,11 +21,6 @@ urlpatterns = [
     path('auth/reset-password/', auth_views.reset_password, name='auth-reset-password'),
     path('auth/resend-otp/', auth_views.resend_otp, name='auth-resend-otp'),
     path('auth/check-email-exists/', auth_views.check_email_exists, name='auth-check-email-exists'),
-    
-    # Debug endpoints (remove in production)
-    path('debug/otps/', auth_views.debug_otps, name='debug-otps'),
-    path('debug/pending-users/', auth_views.debug_pending_users, name='debug-pending-users'),
-    path('debug/users/', views.debug_users, name='debug-users'),
 
     # location api   
     path('states/', get_states, name='get_states'),
@@ -106,3 +102,11 @@ urlpatterns = [
     path('api/upload/profile-image/', api_views.upload_profile_image, name='api-upload-profile-image'),
     path('api/upload/document/', api_views.upload_document, name='api-upload-document'),
 ]
+
+# Add debug endpoints only in development mode
+if settings.DEBUG:
+    urlpatterns += [
+        path('debug/otps/', auth_views.debug_otps, name='debug-otps'),
+        path('debug/pending-users/', auth_views.debug_pending_users, name='debug-pending-users'),
+        path('debug/users/', views.debug_users, name='debug-users'),
+    ]
