@@ -32,8 +32,13 @@ export const UploadFellowPhoto = ({
     formData.append("photo", selectedImage);
     formData.append("fellow_id", fellowId);
 
+    // Automatically detect environment
+    const API_URL = import.meta.env.PROD
+      ? '/api/fellow/photo-upload/'
+      : 'http://localhost:8000/api/fellow/photo-upload/';
+
     try {
-      const res = await fetch("http://localhost:8000/api/fellow/photo-upload/", {
+      const res = await fetch(API_URL, {
         method: "POST",
         body: formData,
       });
