@@ -202,47 +202,55 @@ const HostMessaging: React.FC = () => {
           const mockMessages: Message[] = [
             {
               id: 1,
+              sender: 1,
+              recipient: 2,
               sender_name: "Tech Summit Organizer",
               recipient_name: "Dr. Sarah Johnson",
+              event: 1,
+              event_title: "AI in Healthcare: Future Perspectives",
               subject: "Speaking Opportunity - AI in Healthcare",
               body: "Dear Dr. Johnson, we would love to have you speak at our upcoming Tech Summit about AI applications in healthcare. The event is scheduled for September 15th.",
               is_read: true,
-              created_at: "2024-09-01T09:00:00Z",
-              sender_id: 1,
-              recipient_id: 2
+              created_at: "2024-09-01T09:00:00Z"
             },
             {
               id: 2,
+              sender: 2,
+              recipient: 1,
               sender_name: "Dr. Sarah Johnson",
               recipient_name: "Tech Summit Organizer",
+              event: 1,
+              event_title: "AI in Healthcare: Future Perspectives",
               subject: "Re: Speaking Opportunity - AI in Healthcare",
               body: "Thank you for the invitation! I'm very interested in participating. Could you provide more details about the expected audience and technical setup?",
               is_read: true,
-              created_at: "2024-09-01T14:30:00Z",
-              sender_id: 2,
-              recipient_id: 1
+              created_at: "2024-09-01T14:30:00Z"
             },
             {
               id: 3,
+              sender: 1,
+              recipient: 2,
               sender_name: "Tech Summit Organizer",
               recipient_name: "Dr. Sarah Johnson",
+              event: 1,
+              event_title: "AI in Healthcare: Future Perspectives",
               subject: "Event Details and Requirements",
               body: "Great to hear from you! The audience will consist of about 500 healthcare professionals and tech leaders. We'll provide wireless microphone, presentation clicker, and stage lighting. The talk should be 45 minutes including Q&A.",
               is_read: true,
-              created_at: "2024-09-02T11:15:00Z",
-              sender_id: 1,
-              recipient_id: 2
+              created_at: "2024-09-02T11:15:00Z"
             },
             {
               id: 4,
+              sender: 2,
+              recipient: 1,
               sender_name: "Dr. Sarah Johnson",
               recipient_name: "Tech Summit Organizer",
+              event: 1,
+              event_title: "AI in Healthcare: Future Perspectives",
               subject: "Re: Event Details and Requirements",
               body: "Perfect! That sounds exactly like what I was hoping for. I'll prepare a comprehensive presentation covering current AI applications and future trends in healthcare. Looking forward to discussing the technical requirements for the presentation.",
               is_read: false,
-              created_at: "2024-09-07T10:30:00Z",
-              sender_id: 2,
-              recipient_id: 1
+              created_at: "2024-09-07T10:30:00Z"
             }
           ];
           
