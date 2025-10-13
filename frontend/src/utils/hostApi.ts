@@ -1,6 +1,9 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api';
+// Automatically detect environment - production uses relative /api, development uses localhost
+const API_BASE_URL = import.meta.env.PROD
+  ? '/api'  // Production: relative path (nginx will proxy /api to backend)
+  : 'http://localhost:8000/api';  // Development: direct backend URL
 
 // Create axios instance with default config
 const api = axios.create({
