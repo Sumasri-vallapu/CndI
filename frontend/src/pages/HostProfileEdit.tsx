@@ -37,6 +37,7 @@ const HostProfileEdit: React.FC = () => {
     firstName: 'Dr. Sarah',
     lastName: 'Johnson',
     email: 'sarah.johnson@email.com',
+    username: 'sarahjohnson',
     phone: '+1 (555) 123-4567',
     location: 'San Francisco, CA',
     organization: 'Stanford Medical Center',
@@ -201,7 +202,23 @@ const HostProfileEdit: React.FC = () => {
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                  disabled
                 />
+                <p className="text-xs text-gray-500 mt-1">Email cannot be changed</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Username
+                </label>
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => handleInputChange('username', e.target.value.toLowerCase())}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent"
+                  placeholder="yourusername"
+                />
+                <p className="text-xs text-gray-500 mt-1">Used for messaging. Letters, numbers, and underscores only.</p>
               </div>
 
               <div>

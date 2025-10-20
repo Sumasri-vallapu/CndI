@@ -54,6 +54,18 @@ const HostLogin: React.FC = () => {
         navigate('/host/dashboard');
       } else {
         const err = await res.json();
+
+        // Handle approval status errors
+        if (err.approval_status === 'pending') {
+          navigate('/pending-approval');
+          return;
+        } else if (err.approval_status === 'rejected') {
+          navigate('/account-rejected', {
+            state: { rejectionReason: err.rejection_reason }
+          });
+          return;
+        }
+
         setError(err.error || 'Login failed. Please check your credentials.');
       }
     } catch {

@@ -47,31 +47,39 @@ class HostSerializer(serializers.ModelSerializer):
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     total_events = serializers.ReadOnlyField()
     completed_events = serializers.ReadOnlyField()
-    
+    user_type = serializers.SerializerMethodField()
+
     class Meta:
         model = Host
         fields = [
-            'id', 'user', 'user_email', 'user_name', 'company_name', 
-            'organization_type', 'website', 'bio', 'profile_image', 
-            'verified', 'total_events', 'completed_events', 
+            'id', 'user', 'user_email', 'user_name', 'username', 'company_name',
+            'organization_type', 'website', 'bio', 'profile_image',
+            'verified', 'total_events', 'completed_events', 'user_type',
             'created_at', 'updated_at'
         ]
+
+    def get_user_type(self, obj):
+        return 'host'
 
 
 class SpeakerSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)
     user_name = serializers.CharField(source='user.get_full_name', read_only=True)
     average_rating = serializers.ReadOnlyField()
+    user_type = serializers.SerializerMethodField()
 
     class Meta:
         model = Speaker
         fields = [
-            'id', 'user', 'user_email', 'user_name', 'bio', 'expertise',
+            'id', 'user', 'user_email', 'user_name', 'username', 'bio', 'expertise',
             'speaking_topics', 'experience_years', 'hourly_rate',
             'availability_status', 'profile_image', 'website',
             'social_media', 'location', 'languages', 'industry',
-            'average_rating', 'created_at', 'updated_at'
+            'average_rating', 'user_type', 'created_at', 'updated_at'
         ]
+
+    def get_user_type(self, obj):
+        return 'speaker'
 
 
 class SpeakerAvailabilitySerializer(serializers.ModelSerializer):
@@ -188,22 +196,35 @@ class OTPVerificationSerializer(serializers.Serializer):
 class PasswordSetSerializer(serializers.Serializer):
     """Set password after OTP verification"""
     email = serializers.EmailField()
+    username = serializers.CharField(max_length=50, required=False, allow_blank=True)
     password = serializers.CharField(write_only=True)
     confirm_password = serializers.CharField(write_only=True)
-    
+
+    def validate_username(self, value):
+        if value:
+            # Check if username already exists in Host or Speaker models
+            from .models import Host, Speaker
+            if Host.objects.filter(username=value).exists() or Speaker.objects.filter(username=value).exists():
+                raise serializers.ValidationError("This username is already taken")
+            # Validate username format (alphanumeric and underscores only)
+            import re
+            if not re.match(r'^[a-zA-Z0-9_]+$', value):
+                raise serializers.ValidationError("Username can only contain letters, numbers, and underscores")
+        return value
+
     def validate(self, attrs):
         password = attrs.get('password')
         confirm_password = attrs.get('confirm_password')
-        
+
         if password != confirm_password:
             raise serializers.ValidationError("Passwords do not match")
-        
+
         # Validate password strength
         try:
             validate_password(password)
         except ValidationError as e:
             raise serializers.ValidationError({"password": e.messages})
-        
+
         return attrs
 
 

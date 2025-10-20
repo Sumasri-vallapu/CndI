@@ -6,6 +6,7 @@ import CustomDropdown from '../components/CustomDropdown';
 interface HostFormData {
   email: string;
   otp: string;
+  username: string;
   password: string;
   confirmPassword: string;
   firstName: string;
@@ -29,7 +30,7 @@ const HostSignup: React.FC = () => {
   const [resendCooldown, setResendCooldown] = useState(0);
 
   const [formData, setFormData] = useState<HostFormData>({
-    email: '', otp: '', password: '', confirmPassword: '',
+    email: '', otp: '', username: '', password: '', confirmPassword: '',
     firstName: '', lastName: '', phone: '', organization: '', organizationType: '', position: ''
   });
 
@@ -172,6 +173,14 @@ const HostSignup: React.FC = () => {
         setError('Please verify your email first');
         return false;
       }
+      if (!formData.username) {
+        setError('Please enter a username');
+        return false;
+      }
+      if (!/^[a-zA-Z0-9_]+$/.test(formData.username)) {
+        setError('Username can only contain letters, numbers, and underscores');
+        return false;
+      }
       if (!formData.password || !formData.confirmPassword) {
         setError('Please set your password');
         return false;
@@ -219,6 +228,7 @@ const HostSignup: React.FC = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
+          username: formData.username,
           password: formData.password,
           confirm_password: formData.confirmPassword
         })
@@ -226,11 +236,14 @@ const HostSignup: React.FC = () => {
 
       if (res.ok) {
         const data = await res.json();
-        localStorage.setItem('access_token', data.access);
-        localStorage.setItem('refresh_token', data.refresh);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        localStorage.setItem('userType', data.user.user_type);
-        navigate('/host/dashboard');
+
+        // Account created successfully, redirect to pending approval page
+        if (data.approval_status === 'pending') {
+          navigate('/pending-approval');
+        } else {
+          // Fallback in case approval is already granted (shouldn't happen normally)
+          setError('Account created but status unknown. Please contact support.');
+        }
       } else {
         const err = await res.json();
         setError(err.error || 'Failed to create account');
@@ -314,9 +327,21 @@ const HostSignup: React.FC = () => {
         </div>
       )}
 
-      {/* Password Setup */}
+      {/* Username and Password Setup */}
       {emailVerified && (
         <div className="space-y-4">
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-white">Username *</label>
+            <input
+              type="text"
+              value={formData.username}
+              onChange={(e) => handleInputChange('username', e.target.value.toLowerCase())}
+              placeholder="Choose a unique username"
+              className="w-full h-10 px-3 py-2 border-2 border-white/30 bg-white/20 backdrop-blur-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-white focus:border-white transition-colors duration-200 text-sm text-white placeholder:text-white/70"
+            />
+            <p className="text-xs text-white/70">This will be used for messaging. Letters, numbers, and underscores only.</p>
+          </div>
+
           <div className="space-y-2">
             <label className="block text-sm font-medium text-white">Password *</label>
             <input

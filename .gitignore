@@ -33,12 +33,50 @@ frontend/node_modules/
 !CONTRIBUTING.md
 !LICENSE.md
 
-# Ignore Claude Code configuration and traces
+# Keep production documentation
+!DEPLOYMENT_GUIDE.md
+!PRODUCTION_READY_CHECKLIST.md
+!QUICK_DEPLOY.md
+!PRODUCTION_UPDATES.md
+
+# ========================================
+# Claude Code & AI Assistant Files
+# ========================================
+# Claude Code directories
 .claude/
+.claude_code/
+.claudeCode/
+claude_code/
+
+# Claude configuration files
+.claude.json
+claude.json
+.claude_history
+claude_history/
+
+# Claude session and cache files
+.claude_cache/
+.claude_sessions/
+claude-sessions/
+.claude-cache/
+
+# Claude documentation and traces
 CLAUDE.md
 claude.md
 *claude*.txt
+*CLAUDE*.txt
 common_claude_prompts.txt
+claude_prompts.txt
+
+# Claude temporary and log files
+claude_temp/
+.claude_temp/
+claude_*.log
+.claude_*.log
+
+# Claude workspace files
+.claude_workspace
+claude.code-workspace
 
 # Ignore deployment summary files (user-specific)
 FINAL_SUMMARY.txt
@@ -78,3 +116,21 @@ Thumbs.db
 # Ignore IDE-specific files
 .idea/
 *.iml
+
+# ========================================
+# Keep Important Deployment Files
+# ========================================
+# Deployment scripts should be tracked
+!deploy_backend.sh
+!deploy_frontend.sh
+!setup_ssl.sh
+!update_deployment.sh
+
+# Keep environment examples
+!.env.example
+!backend/.env.example
+!frontend/.env.example
+!frontend/.env.development
+
+# Keep migration files
+!backend/api/migrations/*.py

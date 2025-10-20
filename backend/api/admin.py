@@ -1,4 +1,8 @@
 from django.contrib import admin
+from django.utils import timezone
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.conf import settings
 from .models import (
     UserProfile, State, District, Mandal, GramPanchayat,
     Host, Speaker, Event, SpeakerAvailability, Payment, Message, EventRating,
@@ -42,18 +46,323 @@ class GramPanchayatAdmin(admin.ModelAdmin):
 
 @admin.register(Host)
 class HostAdmin(admin.ModelAdmin):
-    list_display = ['user', 'company_name', 'organization_type', 'verified', 'created_at']
-    search_fields = ['user__email', 'company_name']
-    list_filter = ['organization_type', 'verified']
-    readonly_fields = ['created_at', 'updated_at']
+    list_display = ['user', 'company_name', 'organization_type', 'approval_status_colored', 'verified', 'created_at']
+    search_fields = ['user__email', 'company_name', 'user__first_name', 'user__last_name']
+    list_filter = ['approval_status', 'organization_type', 'verified', 'created_at']
+    readonly_fields = ['created_at', 'updated_at', 'approved_at', 'approved_by']
+    fieldsets = (
+        ('User Information', {
+            'fields': ('user', 'company_name', 'organization_type', 'website', 'bio', 'profile_image')
+        }),
+        ('Verification', {
+            'fields': ('verified',)
+        }),
+        ('Approval Status', {
+            'fields': ('approval_status', 'rejection_reason', 'approved_at', 'approved_by'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    actions = ['approve_hosts', 'reject_hosts']
+
+    @admin.display(description='Approval Status')
+    def approval_status_colored(self, obj):
+        colors = {
+            'pending': 'orange',
+            'approved': 'green',
+            'rejected': 'red'
+        }
+        color = colors.get(obj.approval_status, 'gray')
+        return f'<span style="color: {color}; font-weight: bold;">{obj.get_approval_status_display()}</span>'
+    approval_status_colored.allow_tags = True
+
+    @admin.action(description='Approve selected Hosts')
+    def approve_hosts(self, request, queryset):
+        for host in queryset:
+            if host.approval_status != 'approved':
+                host.approval_status = 'approved'
+                host.approved_at = timezone.now()
+                host.approved_by = request.user
+                host.rejection_reason = ''
+                host.save()
+
+                # Send approval email
+                self.send_approval_email(host)
+
+        self.message_user(request, f'{queryset.count()} host(s) approved successfully.')
+
+    @admin.action(description='Reject selected Hosts')
+    def reject_hosts(self, request, queryset):
+        for host in queryset:
+            if host.approval_status != 'rejected':
+                host.approval_status = 'rejected'
+                host.rejection_reason = 'Your application did not meet our requirements.'
+                host.approved_at = None
+                host.approved_by = None
+                host.save()
+
+                # Send rejection email
+                self.send_rejection_email(host)
+
+        self.message_user(request, f'{queryset.count()} host(s) rejected.')
+
+    def send_approval_email(self, host):
+        """Send approval email to host using HTML template"""
+        try:
+            subject = '🎉 Your Host Account Has Been Approved!'
+
+            # Get login URL
+            login_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/host-login" if settings.CORS_ALLOWED_ORIGINS else "http://localhost:3000/host-login"
+            support_email = settings.EMAIL_HOST_USER
+
+            # Render HTML template
+            html_content = render_to_string('emails/account_approved.html', {
+                'first_name': host.user.first_name or 'there',
+                'user_type': 'Host',
+                'login_url': login_url,
+                'SUPPORT_EMAIL': support_email,
+            })
+
+            # Plain text fallback
+            text_content = f'''
+Dear {host.user.first_name},
+
+Congratulations! Your Host account for {host.company_name} has been approved by our admin team.
+
+You can now log in to your account and start posting speaking requests.
+
+Login here: {login_url}
+
+Thank you for joining Connect & Inspire!
+
+Best regards,
+The Connect & Inspire Team
+            '''
+
+            # Create email
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[host.user.email]
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+        except Exception as e:
+            print(f"Error sending approval email: {e}")
+
+    def send_rejection_email(self, host):
+        """Send rejection email to host using HTML template"""
+        try:
+            subject = 'Update on Your Host Account Application'
+
+            support_email = settings.EMAIL_HOST_USER
+            rejection_reason = host.rejection_reason or 'Your application did not meet our requirements at this time.'
+
+            # Render HTML template
+            html_content = render_to_string('emails/account_rejected.html', {
+                'first_name': host.user.first_name or 'there',
+                'user_type': 'Host',
+                'rejection_reason': rejection_reason,
+                'SUPPORT_EMAIL': support_email,
+            })
+
+            # Plain text fallback
+            text_content = f'''
+Dear {host.user.first_name},
+
+Thank you for your interest in joining Connect & Inspire as a Host.
+
+After careful review, we regret to inform you that your application has not been approved at this time.
+
+Reason: {rejection_reason}
+
+If you have any questions or would like to reapply, please contact our support team at {support_email}.
+
+Best regards,
+The Connect & Inspire Team
+            '''
+
+            # Create email
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[host.user.email]
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+        except Exception as e:
+            print(f"Error sending rejection email: {e}")
 
 
 @admin.register(Speaker)
 class SpeakerAdmin(admin.ModelAdmin):
-    list_display = ['user', 'expertise', 'experience_years', 'availability_status', 'created_at']
+    list_display = ['user', 'expertise', 'experience_years', 'approval_status_colored', 'availability_status', 'created_at']
     search_fields = ['user__email', 'user__first_name', 'user__last_name', 'speaking_topics']
-    list_filter = ['expertise', 'availability_status']
-    readonly_fields = ['created_at', 'updated_at']
+    list_filter = ['approval_status', 'expertise', 'availability_status', 'created_at']
+    readonly_fields = ['created_at', 'updated_at', 'approved_at', 'approved_by']
+    fieldsets = (
+        ('User Information', {
+            'fields': ('user', 'bio', 'profile_image', 'website')
+        }),
+        ('Professional Details', {
+            'fields': ('expertise', 'speaking_topics', 'experience_years', 'hourly_rate', 'industry', 'location', 'languages')
+        }),
+        ('Social Media', {
+            'fields': ('social_media',),
+            'classes': ('collapse',)
+        }),
+        ('Availability', {
+            'fields': ('availability_status',)
+        }),
+        ('Approval Status', {
+            'fields': ('approval_status', 'rejection_reason', 'approved_at', 'approved_by'),
+            'classes': ('collapse',)
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    actions = ['approve_speakers', 'reject_speakers']
+
+    @admin.display(description='Approval Status')
+    def approval_status_colored(self, obj):
+        colors = {
+            'pending': 'orange',
+            'approved': 'green',
+            'rejected': 'red'
+        }
+        color = colors.get(obj.approval_status, 'gray')
+        return f'<span style="color: {color}; font-weight: bold;">{obj.get_approval_status_display()}</span>'
+    approval_status_colored.allow_tags = True
+
+    @admin.action(description='Approve selected Speakers')
+    def approve_speakers(self, request, queryset):
+        for speaker in queryset:
+            if speaker.approval_status != 'approved':
+                speaker.approval_status = 'approved'
+                speaker.approved_at = timezone.now()
+                speaker.approved_by = request.user
+                speaker.rejection_reason = ''
+                speaker.save()
+
+                # Send approval email
+                self.send_approval_email(speaker)
+
+        self.message_user(request, f'{queryset.count()} speaker(s) approved successfully.')
+
+    @admin.action(description='Reject selected Speakers')
+    def reject_speakers(self, request, queryset):
+        for speaker in queryset:
+            if speaker.approval_status != 'rejected':
+                speaker.approval_status = 'rejected'
+                speaker.rejection_reason = 'Your application did not meet our requirements.'
+                speaker.approved_at = None
+                speaker.approved_by = None
+                speaker.save()
+
+                # Send rejection email
+                self.send_rejection_email(speaker)
+
+        self.message_user(request, f'{queryset.count()} speaker(s) rejected.')
+
+    def send_approval_email(self, speaker):
+        """Send approval email to speaker using HTML template"""
+        try:
+            subject = '🎉 Your Speaker Account Has Been Approved!'
+
+            # Get login URL
+            login_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/speaker-login" if settings.CORS_ALLOWED_ORIGINS else "http://localhost:3000/speaker-login"
+            support_email = settings.EMAIL_HOST_USER
+
+            # Render HTML template
+            html_content = render_to_string('emails/account_approved.html', {
+                'first_name': speaker.user.first_name or 'there',
+                'user_type': 'Speaker',
+                'login_url': login_url,
+                'SUPPORT_EMAIL': support_email,
+            })
+
+            # Plain text fallback
+            text_content = f'''
+Dear {speaker.user.first_name},
+
+Congratulations! Your Speaker account has been approved by our admin team.
+
+You can now log in to your account and start accepting speaking requests from organizers.
+
+Login here: {login_url}
+
+Thank you for joining Connect & Inspire!
+
+Best regards,
+The Connect & Inspire Team
+            '''
+
+            # Create email
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[speaker.user.email]
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+        except Exception as e:
+            print(f"Error sending approval email: {e}")
+
+    def send_rejection_email(self, speaker):
+        """Send rejection email to speaker using HTML template"""
+        try:
+            subject = 'Update on Your Speaker Account Application'
+
+            support_email = settings.EMAIL_HOST_USER
+            rejection_reason = speaker.rejection_reason or 'Your application did not meet our requirements at this time.'
+
+            # Render HTML template
+            html_content = render_to_string('emails/account_rejected.html', {
+                'first_name': speaker.user.first_name or 'there',
+                'user_type': 'Speaker',
+                'rejection_reason': rejection_reason,
+                'SUPPORT_EMAIL': support_email,
+            })
+
+            # Plain text fallback
+            text_content = f'''
+Dear {speaker.user.first_name},
+
+Thank you for your interest in joining Connect & Inspire as a Speaker.
+
+After careful review, we regret to inform you that your application has not been approved at this time.
+
+Reason: {rejection_reason}
+
+If you have any questions or would like to reapply, please contact our support team at {support_email}.
+
+Best regards,
+The Connect & Inspire Team
+            '''
+
+            # Create email
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[speaker.user.email]
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send(fail_silently=False)
+
+        except Exception as e:
+            print(f"Error sending rejection email: {e}")
 
 
 @admin.register(Event)
