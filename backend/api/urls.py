@@ -21,6 +21,7 @@ urlpatterns = [
     path('auth/reset-password/', auth_views.reset_password, name='auth-reset-password'),
     path('auth/resend-otp/', auth_views.resend_otp, name='auth-resend-otp'),
     path('auth/check-email-exists/', auth_views.check_email_exists, name='auth-check-email-exists'),
+    path('auth/approval-status/', auth_views.check_approval_status, name='auth-approval-status'),
 
     # location api   
     path('states/', get_states, name='get_states'),

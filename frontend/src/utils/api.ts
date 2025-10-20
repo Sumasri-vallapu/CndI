@@ -1,8 +1,18 @@
 // API configuration
-// Automatically detect environment - production uses relative /api, development uses localhost
-const BASE_URL = import.meta.env.PROD
-  ? '/api'  // Production: relative path (nginx will proxy /api to backend)
-  : 'http://localhost:8000/api';  // Development: direct backend URL
+// Use environment variable if available, otherwise auto-detect
+const getBaseURL = () => {
+  // If VITE_API_URL is set, use it
+  if (import.meta.env.VITE_API_URL) {
+    return `${import.meta.env.VITE_API_URL}/api`;
+  }
+
+  // Otherwise, auto-detect based on environment
+  return import.meta.env.PROD
+    ? '/api'  // Production: relative path (nginx will proxy /api to backend)
+    : 'http://localhost:8000/api';  // Development: direct backend URL
+};
+
+const BASE_URL = getBaseURL();
 
 // API endpoints
 export const ENDPOINTS = {

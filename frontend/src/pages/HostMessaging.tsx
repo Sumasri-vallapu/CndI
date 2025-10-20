@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ENDPOINTS } from '../utils/api';
+import UserBadge from '../components/UserBadge';
 import {
   Send,
   ArrowLeft,
@@ -39,6 +40,7 @@ interface Conversation {
   event_id: number;
   event_title: string;
   participant_name: string;
+  participant_username?: string;
   participant_email: string;
   participant_type: 'speaker' | 'host';
   last_message: string;
@@ -272,7 +274,8 @@ const HostMessaging: React.FC = () => {
 
   const filteredConversations = conversations.filter(conversation =>
     conversation.participant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    conversation.event_title.toLowerCase().includes(searchTerm.toLowerCase())
+    conversation.event_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (conversation.participant_username && conversation.participant_username.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
   const handleSendMessage = async () => {
@@ -395,7 +398,7 @@ const HostMessaging: React.FC = () => {
                   <Search className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search conversations..."
+                    placeholder="Search by name, username, or event..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#27465C] focus:border-transparent text-sm"
@@ -422,7 +425,13 @@ const HostMessaging: React.FC = () => {
                           <User className="w-5 h-5 text-white" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <h3 className="font-medium text-black truncate">{conversation.participant_name}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium text-black truncate">{conversation.participant_name}</h3>
+                            <UserBadge userType={conversation.participant_type} />
+                          </div>
+                          {conversation.participant_username && (
+                            <p className="text-xs text-gray-500">@{conversation.participant_username}</p>
+                          )}
                           <p className="text-sm text-gray-600 truncate">{conversation.event_title}</p>
                         </div>
                       </div>
@@ -468,7 +477,13 @@ const HostMessaging: React.FC = () => {
                           <User className="w-5 h-5 text-white" />
                         </div>
                         <div>
-                          <h3 className="font-medium text-black">{selectedConversation.participant_name}</h3>
+                          <div className="flex items-center gap-2">
+                            <h3 className="font-medium text-black">{selectedConversation.participant_name}</h3>
+                            <UserBadge userType={selectedConversation.participant_type} />
+                          </div>
+                          {selectedConversation.participant_username && (
+                            <p className="text-xs text-gray-500">@{selectedConversation.participant_username}</p>
+                          )}
                           <p className="text-sm text-gray-600">{selectedConversation.event_title}</p>
                         </div>
                       </div>

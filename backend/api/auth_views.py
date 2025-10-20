@@ -147,11 +147,16 @@ def set_password(request):
     serializer = PasswordSetSerializer(data=request.data)
     if serializer.is_valid():
         email = serializer.validated_data['email']
+        username = serializer.validated_data.get('username', '')
         password = serializer.validated_data['password']
-        
+
         try:
             # Check if email was verified
             pending_user = PendingUser.objects.get(email=email, is_email_verified=True)
+
+            # If username not provided, generate one from email
+            if not username:
+                username = email.split('@')[0] + str(User.objects.count() + 1)
 
             with transaction.atomic():
                 # Check if user already exists
@@ -171,13 +176,13 @@ def set_password(request):
                             return Response({
                                 'error': 'You are already registered as a Host. Please login.'
                             }, status=status.HTTP_400_BAD_REQUEST)
-                        Host.objects.create(user=user)
+                        Host.objects.create(user=user, username=username)
                     elif pending_user.user_type == 'speaker':
                         if hasattr(user, 'speaker'):
                             return Response({
                                 'error': 'You are already registered as a Speaker. Please login.'
                             }, status=status.HTTP_400_BAD_REQUEST)
-                        Speaker.objects.create(user=user)
+                        Speaker.objects.create(user=user, username=username)
                 else:
                     # Create new Django User
                     user = User.objects.create_user(
@@ -190,41 +195,37 @@ def set_password(request):
 
                     # Create specific profile based on user type
                     if pending_user.user_type == 'host':
-                        Host.objects.create(user=user)
+                        Host.objects.create(user=user, username=username)
                     elif pending_user.user_type == 'speaker':
-                        Speaker.objects.create(user=user)
+                        Speaker.objects.create(user=user, username=username)
 
                     # Create basic UserProfile if it doesn't exist
                     if not hasattr(user, 'userprofile'):
                         UserProfile.objects.create(user=user)
 
                 # Clean up
+                user_type_to_return = pending_user.user_type
                 pending_user.delete()
 
                 # Clear any remaining OTPs for this email
                 OTPVerification.objects.filter(email=email).delete()
 
-                # Generate JWT tokens
-                refresh = RefreshToken.for_user(user)
-
-                # Determine current user type for response
-                user_type = pending_user.user_type
-
+                # Account created successfully, but needs admin approval
                 return Response({
-                    'message': 'Account created successfully!',
-                    'access': str(refresh.access_token),
-                    'refresh': str(refresh),
+                    'message': 'Account created successfully! Your account is pending admin approval. You will receive an email once approved.',
+                    'approval_status': 'pending',
                     'user': {
                         'id': user.id,
                         'email': user.email,
                         'first_name': user.first_name,
                         'last_name': user.last_name,
-                        'user_type': user_type,
+                        'username': username,
+                        'user_type': user_type_to_return,
                         'is_host': hasattr(user, 'host'),
                         'is_speaker': hasattr(user, 'speaker')
                     }
                 }, status=status.HTTP_201_CREATED)
-                
+
         except PendingUser.DoesNotExist:
             return Response({
                 'error': 'Email not verified or verification expired. Please start the signup process again.'
@@ -234,7 +235,7 @@ def set_password(request):
             return Response({
                 'error': 'Failed to create account'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -248,14 +249,14 @@ def login(request):
     if serializer.is_valid():
         email = serializer.validated_data['email']
         password = serializer.validated_data['password']
-        
+
         try:
             # Get user by email
             user = User.objects.get(email=email)
-            
+
             # Authenticate
             authenticated_user = authenticate(username=user.username, password=password)
-            
+
             if authenticated_user:
                 # Determine user types (can have both)
                 is_host = hasattr(user, 'host')
@@ -270,7 +271,43 @@ def login(request):
                 elif is_speaker:
                     user_type = 'speaker'
 
-                # Generate tokens
+                # Check approval status
+                approval_status = None
+                rejection_reason = None
+
+                if is_host and is_speaker:
+                    # If both, check if at least one is approved
+                    host_status = user.host.approval_status
+                    speaker_status = user.speaker.approval_status
+
+                    if host_status == 'approved' or speaker_status == 'approved':
+                        approval_status = 'approved'
+                    elif host_status == 'rejected' and speaker_status == 'rejected':
+                        approval_status = 'rejected'
+                        rejection_reason = user.host.rejection_reason or user.speaker.rejection_reason
+                    else:
+                        approval_status = 'pending'
+                elif is_host:
+                    approval_status = user.host.approval_status
+                    rejection_reason = user.host.rejection_reason
+                elif is_speaker:
+                    approval_status = user.speaker.approval_status
+                    rejection_reason = user.speaker.rejection_reason
+
+                # If account is not approved, don't allow login
+                if approval_status == 'pending':
+                    return Response({
+                        'error': 'Your account is pending admin approval. You will receive an email once approved.',
+                        'approval_status': 'pending'
+                    }, status=status.HTTP_403_FORBIDDEN)
+                elif approval_status == 'rejected':
+                    return Response({
+                        'error': f'Your account was rejected. Reason: {rejection_reason}' if rejection_reason else 'Your account was rejected by admin.',
+                        'approval_status': 'rejected',
+                        'rejection_reason': rejection_reason
+                    }, status=status.HTTP_403_FORBIDDEN)
+
+                # Generate tokens only if approved
                 refresh = RefreshToken.for_user(authenticated_user)
 
                 return Response({
@@ -284,14 +321,15 @@ def login(request):
                         'last_name': user.last_name,
                         'user_type': user_type,
                         'is_host': is_host,
-                        'is_speaker': is_speaker
+                        'is_speaker': is_speaker,
+                        'approval_status': approval_status
                     }
                 }, status=status.HTTP_200_OK)
             else:
                 return Response({
                     'error': 'Invalid email or password'
                 }, status=status.HTTP_401_UNAUTHORIZED)
-                
+
         except User.DoesNotExist:
             return Response({
                 'error': 'No account found with this email address'
@@ -301,7 +339,7 @@ def login(request):
             return Response({
                 'error': 'Login failed'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    
+
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -457,17 +495,72 @@ def resend_otp(request):
 def check_email_exists(request):
     """Check if email already exists in the system"""
     email = request.data.get('email')
-    
+
     if not email:
         return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
-    
+
     # Check if user with this email already exists
     exists = User.objects.filter(email=email).exists()
-    
+
     return Response({
         "exists": exists,
         "email": email
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def check_approval_status(request):
+    """Check approval status for a user by email"""
+    email = request.query_params.get('email')
+
+    if not email:
+        return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = User.objects.get(email=email)
+
+        is_host = hasattr(user, 'host')
+        is_speaker = hasattr(user, 'speaker')
+
+        if not is_host and not is_speaker:
+            return Response({
+                "error": "User found but no host or speaker profile exists"
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        response_data = {
+            "email": email,
+            "is_host": is_host,
+            "is_speaker": is_speaker
+        }
+
+        if is_host:
+            response_data["host_approval_status"] = user.host.approval_status
+            response_data["host_rejection_reason"] = user.host.rejection_reason
+
+        if is_speaker:
+            response_data["speaker_approval_status"] = user.speaker.approval_status
+            response_data["speaker_rejection_reason"] = user.speaker.rejection_reason
+
+        # Overall approval status
+        if is_host and is_speaker:
+            if user.host.approval_status == 'approved' or user.speaker.approval_status == 'approved':
+                response_data["overall_status"] = 'approved'
+            elif user.host.approval_status == 'rejected' and user.speaker.approval_status == 'rejected':
+                response_data["overall_status"] = 'rejected'
+            else:
+                response_data["overall_status"] = 'pending'
+        elif is_host:
+            response_data["overall_status"] = user.host.approval_status
+        elif is_speaker:
+            response_data["overall_status"] = user.speaker.approval_status
+
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    except User.DoesNotExist:
+        return Response({
+            "error": "No user found with this email"
+        }, status=status.HTTP_404_NOT_FOUND)
 
 
 # Debug endpoints (remove in production)

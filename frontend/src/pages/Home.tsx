@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
-// Using local images from public folder
-const speakerImages = [
+// Using local images from public folder - expanded pool
+const allSpeakerImages = [
   "/img1.png",
   "/img2.png",
   "/img3.png",
@@ -10,21 +10,34 @@ const speakerImages = [
   "/img5.png",
   "/img6.png",
   "/img7.png",
+  "/Img8.jpeg",
+  "/img10.jpg",
+  "/img11.jpg",
+  "/img12.jpg",
 ];
 
 export default function Home() {
   const navigate = useNavigate();
   const [isVisible, setIsVisible] = useState(false);
-  const [rotationIndex, setRotationIndex] = useState(0);
+  const imagesPerView = 7;
+  const [startIndex, setStartIndex] = useState(0);
 
   useEffect(() => {
     setIsVisible(true);
   }, []);
 
-  // Rotate positions every 5 seconds
+  // Slide window every 5 seconds - moves from left to right with infinite loop
   useEffect(() => {
     const interval = setInterval(() => {
-      setRotationIndex((prev) => (prev + 1) % speakerImages.length);
+      setStartIndex((prev) => {
+        // Move left to right (decrement to show images moving from left)
+        const nextIndex = prev - 1;
+        // Smooth infinite loop: wrap to end maintaining smooth transition
+        if (nextIndex < 0) {
+          return allSpeakerImages.length - 1;
+        }
+        return nextIndex;
+      });
     }, 5000);
 
     return () => clearInterval(interval);
@@ -105,56 +118,80 @@ export default function Home() {
 
       {/* Speaker Images Row - 3D Convex Carousel */}
       <div
-        className="flex justify-center items-end gap-1 sm:gap-2 mt-8 mb-8 px-4 relative"
+        className="w-full flex justify-center items-center mt-8 mb-8 px-4 overflow-hidden"
         style={{
-          perspective: '1500px',
-          perspectiveOrigin: 'center center',
-          transformStyle: 'preserve-3d'
+          minHeight: '200px'
         }}
       >
-        {speakerImages.map((src, idx) => {
-          // Calculate current position for this image
-          const currentPosition = (idx + rotationIndex) % 7;
-          const positionStyle = getPositionStyle(currentPosition);
+        <div
+          className="flex justify-center items-end gap-1 sm:gap-2 relative"
+          style={{
+            perspective: '1500px',
+            perspectiveOrigin: 'center center',
+            transformStyle: 'preserve-3d',
+            maxWidth: '100%'
+          }}
+        >
+        {/* Render all images and animate their positions */}
+        {allSpeakerImages.map((src, imageIdx) => {
+          // Calculate the visual position with wrapping for infinite loop
+          let relativePosition = imageIdx - startIndex;
+
+          // Handle wrapping: if image is behind startIndex, wrap it to the front
+          if (relativePosition < 0) {
+            relativePosition = allSpeakerImages.length + relativePosition;
+          }
+
+          // Handle forward wrapping: if position goes beyond array length
+          if (relativePosition >= allSpeakerImages.length) {
+            relativePosition = relativePosition - allSpeakerImages.length;
+          }
+
+          // Determine if this image should be visible (only show 7 images)
+          const shouldShow = relativePosition >= 0 && relativePosition < imagesPerView;
+
+          if (!shouldShow) return null;
+
+          const positionStyle = getPositionStyle(relativePosition);
 
           // Calculate distance from center for shadow intensity
-          const distanceFromCenter = Math.abs(currentPosition - 3);
+          const distanceFromCenter = Math.abs(relativePosition - 3);
 
           return (
             <div
-              key={idx}
+              key={imageIdx}
               className={`rounded-xl overflow-hidden hover:scale-105 cursor-pointer relative ${isVisible ? 'opacity-100' : 'opacity-0'}`}
               style={{
                 ...positionStyle,
+                order: relativePosition,
                 transition: 'all 2.5s cubic-bezier(0.4, 0, 0.2, 1)',
-                order: currentPosition,
                 transformStyle: 'preserve-3d',
-                boxShadow: currentPosition === 3
+                boxShadow: relativePosition === 3
                   ? '0 25px 50px rgba(0,0,0,0.6), 0 10px 20px rgba(0,0,0,0.4)'
                   : `0 ${15 - distanceFromCenter * 3}px ${30 - distanceFromCenter * 5}px rgba(0,0,0,0.7)`,
-                border: currentPosition === 3 ? '3px solid rgba(255,255,255,0.3)' : '2px solid rgba(255,255,255,0.1)',
+                border: relativePosition === 3 ? '3px solid rgba(255,255,255,0.3)' : '2px solid rgba(255,255,255,0.1)',
               }}
               onClick={() => navigate('/find-speaker')}
             >
               <img
                 src={src}
-                alt={`Speaker ${idx + 1}`}
+                alt={`Speaker ${imageIdx + 1}`}
                 className="object-cover w-full h-full"
                 style={{
-                  filter: currentPosition === 3 ? 'brightness(1.15) contrast(1.1)' : 'brightness(0.95) contrast(1)',
+                  filter: relativePosition === 3 ? 'brightness(1.15) contrast(1.1)' : 'brightness(0.95) contrast(1)',
                 }}
               />
               {/* Gradient overlay for depth and shadow */}
               <div
                 className="absolute inset-0 pointer-events-none"
                 style={{
-                  background: currentPosition === 3
+                  background: relativePosition === 3
                     ? 'linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 100%)'
                     : `linear-gradient(to bottom, rgba(0,0,0,${0.15 + distanceFromCenter * 0.08}) 0%, rgba(0,0,0,${0.25 + distanceFromCenter * 0.1}) 100%)`,
                 }}
               />
               {/* Highlight on center image */}
-              {currentPosition === 3 && (
+              {relativePosition === 3 && (
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
@@ -165,6 +202,7 @@ export default function Home() {
             </div>
           );
         })}
+        </div>
       </div>
 
       {/* Main Content */}

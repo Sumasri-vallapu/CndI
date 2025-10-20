@@ -27,6 +27,8 @@ import PaymentFlow from './pages/PaymentFlow';
 import HostMessaging from './pages/HostMessagingSimple';
 import SendSpeakerRequest from './pages/SendSpeakerRequest';
 import DashboardLink from './components/DashboardLink';
+import PendingApproval from './pages/PendingApproval';
+import AccountRejected from './pages/AccountRejected';
 
 // Simple Protected component for testing
 const Protected = () => {
@@ -55,6 +57,10 @@ export default function App() {
         <Route path="/host-signup" element={<HostSignup />} />
         <Route path="/speaker-login" element={<SpeakerLogin />} />
         <Route path="/speaker-signup" element={<SpeakerSignup />} />
+
+        {/* Approval status routes */}
+        <Route path="/pending-approval" element={<PendingApproval />} />
+        <Route path="/account-rejected" element={<AccountRejected />} />
 
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

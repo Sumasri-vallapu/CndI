@@ -15,14 +15,28 @@ class Host(models.Model):
         ('healthcare', 'Healthcare'),
         ('other', 'Other'),
     ]
-    
+
+    APPROVAL_STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=50, unique=True, help_text="Unique username for messaging")
     company_name = models.CharField(max_length=100, blank=True)
     organization_type = models.CharField(max_length=20, choices=ORGANIZATION_TYPE_CHOICES, blank=True)
     website = models.URLField(blank=True)
     bio = models.TextField(max_length=500, blank=True)
     profile_image = models.URLField(blank=True)
     verified = models.BooleanField(default=False)
+
+    # Admin Approval Fields
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default='pending')
+    rejection_reason = models.TextField(blank=True, help_text="Reason for rejection (if applicable)")
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_hosts')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -133,14 +147,21 @@ class Speaker(models.Model):
         ('social', 'Social Issues'),
         ('other', 'Other'),
     ]
-    
+
     AVAILABILITY_STATUS = [
         ('available', 'Available'),
         ('busy', 'Busy'),
         ('unavailable', 'Unavailable'),
     ]
-    
+
+    APPROVAL_STATUS_CHOICES = [
+        ('pending', 'Pending Approval'),
+        ('approved', 'Approved'),
+        ('rejected', 'Rejected'),
+    ]
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
+    username = models.CharField(max_length=50, unique=True, help_text="Unique username for messaging")
     bio = models.TextField(max_length=1000, blank=True)
     expertise = models.CharField(max_length=20, choices=EXPERTISE_CHOICES, blank=True)
     speaking_topics = models.TextField(help_text="Comma-separated list of speaking topics", blank=True)
@@ -153,6 +174,13 @@ class Speaker(models.Model):
     location = models.CharField(max_length=200, blank=True, help_text="City, State/Country")
     languages = models.CharField(max_length=200, blank=True, help_text="Comma-separated languages")
     industry = models.CharField(max_length=100, blank=True)
+
+    # Admin Approval Fields
+    approval_status = models.CharField(max_length=20, choices=APPROVAL_STATUS_CHOICES, default='pending')
+    rejection_reason = models.TextField(blank=True, help_text="Reason for rejection (if applicable)")
+    approved_at = models.DateTimeField(null=True, blank=True)
+    approved_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='approved_speakers')
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
@@ -404,6 +432,7 @@ class PendingUser(models.Model):
 
     email = models.EmailField(unique=True)
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES)
+    username = models.CharField(max_length=50, blank=True)
     first_name = models.CharField(max_length=30, blank=True)
     last_name = models.CharField(max_length=30, blank=True)
     password_hash = models.CharField(max_length=128, blank=True)  # Will be set after OTP verification
