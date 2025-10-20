@@ -7,7 +7,6 @@ interface LocationOption {
 }
 
 interface LocationData {
-    states: LocationOption[];
     districts: LocationOption[];
     mandals: LocationOption[];
     grampanchayats: LocationOption[];
@@ -15,30 +14,26 @@ interface LocationData {
 
 export const useLocationData = () => {
     const [locationData, setLocationData] = useState<LocationData>({
-        states: [],
         districts: [],
         mandals: [],
         grampanchayats: []
     });
 
     useEffect(() => {
-        fetchStates();
+        // Since we have only one state (Telangana), auto load districts for it
+        fetchDistricts("36");
     }, []);
 
-    const fetchStates = async () => {
+    const fetchDistricts = async (stateId: string = "36") => {
         try {
-            const res = await fetch(ENDPOINTS.GET_STATES);
+            const url = `${ENDPOINTS.GET_DISTRICTS}?state_id=${stateId}`;
+            console.log("Fetching districts from:", url);
+            const res = await fetch(url);
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
             const data = await res.json();
-            setLocationData(prev => ({ ...prev, states: data }));
-        } catch (error) {
-            console.error("Failed to fetch states:", error);
-        }
-    };
-
-    const fetchDistricts = async (stateId: string) => {
-        try {
-            const res = await fetch(`${ENDPOINTS.GET_DISTRICTS}?state_id=${stateId}`);
-            const data = await res.json();
+            console.log("Districts loaded:", data.length, "items");
             setLocationData(prev => ({
                 ...prev,
                 districts: data,
@@ -52,8 +47,14 @@ export const useLocationData = () => {
 
     const fetchMandals = async (districtId: string) => {
         try {
-            const res = await fetch(`${ENDPOINTS.GET_MANDALS}?district_id=${districtId}`);
+            const url = `${ENDPOINTS.GET_MANDALS}?district_id=${districtId}`;
+            console.log("Fetching mandals from:", url);
+            const res = await fetch(url);
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
             const data = await res.json();
+            console.log("Mandals loaded:", data.length, "items");
             setLocationData(prev => ({
                 ...prev,
                 mandals: data,
@@ -66,8 +67,14 @@ export const useLocationData = () => {
 
     const fetchGrampanchayats = async (mandalId: string) => {
         try {
-            const res = await fetch(`${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal_id=${mandalId}`);
+            const url = `${ENDPOINTS.GET_GRAMPANCHAYATS}?mandal_id=${mandalId}`;
+            console.log("Fetching grampanchayats from:", url);
+            const res = await fetch(url);
+            if (!res.ok) {
+                throw new Error(`HTTP error! status: ${res.status}`);
+            }
             const data = await res.json();
+            console.log("Grampanchayats loaded:", data.length, "items");
             setLocationData(prev => ({
                 ...prev,
                 grampanchayats: data
@@ -83,4 +90,4 @@ export const useLocationData = () => {
         fetchMandals,
         fetchGrampanchayats
     };
-}; 
+};

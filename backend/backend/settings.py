@@ -1,33 +1,23 @@
-from pathlib import Path
 import os
+from pathlib import Path
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'your-clearmyfile-secret-key'  # Change before production
-DEBUG = True
+# Load environment variables
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "clearmyfile.org", "www.clearmyfile.org", "https://clearmyfile.org",]
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('SECRET_KEY', 'your-new-project-secret-key-change-this-for-production')
 
-# CORS
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://clearmyfile.org",
-    "https://www.clearmyfile.org"
-]
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True  # or specify your frontend URL
-CORS_ALLOW_METHODS = ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"]
-CORS_ALLOW_HEADERS = [
-    "accept", "accept-encoding", "authorization", "content-type", "dnt",
-    "origin", "user-agent", "x-csrftoken", "x-requested-with"
-]
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "https://clearmyfile.org",
-    "https://www.clearmyfile.org"
-]
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
-# Installed apps
+# Parse ALLOWED_HOSTS from environment
+allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,13.53.36.126')
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+
+# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,10 +27,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'storages',
     'api',
     'rest_framework_simplejwt',
-
 ]
 
 MIDDLEWARE = [
@@ -59,7 +47,7 @@ ROOT_URLCONF = 'backend.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -74,15 +62,11 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'backend.wsgi.application'
 
-# PostgreSQL DB (replace values accordingly)
+# Database - Simple SQLite
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
-        # 'USER': 'your_db_user',
-        # 'PASSWORD': 'your_db_password',
-        # 'HOST': 'your-db-host.amazonaws.com',
-        # 'PORT': '5432',
     }
 }
 
@@ -94,59 +78,48 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
+# Internationalization
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'Asia/Kolkata'
 USE_I18N = True
 USE_TZ = True
 
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# File upload settings
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20 * 1024 * 1024  # 20MB
 
-STATIC_URL = '/static/'
+# CORS settings for frontend
+cors_origins_env = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000')
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',')]
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# Email Configuration
-# For development: use console backend to see OTP in terminal
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in development
 
-# For production: SMTP settings configured
+# Email Configuration for SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'clearmyfile.org@gmail.com'
-EMAIL_HOST_PASSWORD = 'vdnl xmcv pmih jwks'
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'vallapusumasri@gmail.com')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'bvvs wgmo bjcb yvld')
+DEFAULT_FROM_EMAIL = f'Connect and Inspire <{EMAIL_HOST_USER}>'
 
-# S3 Storage
-# AWS_ACCESS_KEY_ID = 'your-clearmyfile-access-key'
-# AWS_SECRET_ACCESS_KEY = 'your-clearmyfile-secret'
-# AWS_STORAGE_BUCKET_NAME = 'clearmyfile-s3-bucket'
-# AWS_S3_REGION_NAME = 'ap-south-1'
-# AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com'
+# Media files (for user uploads)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
-# DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-
-# Logging
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'console': {'class': 'logging.StreamHandler', 'formatter': 'verbose'},
-        'file': {
-            'class': 'logging.FileHandler',
-            'filename': 'debug.log',
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['console', 'file'],
-            'level': 'INFO',
-        },
-    },
-}
+# Security settings (enabled in production when DEBUG=False)
+if not DEBUG:
+    SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'True').lower() == 'true'
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True

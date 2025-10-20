@@ -7,15 +7,12 @@ export default {
   theme: {
     extend: {
       colors: {
-        shroomStart: '#5C258D',
-        shroomEnd: '#4389A2',
-        actionYellow: '#FFEB3B',
-        actionYellowHover: '#FDD835',
-        darkNav: '#212121',
-        darkFooter: '#424242',
+        primaryGreen: '#49a741',
+        hoverGreen: '#3e9238',
+        progressGreen: '#4caf50',
       },
       fontFamily: {
-        sans: ['system-ui', 'sans-serif'],
+        sans: ['Roboto', 'Helvetica Neue', 'Helvetica', 'Arial', 'sans-serif'],
       },
     },
   },

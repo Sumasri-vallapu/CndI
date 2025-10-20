@@ -7,9 +7,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# Dependencies
 node_modules
+
+# Build output (should be built on server)
 dist
 dist-ssr
+build
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
 *.local
 
 # Editor directories and files
@@ -22,3 +32,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Testing
+coverage
+.nyc_output
+
+# Temporary files
+.cache
+.parcel-cache
+
