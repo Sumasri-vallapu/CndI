@@ -81,13 +81,23 @@ class Command(BaseCommand):
         if dry_run:
             self.stdout.write(self.style.WARNING('DRY RUN MODE - No changes will be made'))
 
-        # Find hosts without usernames
-        hosts_without_username = Host.objects.filter(username__isnull=True) | Host.objects.filter(username='')
-        hosts_count = hosts_without_username.count()
+        try:
+            # Find hosts without usernames
+            hosts_without_username = Host.objects.filter(username__isnull=True) | Host.objects.filter(username='')
+            hosts_count = hosts_without_username.count()
 
-        # Find speakers without usernames
-        speakers_without_username = Speaker.objects.filter(username__isnull=True) | Speaker.objects.filter(username='')
-        speakers_count = speakers_without_username.count()
+            # Find speakers without usernames
+            speakers_without_username = Speaker.objects.filter(username__isnull=True) | Speaker.objects.filter(username='')
+            speakers_count = speakers_without_username.count()
+        except Exception as e:
+            self.stdout.write(
+                self.style.ERROR(
+                    f'Error accessing username field: {str(e)}\n'
+                    'This usually means the migration has not been applied yet.\n'
+                    'Please run: python manage.py migrate'
+                )
+            )
+            return
 
         total_count = hosts_count + speakers_count
 
