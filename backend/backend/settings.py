@@ -14,8 +14,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'your-new-project-secret-key-change-th
 DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # Parse ALLOWED_HOSTS from environment
-allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,13.53.36.126')
-ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')]
+allowed_hosts_env = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,13.53.36.126,localhost:8000')
+ALLOWED_HOSTS = [host.strip() for host in allowed_hosts_env.split(',')] + ['localhost', '127.0.0.1', 'localhost:8000']
 
 # Application definition
 INSTALLED_APPS = [
@@ -101,7 +101,7 @@ cors_origins_env = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',')]
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all origins in development
+CORS_ALLOW_ALL_ORIGINS = True  # Temporarily allow all origins to debug CORS issue
 
 # Email Configuration for SMTP
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
