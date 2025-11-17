@@ -200,35 +200,38 @@ def speaker_profile(request, speaker_id=None):
 @api_view(['GET'])
 def speakers_list(request):
     """List all speakers with filtering"""
-    speakers = Speaker.objects.all()
+    try:
+        speakers = Speaker.objects.all()
 
-    # Filter by expertise
-    expertise = request.query_params.get('expertise')
-    if expertise:
-        speakers = speakers.filter(expertise=expertise)
+        # Filter by expertise
+        expertise = request.query_params.get('expertise')
+        if expertise:
+            speakers = speakers.filter(expertise=expertise)
 
-    # Filter by availability
-    availability = request.query_params.get('availability')
-    if availability:
-        speakers = speakers.filter(availability_status=availability)
+        # Filter by availability
+        availability = request.query_params.get('availability')
+        if availability:
+            speakers = speakers.filter(availability_status=availability)
 
-    # Filter by industry
-    industry = request.query_params.get('industry')
-    if industry:
-        speakers = speakers.filter(industry__icontains=industry)
+        # Filter by industry
+        industry = request.query_params.get('industry')
+        if industry:
+            speakers = speakers.filter(industry__icontains=industry)
 
-    # Search by name or topics
-    search = request.query_params.get('search')
-    if search:
-        speakers = speakers.filter(
-            Q(user__first_name__icontains=search) |
-            Q(user__last_name__icontains=search) |
-            Q(speaking_topics__icontains=search) |
-            Q(bio__icontains=search)
-        )
+        # Search by name or topics
+        search = request.query_params.get('search')
+        if search:
+            speakers = speakers.filter(
+                Q(user__first_name__icontains=search) |
+                Q(user__last_name__icontains=search) |
+                Q(speaking_topics__icontains=search) |
+                Q(bio__icontains=search)
+            )
 
-    serializer = SpeakerSerializer(speakers, many=True)
-    return Response(serializer.data)
+        serializer = SpeakerSerializer(speakers, many=True)
+        return Response(serializer.data)
+    except Exception as e:
+        return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
