@@ -114,8 +114,8 @@ class HostAdmin(admin.ModelAdmin):
         try:
             subject = '🎉 Your Host Account Has Been Approved!'
 
-            # Get login URL
-            login_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/host-login" if settings.CORS_ALLOWED_ORIGINS else "http://localhost:3000/host-login"
+            # Get approval confirmation URL (shows congrats page, then redirects to login)
+            login_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/account-approved?role=host" if settings.CORS_ALLOWED_ORIGINS else "http://localhost:3000/account-approved?role=host"
             support_email = settings.EMAIL_HOST_USER
 
             # Render HTML template
@@ -278,8 +278,8 @@ class SpeakerAdmin(admin.ModelAdmin):
         try:
             subject = '🎉 Your Speaker Account Has Been Approved!'
 
-            # Get login URL
-            login_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/speaker-login" if settings.CORS_ALLOWED_ORIGINS else "http://localhost:3000/speaker-login"
+            # Get approval confirmation URL (shows congrats page, then redirects to login)
+            login_url = f"{settings.CORS_ALLOWED_ORIGINS[0]}/account-approved?role=speaker" if settings.CORS_ALLOWED_ORIGINS else "http://localhost:3000/account-approved?role=speaker"
             support_email = settings.EMAIL_HOST_USER
 
             # Render HTML template

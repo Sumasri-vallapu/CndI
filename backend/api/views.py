@@ -82,14 +82,69 @@ class SpeakerListView(generics.ListAPIView):
     permission_classes = [AllowAny]  # Allow public access to browse speakers
 
     def get_queryset(self):
-        queryset = Speaker.objects.all()
-        expertise = self.request.query_params.get('expertise', None)
-        availability = self.request.query_params.get('availability', None)
+        # Only show approved speakers to the public
+        queryset = Speaker.objects.filter(approval_status='approved')
 
-        if expertise:
+        # Search across name, expertise, and bio
+        search = self.request.query_params.get('search', None)
+        if search:
+            queryset = queryset.filter(
+                Q(user__first_name__icontains=search) |
+                Q(user__last_name__icontains=search) |
+                Q(expertise__icontains=search) |
+                Q(bio__icontains=search)
+            )
+
+        # Expertise filter
+        expertise = self.request.query_params.get('expertise', None)
+        if expertise and expertise != 'All':
             queryset = queryset.filter(expertise=expertise)
-        if availability:
+
+        # Availability filter
+        availability = self.request.query_params.get('availability', None)
+        if availability and availability != 'All':
             queryset = queryset.filter(availability_status=availability)
+
+        # Experience range filter
+        experience = self.request.query_params.get('experience', None)
+        if experience and experience != 'All':
+            if experience == '0-5 years':
+                queryset = queryset.filter(experience_years__gte=0, experience_years__lte=5)
+            elif experience == '6-10 years':
+                queryset = queryset.filter(experience_years__gte=6, experience_years__lte=10)
+            elif experience == '11-15 years':
+                queryset = queryset.filter(experience_years__gte=11, experience_years__lte=15)
+            elif experience == '16-20 years':
+                queryset = queryset.filter(experience_years__gte=16, experience_years__lte=20)
+            elif experience == '20+ years':
+                queryset = queryset.filter(experience_years__gt=20)
+
+        # Price range filter
+        price_range = self.request.query_params.get('priceRange', None)
+        if price_range and price_range != 'All':
+            if price_range == '$0-$2,500':
+                queryset = queryset.filter(hourly_rate__gte=0, hourly_rate__lte=2500)
+            elif price_range == '$2,500-$5,000':
+                queryset = queryset.filter(hourly_rate__gt=2500, hourly_rate__lte=5000)
+            elif price_range == '$5,000-$10,000':
+                queryset = queryset.filter(hourly_rate__gt=5000, hourly_rate__lte=10000)
+            elif price_range == '$10,000+':
+                queryset = queryset.filter(hourly_rate__gt=10000)
+
+        # Location filter
+        location = self.request.query_params.get('location', None)
+        if location and location != 'All':
+            queryset = queryset.filter(location=location)
+
+        # Language filter (check if language is in comma-separated list)
+        language = self.request.query_params.get('language', None)
+        if language and language != 'All':
+            queryset = queryset.filter(languages__icontains=language)
+
+        # Industry filter
+        industry = self.request.query_params.get('industry', None)
+        if industry and industry != 'All':
+            queryset = queryset.filter(industry=industry)
 
         return queryset
 

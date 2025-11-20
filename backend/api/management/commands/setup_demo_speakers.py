@@ -4,9 +4,19 @@ from api.models import Speaker, UserProfile
 
 
 class Command(BaseCommand):
-    help = 'Creates fake speaker profiles for testing'
+    help = 'Setup demo speakers - deletes all existing and creates 20 new ones with images'
 
     def handle(self, *args, **kwargs):
+        self.stdout.write(self.style.WARNING('🗑️  Deleting all existing speakers...'))
+
+        # Delete all existing speakers (this will cascade delete users)
+        speaker_count = Speaker.objects.count()
+        Speaker.objects.all().delete()
+
+        self.stdout.write(self.style.SUCCESS(f'✅ Deleted {speaker_count} existing speakers'))
+
+        self.stdout.write(self.style.WARNING('📦 Creating 20 new speakers with images...'))
+
         fake_speakers = [
             {
                 'email': 'elon.musk@speaker.com',
@@ -168,7 +178,6 @@ class Command(BaseCommand):
                 'industry': 'Marketing',
                 'profile_image': 'https://randomuser.me/api/portraits/women/5.jpg'
             },
-            # NEW SPEAKERS BELOW
             {
                 'email': 'michael.brown@speaker.com',
                 'first_name': 'Michael',
@@ -333,11 +342,6 @@ class Command(BaseCommand):
 
         created_count = 0
         for speaker_data in fake_speakers:
-            # Check if user already exists
-            if User.objects.filter(email=speaker_data['email']).exists():
-                self.stdout.write(self.style.WARNING(f"User {speaker_data['email']} already exists, skipping..."))
-                continue
-
             # Create user
             user = User.objects.create_user(
                 username=speaker_data['email'],
@@ -350,18 +354,9 @@ class Command(BaseCommand):
             # Create UserProfile
             UserProfile.objects.create(user=user)
 
-            # Generate unique username
-            base_username = f"{speaker_data['first_name'].lower()}.{speaker_data['last_name'].lower()}"
-            username = base_username
-            counter = 1
-            while Speaker.objects.filter(username=username).exists():
-                username = f"{base_username}{counter}"
-                counter += 1
-
             # Create Speaker profile
             Speaker.objects.create(
                 user=user,
-                username=username,
                 bio=speaker_data['bio'],
                 expertise=speaker_data['expertise'],
                 speaking_topics=speaker_data['speaking_topics'],
@@ -377,6 +372,10 @@ class Command(BaseCommand):
             )
 
             created_count += 1
-            self.stdout.write(self.style.SUCCESS(f"Created speaker: {speaker_data['first_name']} {speaker_data['last_name']}"))
+            self.stdout.write(self.style.SUCCESS(f'✅ Created: {speaker_data["first_name"]} {speaker_data["last_name"]}'))
 
-        self.stdout.write(self.style.SUCCESS(f"\nSuccessfully created {created_count} fake speakers!"))
+        self.stdout.write('')
+        self.stdout.write(self.style.SUCCESS(f'🎉 Successfully created {created_count} speakers!'))
+        self.stdout.write(self.style.SUCCESS(f'🎯 All speakers are auto-approved and have profile images'))
+        self.stdout.write('')
+        self.stdout.write(self.style.WARNING(f'💡 Refresh your frontend to see the speakers!'))
