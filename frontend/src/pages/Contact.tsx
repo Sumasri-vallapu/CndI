@@ -1,10 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
-// Automatically detect environment - production uses relative path, development uses localhost
-const API_BASE_URL = import.meta.env.PROD
-  ? ''  // Production: empty string for relative paths (nginx proxies /api)
-  : 'http://localhost:8000';  // Development: direct backend URL
+// Use environment variable if available, otherwise auto-detect
+// Note: Contact form endpoint doesn't use /api prefix
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL?.replace('/api', '') || (
+  import.meta.env.PROD
+    ? ''  // Production: empty string for relative paths (nginx proxies /api)
+    : 'http://localhost:8000'  // Development: direct backend URL
+);
 
 export default function Contact() {
   const navigate = useNavigate();

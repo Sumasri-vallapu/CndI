@@ -18,10 +18,13 @@ NC='\033[0m' # No Color
 # Navigate to backend directory
 cd backend
 
-# Check if .env exists
-if [ ! -f .env ]; then
-    echo -e "${RED}Error: .env file not found!${NC}"
-    echo "Please create .env file from .env.example"
+# Check if .env.production exists, if so copy it to .env
+if [ -f .env.production ]; then
+    echo -e "${YELLOW}Copying .env.production to .env...${NC}"
+    cp .env.production .env
+elif [ ! -f .env ]; then
+    echo -e "${RED}Error: Neither .env nor .env.production file found!${NC}"
+    echo "Please create .env file from .env.example with production settings"
     exit 1
 fi
 
