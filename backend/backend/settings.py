@@ -101,15 +101,22 @@ cors_origins_env = os.environ.get('CORS_ALLOWED_ORIGINS', 'http://localhost:3000
 CORS_ALLOWED_ORIGINS = [origin.strip() for origin in cors_origins_env.split(',')]
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True  # Temporarily allow all origins to debug CORS issue
+# Only allow all origins in DEBUG mode, use specific origins in production
+CORS_ALLOW_ALL_ORIGINS = DEBUG
 
 # Email Configuration for SMTP
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# Use console backend for local development, SMTP for production
+email_backend_type = os.environ.get('EMAIL_BACKEND', 'smtp').lower()
+if email_backend_type == 'console':
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', 'vallapusumasri@gmail.com')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', 'bvvs wgmo bjcb yvld')
+EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD', '')
 DEFAULT_FROM_EMAIL = f'Connect and Inspire <{EMAIL_HOST_USER}>'
 
 # Media files (for user uploads)

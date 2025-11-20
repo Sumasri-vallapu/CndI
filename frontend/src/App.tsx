@@ -29,6 +29,7 @@ import SendSpeakerRequest from './pages/SendSpeakerRequest';
 import DashboardLink from './components/DashboardLink';
 import PendingApproval from './pages/PendingApproval';
 import AccountRejected from './pages/AccountRejected';
+import AccountApproved from './pages/AccountApproved';
 
 // Simple Protected component for testing
 const Protected = () => {
@@ -61,6 +62,7 @@ export default function App() {
         {/* Approval status routes */}
         <Route path="/pending-approval" element={<PendingApproval />} />
         <Route path="/account-rejected" element={<AccountRejected />} />
+        <Route path="/account-approved" element={<AccountApproved />} />
 
         <Route path="/welcome" element={<Welcome />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />

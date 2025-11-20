@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChevronDown, Check, Loader2 } from 'lucide-react';
 import { ENDPOINTS } from '../utils/api';
@@ -109,85 +109,81 @@ export default function FindSpeaker() {
     industry: 'All'
   });
 
-  // Fetch speakers from backend
-  useEffect(() => {
-    fetchSpeakers();
-  }, []);
-
-  const fetchSpeakers = async () => {
+  const fetchSpeakers = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(ENDPOINTS.SPEAKERS);
+
+      // Build query params from filters
+      const params = new URLSearchParams();
+
+      if (searchTerm) params.append('search', searchTerm);
+      if (filters.expertise !== 'All') params.append('expertise', filters.expertise);
+      if (filters.availability !== 'All') params.append('availability', filters.availability);
+      if (filters.experience !== 'All') params.append('experience', filters.experience);
+      if (filters.priceRange !== 'All') params.append('priceRange', filters.priceRange);
+      if (filters.location !== 'All') params.append('location', filters.location);
+      if (filters.language !== 'All') params.append('language', filters.language);
+      if (filters.industry !== 'All') params.append('industry', filters.industry);
+
+      const url = `${ENDPOINTS.SPEAKERS}${params.toString() ? '?' + params.toString() : ''}`;
+      const response = await fetch(url);
+
       if (!response.ok) throw new Error('Failed to fetch speakers');
       const data = await response.json();
-      setSpeakers(data);
+      // Handle paginated response from Django REST Framework
+      setSpeakers(Array.isArray(data) ? data : (data.results || []));
       setError('');
     } catch (err) {
       setError('Failed to load speakers. Please try again later.');
       console.error('Error fetching speakers:', err);
+      setSpeakers([]); // Ensure speakers is always an array
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, filters]);
 
-  // Generate filter options from actual data
+  // Fetch speakers from backend with filters
+  // Debounce search term to avoid excessive API calls
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      fetchSpeakers();
+    }, 300); // Wait 300ms after user stops typing
+
+    return () => clearTimeout(debounceTimer);
+  }, [fetchSpeakers]); // Re-fetch when fetchSpeakers changes
+
+  // We need to fetch all speakers once to get filter options
+  // This is a separate fetch to populate dropdowns
+  const [allSpeakersForFilters, setAllSpeakersForFilters] = useState<Speaker[]>([]);
+
+  useEffect(() => {
+    // Fetch all speakers once on mount to populate filter options
+    const fetchAllSpeakers = async () => {
+      try {
+        const response = await fetch(ENDPOINTS.SPEAKERS);
+        if (response.ok) {
+          const data = await response.json();
+          setAllSpeakersForFilters(Array.isArray(data) ? data : (data.results || []));
+        }
+      } catch (err) {
+        console.error('Error fetching speakers for filters:', err);
+      }
+    };
+    fetchAllSpeakers();
+  }, []);
+
+  // Generate filter options from all speakers (not filtered results)
   const filterOptions = {
-    expertise: ['All', ...Array.from(new Set(speakers.map(s => s.expertise).filter(Boolean)))],
+    expertise: ['All', ...Array.from(new Set(allSpeakersForFilters.map(s => s.expertise).filter(Boolean)))],
     availability: ['All', 'available', 'busy', 'unavailable'],
     experience: ['All', '0-5 years', '6-10 years', '11-15 years', '16-20 years', '20+ years'],
     priceRange: ['All', '$0-$2,500', '$2,500-$5,000', '$5,000-$10,000', '$10,000+'],
-    location: ['All', ...Array.from(new Set(speakers.map(s => s.location).filter(Boolean)))],
+    location: ['All', ...Array.from(new Set(allSpeakersForFilters.map(s => s.location).filter(Boolean)))],
     language: ['All', ...Array.from(new Set(
-      speakers.flatMap(s => s.languages ? s.languages.split(',').map(l => l.trim()) : [])
+      allSpeakersForFilters.flatMap(s => s.languages ? s.languages.split(',').map(l => l.trim()) : [])
     ))],
-    industry: ['All', ...Array.from(new Set(speakers.map(s => s.industry).filter(Boolean)))]
+    industry: ['All', ...Array.from(new Set(allSpeakersForFilters.map(s => s.industry).filter(Boolean)))]
   };
-
-  const filteredSpeakers = speakers.filter(speaker => {
-    const matchesSearch = speaker.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         speaker.expertise.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         speaker.bio.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesExpertise = filters.expertise === 'All' || speaker.expertise === filters.expertise;
-    const matchesAvailability = filters.availability === 'All' || speaker.availability_status === filters.availability;
-
-    // Experience filter
-    let matchesExperience = true;
-    if (filters.experience !== 'All') {
-      const years = speaker.experience_years;
-      if (filters.experience === '0-5 years') matchesExperience = years >= 0 && years <= 5;
-      else if (filters.experience === '6-10 years') matchesExperience = years >= 6 && years <= 10;
-      else if (filters.experience === '11-15 years') matchesExperience = years >= 11 && years <= 15;
-      else if (filters.experience === '16-20 years') matchesExperience = years >= 16 && years <= 20;
-      else if (filters.experience === '20+ years') matchesExperience = years > 20;
-    }
-
-    // Price range filter
-    let matchesPriceRange = true;
-    if (filters.priceRange !== 'All' && speaker.hourly_rate) {
-      const rate = parseFloat(speaker.hourly_rate.toString());
-      if (filters.priceRange === '$0-$2,500') matchesPriceRange = rate >= 0 && rate <= 2500;
-      else if (filters.priceRange === '$2,500-$5,000') matchesPriceRange = rate > 2500 && rate <= 5000;
-      else if (filters.priceRange === '$5,000-$10,000') matchesPriceRange = rate > 5000 && rate <= 10000;
-      else if (filters.priceRange === '$10,000+') matchesPriceRange = rate > 10000;
-    }
-
-    // Location filter
-    const matchesLocation = filters.location === 'All' || speaker.location === filters.location;
-
-    // Language filter
-    let matchesLanguage = true;
-    if (filters.language !== 'All') {
-      const speakerLanguages = speaker.languages ? speaker.languages.split(',').map(l => l.trim()) : [];
-      matchesLanguage = speakerLanguages.includes(filters.language);
-    }
-
-    // Industry filter
-    const matchesIndustry = filters.industry === 'All' || speaker.industry === filters.industry;
-
-    return matchesSearch && matchesExpertise && matchesAvailability && matchesExperience &&
-           matchesPriceRange && matchesLocation && matchesLanguage && matchesIndustry;
-  });
 
   const handleFilterChange = (filterType: string, value: string) => {
     setFilters(prev => ({
@@ -317,7 +313,7 @@ export default function FindSpeaker() {
         {/* Speaker Cards Grid */}
         {!loading && !error && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSpeakers.map(speaker => (
+            {speakers.map(speaker => (
               <div
                 key={speaker.id}
                 onClick={() => handleSpeakerSelect(speaker.id)}
@@ -402,7 +398,7 @@ export default function FindSpeaker() {
         )}
 
         {/* No Results Message */}
-        {!loading && !error && filteredSpeakers.length === 0 && (
+        {!loading && !error && speakers.length === 0 && (
           <div className="text-center text-white py-6">
             <p className="text-lg mb-2">No speakers found</p>
             <p className="text-sm opacity-75">Try adjusting your search or filters</p>

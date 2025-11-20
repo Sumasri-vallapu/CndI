@@ -1,9 +1,9 @@
 // API configuration
 // Use environment variable if available, otherwise auto-detect
 const getBaseURL = () => {
-  // If VITE_API_URL is set, use it
-  if (import.meta.env.VITE_API_URL) {
-    return `${import.meta.env.VITE_API_URL}/api`;
+  // If VITE_API_BASE_URL is set, use it
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
   }
 
   // Otherwise, auto-detect based on environment
